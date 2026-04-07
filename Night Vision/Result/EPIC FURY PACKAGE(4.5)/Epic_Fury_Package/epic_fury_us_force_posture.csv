@@ -1,0 +1,11 @@
+posture_id,base_name,host_country,combatant_command,base_type,lat,lng,accuracy_m,primary_mission,us_personnel_est,key_assets,role_in_epic_fury,status,source_id,source_tier,confidence_level,date_verified
+FP-001,Al Udeid Air Base,Qatar,CENTCOM,Main_Operating_Base,25.1169,51.3150,200,Air_Operations_Hub,10000,B-52H_F-15E_KC-135_AWACS,Primary_strike_hub_CENTCOM,Active,U05,A,High,2026-02-28
+FP-002,Ali Al Salem Air Base,Kuwait,CENTCOM,Forward_Operating_Base,29.3469,47.5161,200,Fighter_CAS,3500,F/A-18_A-10,Strike_support_N_Gulf,Active_attacked,U05,A,High,2026-02-28
+FP-003,Al Dhafra Air Base,UAE,CENTCOM,Main_Operating_Base,24.2477,54.5491,200,Stealth_ISR,5000,F-35A_RQ-4_U-2,F-35A_strikes_ISR,Active_attacked,U05,A,High,2026-02-28
+FP-004,Muwaffaq Al Salti Air Base,Jordan,CENTCOM,Forward_Operating_Base,31.9717,36.2597,300,Fighter_Operations,3000,F-16C_KC-135,Strike_egress_support,Active_attacked,U05,A,High,2026-02-28
+FP-005,Naval Support Activity Bahrain,Bahrain,CENTCOM,Naval_Base,26.2285,50.6136,300,5th_Fleet_HQ,7000,DDG_CG_P-8,Fleet_coordination_Hormuz,Active_attacked,U05,A,High,2026-02-28
+FP-006,Diego Garcia (BIOT),British Indian Ocean Territory,CENTCOM_INDOPACOM,Strategic_Base,-7.3133,72.4228,200,Long_Range_Strike,4000,B-2A_B-52H_KC-135_P-8,B-2_primary_launch_hub,Active,U05,A,High,2026-02-28
+FP-007,Erbil Air Base,Iraq_Kurdistan,CENTCOM,Forward_Operating_Base,36.2375,43.9637,300,SOF_ISR,2000,MC-130_ISR_SOF,Counter-proxy_ops,Active_attacked,U05,A,High,2026-02-28
+FP-008,Whiteman AFB (CONUS),USA,ACC_STRATCOM,Home_Station,38.7219,-93.5491,200,B-2_Home_Station,3000,B-2A_Spirit,B-2_primary_staging_route,Active,U01,A,High,2026-02-28
+FP-009,Nevatim Air Base,Israel,N/A_Partner,Partner_Base,31.2083,35.0122,300,F-35I_IDF_Ops,6000,F-35I_Adir_F-16I,Israel_Roaring_Lion_hub,Active,W06,C,High,2026-02-28
+FP-010,USS Eisenhower CVN,Arabian_Sea,CENTCOM,Carrier_Strike_Group,22.0000,60.0000,50000,Carrier_Aviation,5000,F/A-18_E/F_EA-18G_E-2D,Southern_strike_corridor,Active,U05,A,Medium,2026-02-28
