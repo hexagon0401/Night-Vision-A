@@ -31,12 +31,12 @@ class Page:
 
 def decode(manifest: Manifest, body: bytes) -> Page:
     try:
-        if manifest.provider in ('gdelt', 'ucdp'):
+        if manifest.provider in ('gdelt', 'ucdp', 'usgs'):
             data = json.loads(body)
-            field = 'articles' if manifest.provider == 'gdelt' else 'Result'
+            field = 'articles' if manifest.provider == 'gdelt' else 'features' if manifest.provider=='usgs' else 'Result'
             if not isinstance(data, dict) or field not in data or not isinstance(data[field], list):
                 raise AdapterError('unexpected_provider_schema')
-            return Page(data[field], bool(data.get('NextPageUrl')))
+            return Page(data[field], bool(data.get('NextPageUrl')) or (manifest.provider=='usgs' and len(data[field])>=int(manifest.params.get('limit','250'))))
         if manifest.provider == 'firms':
             reader = csv.DictReader(io.StringIO(body.decode('utf-8-sig'), newline=''), strict=True)
             required = {'latitude', 'longitude', 'acq_date', 'acq_time', 'bright_ti4'}
@@ -168,6 +168,11 @@ def normalize(manifest: Manifest, row: dict, response_hash: str, acquired: datet
                 position = (finite(row['latitude']), finite(row['longitude']))
             else:
                 gaps.append('location_precision_not_exact')
+    elif provider=='usgs':
+        properties=row['properties'];identity=str(row['id'])
+        observed=datetime.fromtimestamp(finite(properties['time'])/1000,timezone.utc);event_time=observed;precision='instant'
+        coordinates=row['geometry']['coordinates'];position=(finite(coordinates[1]),finite(coordinates[0]))
+        url=canonical_url(properties['url']);title=f"USGS reported magnitude {properties['mag']} ({properties.get('magType','unknown')}): {properties.get('place','location description unavailable')}"
     else:
         observed = datetime.strptime(f"{row['acq_date']} {str(row['acq_time']).zfill(4)}", '%Y-%m-%d %H%M').replace(tzinfo=timezone.utc)
         precision = 'instant'
@@ -199,6 +204,10 @@ def normalize(manifest: Manifest, row: dict, response_hash: str, acquired: datet
     if provider == 'ucdp':
         event = Event(event_id=f'event:{suffix}', event_type='reported_conflict_event', event_time_utc=event_time,
                       description=title, location=location, evidence_status='reported', provenance=provenance)
+    if provider=='usgs':
+        entity=Entity(entity_id=f'entity:{manifest.source_id}:catalog',entity_type='earthquake_catalog_series',name='USGS bounded regional earthquake catalog',location=None,evidence_status='reported',provenance=provenance)
+        event=Event(event_id=f'event:{suffix}',event_type='reported_earthquake',event_time_utc=event_time,description=title,entity_ids=[entity.entity_id],location=location,evidence_status='reported',provenance=provenance)
+        observation=Observation(observation_id=f'observation:{suffix}',entity_id=entity.entity_id,observed_at_utc=observed,metric='earthquake_magnitude',value=finite(row['properties']['mag']),unit=str(row['properties'].get('magType') or 'unknown_magnitude_scale'),source_record_id=identity,location=location,evidence_status='reported',provenance=provenance)
     if provider == 'firms':
         entity = Entity(entity_id=f'entity:{suffix}', entity_type='satellite_detection', name=title,
                         location=location, evidence_status='reported', provenance=provenance)

@@ -120,3 +120,35 @@ test("Foundry export defaults to observed scope and downloads a real ZIP", async
   await page.getByLabel("추론·시나리오 포함").check();
   await expect(link).toHaveAttribute("href", "/exports/synthetic-all.zip");
 });
+
+test("real source-backed Alpha can be explored, traced and exported", async ({
+  page,
+}) => {
+  await page.goto("/?case=alpha");
+  await expect(page.locator('[data-map-ready="true"]')).toBeVisible();
+  await expect(page.locator(".demo-label")).toContainText(
+    "SOURCE-BACKED ALPHA",
+  );
+  await page.getByRole("button", { name: "Cases", exact: true }).click();
+  expect(await page.locator(".candidate-row").count()).toBeGreaterThan(0);
+  await page.locator(".candidate-row").first().click();
+  await expect(page.locator(".evidence")).toBeVisible();
+  await page.locator(".source-record").first().locator("summary").click();
+  await expect(
+    page.getByRole("link", { name: "원문 열기" }).first(),
+  ).toHaveAttribute("href", /^https:\/\/earthquake.usgs.gov\//);
+  await page.getByRole("button", { name: "Trace", exact: true }).click();
+  await expect(page.locator(".trace-dock")).toBeVisible();
+  await page
+    .locator(".trace-dock")
+    .getByRole("button", { name: "Explore", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Download Foundry CSV ZIP" }),
+  ).toHaveAttribute("href", "/exports/alpha-observed.zip");
+  await page
+    .getByRole("combobox", { name: "사례 선택" })
+    .selectOption("synthetic");
+  await expect(page.locator(".demo-label")).toContainText("SYNTHETIC DATA");
+});

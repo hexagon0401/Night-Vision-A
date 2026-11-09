@@ -1,0 +1,27 @@
+{
+  "source_id": "usgs-taiwan",
+  "provider": "usgs",
+  "endpoint": "https://earthquake.usgs.gov/fdsnws/event/1/query",
+  "publisher": "U.S. Geological Survey",
+  "publisher_family": "usgs",
+  "enabled": false,
+  "params": {
+    "format": "geojson",
+    "starttime": "2023-01-01",
+    "endtime": "2024-04-05",
+    "minlatitude": "21",
+    "maxlatitude": "26",
+    "minlongitude": "119",
+    "maxlongitude": "123",
+    "minmagnitude": "4.5",
+    "orderby": "time-asc",
+    "limit": "250"
+  },
+  "max_records": 250,
+  "rights": {
+    "statement": "USGS public earthquake catalog metadata; retain USGS attribution and original event links; third-party exceptions remain applicable",
+    "terms_url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "reviewed": true,
+    "redistribution": "permitted"
+  }
+}

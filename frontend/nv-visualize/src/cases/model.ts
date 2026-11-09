@@ -26,8 +26,8 @@ export function readPayload(value: unknown): CasePayload {
     !payload?.case ||
     !payload.analysis ||
     payload.case.case_id !== payload.analysis.case_id ||
-    payload.case.data_origin !== "synthetic" ||
-    payload.analysis.data_origin !== "synthetic" ||
+    !["synthetic", "source_backed"].includes(payload.case.data_origin) ||
+    payload.analysis.data_origin !== payload.case.data_origin ||
     !Array.isArray(payload.analysis.anomalies) ||
     !Array.isArray(payload.case.sources)
   ) {
@@ -80,7 +80,7 @@ export function candidates(payload: CasePayload): Candidate[] {
         anomaly,
         point: latest ? pointOf(latest) : null,
         points: located,
-        name: names[anomaly.detector] ?? anomaly.detector,
+        name: `${names[anomaly.detector] ?? anomaly.detector}${payload.case.data_origin === "source_backed" && latest ? ` · ${latest.value ?? "?"} ${latest.unit}` : ""}`,
         sourceIds: anomaly.provenance.source_ids,
       };
     })

@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install -e './engine[test,storage,collect]' -e './services/api[test]'
+      - run: python -m pip install -c requirements-runtime.txt -e './engine[test,storage,collect]' -e './services/api[test]'
       - run: python -m pytest engine/tests services/api/tests
       - run: python tools/verify_migration.py
       - uses: actions/setup-node@v4
@@ -22,6 +22,7 @@ jobs:
       - run: python tools/generate_map_demo.py --check
       - run: python tools/verify_geography.py
       - run: python tools/build_demo_exports.py --check
+      - run: python tools/build_alpha.py --check
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -37,5 +38,6 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - run: python3 ../../tools/verify_release_assets.py
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

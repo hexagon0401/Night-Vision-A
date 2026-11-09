@@ -32,14 +32,16 @@ def build_graph(case, anomalies, candidates, edge_budget):
             add('claim',row.claim_id,'claim',target,'counterevidence','disputed',row.provenance.source_ids,'Declared counterevidence; do not hide disagreement')
     for row in case.relations:
         add('entity',row.source_entity_id,'entity',row.target_entity_id,'declared_relation',row.evidence_status,row.provenance.source_ids,row.relation_type)
+    observation_index={o.observation_id:o for o in case.observations}
     for row in anomalies:
         for target in row.observation_ids:
-            add('observation',target,'anomaly',row.anomaly_id,'supports','inferred',row.provenance.source_ids,'Measurement used in uncalibrated detector candidate')
+            evidence=observation_index[target].provenance
+            add('observation',target,'anomaly',row.anomaly_id,'supports','inferred',evidence.source_ids+evidence.corroborating_source_ids,'Measurement used in uncalibrated detector candidate')
     for a,b in candidates:
         add('entity',a.entity_id,'entity',b.entity_id,'candidate_cooccurrence','inferred',a.provenance.source_ids+b.provenance.source_ids,
             'Sourced points near in space/time; no movement, intent or causal inference')
     # Candidate edges first ensure bounded graphs still retain the declared candidate topology.
-    ordered=sorted(edges.values(),key=lambda e:({'candidate_cooccurrence':0,'reported_by':1,'supports':2}.get(e.kind,3),e.edge_id))
+    ordered=sorted(edges.values(),key=lambda e:({'candidate_cooccurrence':0,'supports':1,'reported_by':2}.get(e.kind,3),e.edge_id))
     selected=ordered[:edge_budget]
     referenced={identifier for edge in selected for identifier in (edge.source,edge.target)}
     return EvidenceGraph(nodes=sorted([n for n in nodes.values() if n.node_id in referenced],key=lambda n:n.node_id),edges=selected,limited=len(ordered)>edge_budget)

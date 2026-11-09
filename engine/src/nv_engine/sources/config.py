@@ -15,7 +15,7 @@ class Rights(Contract):
 class Manifest(Contract):
     manifest_schema_version: Literal['1.0.0'] = '1.0.0'
     source_id: Annotated[str, Field(pattern=r'^[a-z0-9][a-z0-9_.:-]{0,31}$')]
-    provider: Literal['gdelt', 'ucdp', 'firms', 'rss']
+    provider: Literal['gdelt', 'ucdp', 'firms', 'rss', 'usgs']
     endpoint: str
     enabled: bool = False
     publisher: Text
@@ -40,7 +40,7 @@ class Manifest(Contract):
             raise ValueError('endpoint must be credential-free HTTPS without query or fragment')
         if url.port not in (None, 443):
             raise ValueError('only standard HTTPS endpoints are supported')
-        hosts = {'gdelt': 'api.gdeltproject.org', 'ucdp': 'ucdpapi.pcr.uu.se', 'firms': 'firms.modaps.eosdis.nasa.gov'}
+        hosts = {'gdelt': 'api.gdeltproject.org', 'ucdp': 'ucdpapi.pcr.uu.se', 'firms': 'firms.modaps.eosdis.nasa.gov', 'usgs':'earthquake.usgs.gov'}
         if self.provider in hosts and url.hostname != hosts[self.provider]:
             raise ValueError('provider endpoint does not match official host')
         expected = {'ucdp': 'UCDP_ACCESS_TOKEN', 'firms': 'FIRMS_MAP_KEY'}

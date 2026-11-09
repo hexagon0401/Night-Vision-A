@@ -1,4 +1,11 @@
 {
-  "exported_at_utc": "2026-11-09T06:12:50.575617+00:00",
-  "note": "Original reproducible export build timestamp, separate from source acquisition"
+  "case_export_times": {
+    "synthetic": "2026-11-09T06:43:33.530666+00:00",
+    "alpha": "2026-11-09T06:43:33.575723+00:00"
+  },
+  "input_fingerprints": {
+    "synthetic": "998f29b5040b61dfd1ae63f6c4de62cc16f31dc46e52e0b2b4e36746bbf6bd65",
+    "alpha": "5c1f2366cf4d99787a15559fb235db348ee52a53d7db3a438995ea1a62c51e5f"
+  },
+  "note": "Reproducible export creation times per case, never earlier than its source acquisition"
 }

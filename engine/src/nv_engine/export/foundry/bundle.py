@@ -87,6 +87,7 @@ def export_bundle(case:CaseBundle,options:ExportOptions|None=None,exported_at:da
         if url.username or url.password or any(k.lower() in {'token','access_token','map_key','api_key'} for k,_ in parse_qsl(url.query)):
             raise ExportError('credential_bearing_source_url_rejected')
     files={};schemas={};counts={};errors=[];warnings=[]
+    if any(source.retrieved_at_utc>exported_at for source in case.sources):errors.append('source_acquisition_after_export_time')
     def table(name,headers,rows):
         stream=io.StringIO(newline='');writer=csv.DictWriter(stream,fieldnames=headers,lineterminator='\r\n',extrasaction='raise')
         writer.writeheader();writer.writerows(rows);body=stream.getvalue().encode('utf-8')

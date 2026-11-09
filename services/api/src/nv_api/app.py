@@ -72,3 +72,10 @@ def narrative_case(request: NarrativeRequest):
 
 from nv_api.exports import router as exports_router
 app.include_router(exports_router)
+
+
+from nv_api.security import RequestBudgets
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+import os
+app.add_middleware(RequestBudgets)
+app.add_middleware(TrustedHostMiddleware,allowed_hosts=os.environ.get('NV_ALLOWED_HOSTS','localhost,127.0.0.1,testserver').split(','))

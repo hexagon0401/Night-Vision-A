@@ -96,6 +96,15 @@ def to_bundle(result: CollectionResult) -> CaseBundle | None:
             value = getattr(record, singular)
             if value is not None:
                 fields[plural].append(value)
+    merged={}
+    for entity in fields['entities']:
+        if entity.entity_id in merged:
+            old=merged[entity.entity_id]
+            if (old.entity_type,old.name,old.location)!=(entity.entity_type,entity.name,entity.location):raise ValueError('conflicting canonical entity identity')
+            combined=old.provenance.model_copy(update={'source_ids':sorted(set(old.provenance.source_ids+entity.provenance.source_ids))})
+            merged[entity.entity_id]=old.model_copy(update={'provenance':combined})
+        else:merged[entity.entity_id]=entity
+    fields['entities']=list(merged.values())
     case_hash = digest(json_bytes(sorted(record.record_key for record in result.records)))
     origin = origins.pop()
     return CaseBundle(case_id=f'case:{case_hash}', title=f"{'SYNTHETIC DATA — ' if origin == 'synthetic' else ''}{result.report.provider_id} bounded acquisition",

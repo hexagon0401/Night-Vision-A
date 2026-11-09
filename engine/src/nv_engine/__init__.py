@@ -1,2 +1,2 @@
-"""NV Engine contracts and bounded collection. No automatic acquisition or detectors."""
+"""NV Engine contracts, bounded collection, candidate analysis, narrative and export. Imports never start a poller."""
 __version__ = "2.0.0"

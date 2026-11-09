@@ -1,0 +1,18 @@
+{
+  "endpoint": "https://earthquake.usgs.gov/fdsnws/event/1/query",
+  "params": {
+    "format": "geojson",
+    "starttime": "2023-01-01",
+    "endtime": "2024-04-05",
+    "minlatitude": "21",
+    "maxlatitude": "26",
+    "minlongitude": "119",
+    "maxlongitude": "123",
+    "minmagnitude": "4.5",
+    "orderby": "time-asc",
+    "limit": "250"
+  },
+  "acquired_at_utc": "2026-11-09T06:19:21.189731+00:00",
+  "sha256": "d680b63177d3a7fac72f5e98e667916810359a049b11f8165169b5d5a7e30146",
+  "capture_method": "Explicit bounded HTTPS GET via verified TLS/proxy; original response retained"
+}

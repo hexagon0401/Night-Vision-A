@@ -120,7 +120,8 @@
         "gdelt",
         "ucdp",
         "firms",
-        "rss"
+        "rss",
+        "usgs"
       ],
       "title": "Provider",
       "type": "string"

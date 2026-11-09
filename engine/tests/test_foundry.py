@@ -13,7 +13,7 @@ def fixture():
 
 def test_zip_hashes_csv_roundtrip_inference_filters_and_lossless_case():
     case=fixture();case.claims[0].statement='한글, "quotes"\nsecond line'
-    when=datetime(2026,1,1,tzinfo=timezone.utc)
+    when=datetime(2026,1,10,tzinfo=timezone.utc)
     blob=export_bundle(case,ExportOptions(include_inferred=True),when)
     assert blob==export_bundle(case,ExportOptions(include_inferred=True),when)
     with zipfile.ZipFile(io.BytesIO(blob)) as z:
@@ -60,3 +60,8 @@ def test_credential_bearing_source_url_never_enters_an_artifact():
     from pydantic import HttpUrl
     case=fixture();case.sources[0].url=HttpUrl('https://fixture-user:fixture-not-real@example.invalid/')
     with pytest.raises(ExportError,match='credential_bearing'):export_bundle(case)
+
+
+def test_export_clock_cannot_predate_retained_source_acquisition():
+    with pytest.raises(ExportError,match='source_acquisition_after_export_time'):
+        export_bundle(fixture(),exported_at=datetime(2025,1,1,tzinfo=timezone.utc))

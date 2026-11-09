@@ -8,9 +8,9 @@ A source-traceable geopolitical anomaly intelligence project: **Detect → Conne
 
 The engine provides ten canonical models, provenance/geotime/reference validation, versioned API/TypeScript contracts and optional snapshot migrations. Bounded GDELT/UCDP/FIRMS/RSS collectors support synthetic replay, retries, cache and dedup. Median/MAD, CUSUM and sourced-point candidate analysis produce an explicit evidence graph with uncalibrated scores.
 
-NV Visualize provides a Flat Black MapLibre/deck.gl Explore map over real offline cartography and a clearly synthetic case. Sources, Layers, search and user-controlled evidence pinning open on demand.
+NV Visualize provides a Flat Black MapLibre/deck.gl Explore map over real offline cartography, a clearly synthetic lab case and an archived USGS Taiwan-region Alpha. Sources, Layers, search and user-controlled evidence pinning open on demand.
 
-Live sources remain disabled by default. Trace playback and Foundry export are **not implemented**. Historical data remains unverified; no live global intelligence feed or real historical detection accuracy is claimed.
+Live sources remain disabled by default. Source-linked KO/EN Trace playback and audited Foundry CSV ZIP export are implemented. An archived, source-backed USGS Alpha case completes the demonstration pipeline. Historical data remains unverified; no live global intelligence feed or real historical detection accuracy is claimed.
 
 ## Workspace
 
@@ -29,7 +29,7 @@ Python 3.12+ and Node 22+ are supported. Offline development requires no service
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install -e './engine[test,storage,collect]' -e './services/api[test]'
+.venv/bin/python -m pip install -c requirements-runtime.txt -e './engine[test,storage,collect]' -e './services/api[test]'
 .venv/bin/python -m pytest engine/tests services/api/tests
 .venv/bin/nv-engine --version
 .venv/bin/python -m uvicorn nv_api.app:app --app-dir services/api/src --host 0.0.0.0 --port 8000
@@ -68,3 +68,7 @@ Use a fresh output directory. `analysis.json` contains deterministic, uncalibrat
 ## Delivery and licensing
 
 [Ordered roadmap](docs/architecture/README.md): canonical schemas/provenance (implemented) → bounded collectors (implemented) → PR 3 detectors → detectors → real map → Trace → exporter → Alpha deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. No deployment or Foundry upload is included.
+
+## Trace, export and deployment
+
+Select a case and candidate, then Trace for evidence-linked scenes. Play/Pause, previous/next, skip animation, Evidence and KO/EN are available; Explore restores context. Export downloads the selected case's prebuilt scoped ZIP. Custom case/time/track exports use nv-engine export-foundry or the authenticated job API. See [release operations](deploy/README.md) and [actual Alpha source/method](data/alpha/README.md). No source credentials, Foundry account or live server is required for the public static demo.

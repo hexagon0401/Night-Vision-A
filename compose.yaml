@@ -1,0 +1,27 @@
+services:
+  web:
+    image: nv2-web:alpha
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+      secrets: [build_ca]
+    ports: ["127.0.0.1:8080:8080"]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+  api:
+    image: nv2-api:alpha
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.api
+      secrets: [build_ca]
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      NV_API_TOKEN: ${NV_API_TOKEN:-}
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+
+secrets:
+  build_ca:
+    file: ${NV_BUILD_CA_BUNDLE:-/etc/ssl/certs/ca-certificates.crt}

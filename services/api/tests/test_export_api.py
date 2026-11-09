@@ -25,3 +25,10 @@ def test_authenticated_export_lifecycle_and_disabled_default(monkeypatch):
     exports.registry().jobs[key]['expires']=0
     assert client.get(f'/api/v2/exports/{key}',headers=auth).status_code==404
     exports.registry().close();exports._registry=None
+
+
+def test_request_body_and_host_budgets_are_enforced():
+    client=TestClient(app)
+    response=client.post('/api/v2/contracts/validate',content=b'x'*8000001,headers={'Content-Type':'application/json'})
+    assert response.status_code==413
+    assert client.get('/healthz',headers={'Host':'untrusted.example.invalid'}).status_code==400

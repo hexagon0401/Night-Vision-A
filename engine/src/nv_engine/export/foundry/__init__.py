@@ -1,1 +1,1 @@
-"""Reserved package boundary; implementation deferred beyond Phase 0."""
+"""Detached account-free CSV ZIP interoperability, without direct Foundry upload."""

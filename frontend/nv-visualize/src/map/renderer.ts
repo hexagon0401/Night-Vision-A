@@ -42,7 +42,7 @@ export const style: StyleSpecification = {
   sources: {
     countries: {
       type: "geojson",
-      data: "/geography/countries.geojson",
+      data: `${import.meta.env.BASE_URL}geography/countries.geojson`,
       attribution: "Natural Earth · public domain",
     },
   },

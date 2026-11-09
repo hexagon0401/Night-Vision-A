@@ -33,6 +33,7 @@ export function mount(
   payload: CasePayload,
   factory: typeof createMap = createMap,
 ): () => void {
+  const base = import.meta.env.BASE_URL;
   const items = candidates(payload),
     links = candidateLinks(payload);
   const state: {
@@ -51,10 +52,10 @@ export function mount(
     links: false,
   };
   root.innerHTML = `<main class="workspace" aria-label="Night Vision 탐색"><div class="map" role="region" aria-label="지정학 지도"></div>
- <header class="topbar"><a class="brand" href="/" aria-label="Night Vision 홈"><img src="/branding/night-vision-logo.png" alt="네 개 렌즈의 NV 헬멧"/><span>NIGHT VISION<small>CONTEXT THROUGH EVIDENCE</small></span></a><nav aria-label="지도 도구"><span class="mode">Explore</span><button class="trace">Trace</button><input type="search" aria-label="후보 검색" placeholder="Search candidates"/><button data-panel="cases">Cases</button><button data-panel="layers">Layers</button><button data-panel="sources">Sources</button><button data-panel="export">Export</button></nav></header>
+ <header class="topbar"><a class="brand" href="${base}" aria-label="Night Vision 홈"><img src="${base}branding/night-vision-logo.png" alt="네 개 렌즈의 NV 헬멧"/><span>NIGHT VISION<small>CONTEXT THROUGH EVIDENCE</small></span></a><nav aria-label="지도 도구"><span class="mode">Explore</span><button class="trace">Trace</button><input type="search" aria-label="후보 검색" placeholder="Search candidates"/><button data-panel="cases">Cases</button><button data-panel="layers">Layers</button><button data-panel="sources">Sources</button><button data-panel="export">Export</button></nav></header>
  <div class="demo-label">SYNTHETIC DATA <span>· 합성 탐지 실험</span></div><div class="map-message" role="status">지도를 불러오는 중입니다.</div>
  <section class="tool-panel" aria-label="탐색 도구" hidden></section><section class="evidence" aria-label="후보 증거" hidden></section>
- <footer class="statusbar"><span>OFFLINE DEMO <b>·</b> <span data-count></span></span><span class="footer-detail">UNCALIBRATED <b>·</b> EXPLORE</span><span>Natural Earth · WGS84</span></footer></main>`;
+ <footer class="statusbar"><span><span data-mode>OFFLINE DEMO</span> <b>·</b> <span data-count></span></span><span class="footer-detail">UNCALIBRATED <b>·</b> EXPLORE</span><span>Natural Earth · WGS84</span></footer></main>`;
   const panel = root.querySelector<HTMLElement>(".tool-panel")!,
     evidence = root.querySelector<HTMLElement>(".evidence")!,
     message = root.querySelector<HTMLElement>(".map-message")!;
@@ -187,10 +188,14 @@ export function mount(
       d.append(
         text(
           "summary",
-          `${source.publisher} · ${source.source_id.split(":").at(-1)}`,
+          `${source.publisher} · ${source.source_id.split(":").at(-1)?.slice(0, 8)}`,
         ),
         text("p", `발행 계열 · ${source.publisher_family}`),
         text("p", source.license),
+        text(
+          "code",
+          `Published UTC: ${source.published_at_utc ?? "unknown"} / Retrieved UTC: ${source.retrieved_at_utc}`,
+        ),
       );
       const url = safeSourceUrl(source.url);
       if (url && payload.case.data_origin !== "synthetic") {
@@ -209,6 +214,14 @@ export function mount(
     }
   }
   function render() {
+    root.querySelector(".demo-label")!.textContent =
+      payload.case.data_origin === "synthetic"
+        ? "SYNTHETIC DATA · 합성 탐지 실험"
+        : "SOURCE-BACKED ALPHA · USGS Taiwan · uncalibrated";
+    root.querySelector("[data-mode]")!.textContent =
+      payload.case.data_origin === "synthetic"
+        ? "OFFLINE DEMO"
+        : "ARCHIVED ALPHA";
     root.querySelector("[data-count]")!.textContent =
       `${filtered().length} CANDIDATES · ${payload.case.sources.length} SOURCES`;
     root
@@ -262,7 +275,13 @@ export function mount(
       }
       if (state.panel === "sources" || state.panel === "trace-sources") {
         panel.append(
-          text("p", "SYNTHETIC DATA · 출처·위치는 합성 입력입니다.", "muted"),
+          text(
+            "p",
+            payload.case.data_origin === "synthetic"
+              ? "SYNTHETIC DATA · 출처·위치는 합성 입력입니다."
+              : "USGS 공식 자료 · 통계 후보는 미보정입니다.",
+            "muted",
+          ),
         );
         const ids =
           state.panel === "trace-sources" && currentFrame
@@ -323,7 +342,7 @@ export function mount(
       const kind =
         payload.case.data_origin === "synthetic" ? "synthetic" : "alpha";
       const update = () =>
-        (link.href = `/exports/${kind}-${include.checked ? "all" : "observed"}.zip`);
+        (link.href = `${base}exports/${kind}-${include.checked ? "all" : "observed"}.zip`);
       include.onchange = update;
       update();
       panel.append(
