@@ -1,3 +1,4 @@
+import { nimKeys } from "./credentials.js";
 import {
   requireValue,
   ApiError,
@@ -372,7 +373,8 @@ export async function publicData(url, env) {
       runs: runs.map((r) => JSON.parse(r.body)),
       last_success: last?.completed ?? null,
       stale: !last || Date.now() - Date.parse(last.completed) > 5 * 3600000,
-      ai_configured: !!env.NVIDIA_API_KEY,
+      ai_configured: !!nimKeys(env).primary,
+      ai_enabled: !!nimKeys(env).primary && env.NIM_ENABLED === "true",
       github_configured: !!(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
     });
   }

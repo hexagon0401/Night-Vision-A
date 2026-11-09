@@ -1,6 +1,6 @@
 # Local execution only. Use Worker settings → Variables and Secrets in production.
-NVIDIA_API_KEY=
-NVIDIA_SECONDARY_API_KEY=
+NVIDIA_API_KEY_A=
+NVIDIA_API_KEY_B=
 GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 NV_INGEST_TOKEN=

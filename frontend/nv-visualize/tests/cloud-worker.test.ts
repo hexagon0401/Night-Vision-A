@@ -1,4 +1,27 @@
 import { test, expect } from "vitest";
+import { nimKeys } from "../../../services/cloudflare/credentials.js";
+
+test("A/B runtime secrets work with legacy compatibility and deterministic precedence", () => {
+  expect(nimKeys({ NVIDIA_API_KEY_A: "a", NVIDIA_API_KEY_B: "b" })).toEqual({
+    primary: "a",
+    secondary: "b",
+    review: "b",
+  });
+  expect(nimKeys({ NVIDIA_API_KEY: "legacy" })).toEqual({
+    primary: "legacy",
+    secondary: undefined,
+    review: "legacy",
+  });
+  expect(
+    nimKeys({
+      NVIDIA_API_KEY_A: "a",
+      NVIDIA_API_KEY: "old",
+      NVIDIA_API_KEY_B: "b",
+      NVIDIA_SECONDARY_API_KEY: "old-b",
+    }),
+  ).toEqual({ primary: "a", secondary: "b", review: "b" });
+  expect(nimKeys({ NVIDIA_API_KEY_B: "b" }).primary).toBeUndefined();
+});
 import { validateAnswer } from "../../../services/cloudflare/ai.js";
 import { validateRecord } from "../../../services/cloudflare/data.js";
 import {

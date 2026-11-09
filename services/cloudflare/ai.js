@@ -1,3 +1,4 @@
+import { nimKeys } from "./credentials.js";
 import {
   ApiError,
   requireValue,
@@ -101,7 +102,7 @@ export async function reason(
   review = false,
 ) {
   requireValue(
-    env.NVIDIA_API_KEY && env.NIM_ENABLED === "true",
+    nimKeys(env).primary && env.NIM_ENABLED === "true",
     "nim_not_enabled",
     503,
   );
@@ -135,9 +136,8 @@ export async function reason(
   ).first();
   requireValue(!pause, "nim_quota_or_access_paused", 429);
   await reserve(env.DB, user, review);
-  const key = review
-    ? env.NVIDIA_SECONDARY_API_KEY || env.NVIDIA_API_KEY
-    : env.NVIDIA_API_KEY;
+  const keys = nimKeys(env);
+  const key = review ? keys.review : keys.primary;
   let response;
   try {
     response = await fetch(

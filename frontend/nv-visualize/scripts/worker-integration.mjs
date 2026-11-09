@@ -32,7 +32,8 @@ const mf = new Miniflare(
           GITHUB_CLIENT_ID: "test-client",
           GITHUB_CLIENT_SECRET: "test-secret",
           GITHUB_ALLOWED_USER_IDS: "82876856",
-          NVIDIA_API_KEY: "test-nim",
+          NVIDIA_API_KEY_A: "test-nim-A",
+          NVIDIA_API_KEY_B: "test-nim-B",
           NIM_ENABLED: "true",
           NIM_MODEL: "test-model",
           NIM_REVIEW_MODEL: "test-model",
@@ -44,6 +45,14 @@ const mf = new Miniflare(
           if (u.hostname === "api.github.com")
             return Response.json({ id: profileId, login: "owner" });
           if (u.hostname === "integrate.api.nvidia.com") {
+            const input = await request.json();
+            const reviewing = input.messages[0].content.includes(
+              "Review reasoning errors",
+            );
+            assert.equal(
+              request.headers.get("Authorization"),
+              reviewing ? "Bearer test-nim-B" : "Bearer test-nim-A",
+            );
             nimCalls++;
             if (nimStatus !== 200)
               return new Response("provider limit", { status: nimStatus });
@@ -87,6 +96,8 @@ try {
     req("/api/internal/" + path, body, {
       Authorization: "Bearer test-internal",
     });
+  const initialStatus=await(await req('/api/v2/status')).json();
+  assert.equal(initialStatus.ai_configured,true);assert.equal(initialStatus.ai_enabled,true);
   assert.equal((await req("/api/internal/start", {})).status, 401);
   assert.equal((await req("/api/v2/ai/analyze", { case_id: "x" })).status, 401);
   const snapshot = {
@@ -252,12 +263,28 @@ try {
   assert.equal(nimCalls, callsAfterPause);
   await db.prepare("DELETE FROM settings WHERE key LIKE 'nim-paused:%'").run();
   nimStatus = 200;
-  const beforeReview=nimCalls;
-  const reviewed=await(await internal('monitor-ai',{})).json();
-  assert.equal(reviewed.reviewed,1);
-  assert.equal(nimCalls-beforeReview,3,'monitor summary, primary case interpretation and reviewer must be distinct even with the same model');
-  assert.equal((await db.prepare("SELECT count FROM quotas WHERE day=date('now') AND bucket='review'").first()).count,1);
-  await db.prepare('UPDATE snapshots SET metadata=? WHERE id=?').bind(JSON.stringify({coverage:'new test evidence'}),snapshot.id).run();
+  const beforeReview = nimCalls;
+  const reviewed = await (await internal("monitor-ai", {})).json();
+  assert.equal(reviewed.reviewed, 1);
+  assert.equal(
+    nimCalls - beforeReview,
+    3,
+    "monitor summary, primary case interpretation and reviewer must be distinct even with the same model",
+  );
+  assert.equal(
+    (
+      await db
+        .prepare(
+          "SELECT count FROM quotas WHERE day=date('now') AND bucket='review'",
+        )
+        .first()
+    ).count,
+    1,
+  );
+  await db
+    .prepare("UPDATE snapshots SET metadata=? WHERE id=?")
+    .bind(JSON.stringify({ coverage: "new test evidence" }), snapshot.id)
+    .run();
   // Race competing global reservations using actual D1 transactions.
   await db
     .prepare("INSERT OR REPLACE INTO quotas VALUES(date('now'),'nim',39)")

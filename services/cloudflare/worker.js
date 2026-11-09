@@ -1,3 +1,4 @@
+import { nimKeys } from "./credentials.js";
 import {
   ApiError,
   json,
@@ -81,9 +82,9 @@ export default {
         await requireUser(request, env);
         return json({
           database: true,
-          nim_key: !!env.NVIDIA_API_KEY,
+          nim_key: !!nimKeys(env).primary,
           nim_enabled: env.NIM_ENABLED === "true",
-          secondary_key: !!env.NVIDIA_SECONDARY_API_KEY,
+          secondary_key: !!nimKeys(env).secondary,
           model: env.NIM_MODEL,
           review_model: env.NIM_REVIEW_MODEL,
           github: !!(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
