@@ -147,6 +147,7 @@ test("real source-backed Alpha can be explored, traced and exported", async ({
   await expect(
     page.getByRole("link", { name: "Download Foundry CSV ZIP" }),
   ).toHaveAttribute("href", "/exports/alpha-observed.zip");
+  await page.getByText("실험실", { exact: true }).click();
   await page
     .getByRole("combobox", { name: "사례 선택" })
     .selectOption("synthetic");

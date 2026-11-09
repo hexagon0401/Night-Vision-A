@@ -1,40 +1,103 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./styles/tokens.css";
+import "./styles/workbench.css";
 import { mount } from "./app/shell";
 import { readPayload } from "./cases/model";
-import { mountMonitor } from './monitor/view';
-const base = import.meta.env.BASE_URL;
+import { mountMonitor } from "./monitor/view";
+import { sharedMap, disposeMap } from "./map/shared";
+import { accountControl, enhanceControls } from "./ui/controls";
 const root = document.querySelector<HTMLDivElement>("#app")!;
-let cleanup: (() => void) | undefined;
-async function load(kind: string) {
-  const allowed = kind === 'live' ? 'live' : kind === "alpha" ? "alpha" : "synthetic";
+let cleanup: (() => void) | undefined,
+  enhanceCleanup: (() => void) | undefined,
+  accountCleanup: (() => void) | undefined,
+  generation = 0;
+async function render() {
+  const current = ++generation,
+    url = new URL(location.href);
   cleanup?.();
-  root.textContent = "Night Vision · 사례를 불러오는 중입니다.";
-  try {
-    const response = await fetch(allowed==='live'?'/api/v2/cases/'+encodeURIComponent(new URL(location.href).searchParams.get('id')??''):`${base}demo/${allowed}-case.json`);
-    if (!response.ok) throw new Error("Case unavailable");
-    cleanup = mount(root, readPayload(await response.json()));
-    const select = document.createElement("select");
-    select.setAttribute("aria-label", "사례 선택");
-    if(allowed==='live'){const option=document.createElement('option');option.value='live';option.textContent='선택한 UCDP 추이';select.append(option);}
-    for (const [value, label] of [
-      ["synthetic", "Synthetic lab"],
-      ["alpha", "USGS Taiwan Alpha"],
-    ]) {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = label;
-      select.append(option);
+  enhanceCleanup?.();
+  accountCleanup?.();
+  if (url.searchParams.get("view") === "monitor")
+    cleanup = mountMonitor(root, sharedMap);
+  else {
+    const kind =
+      url.searchParams.get("case") === "alpha"
+        ? "alpha"
+        : url.searchParams.get("case") === "live"
+          ? "live"
+          : "synthetic";
+    root.textContent = "Night Vision · 사례를 불러오는 중입니다.";
+    try {
+      const response = await fetch(
+        kind === "live"
+          ? "/api/v2/cases/" +
+              encodeURIComponent(url.searchParams.get("id") ?? "")
+          : `${import.meta.env.BASE_URL}demo/${kind}-case.json`,
+      );
+      if (!response.ok) throw Error();
+      const payload = readPayload(await response.json());
+      if (current !== generation) return;
+      cleanup = mount(root, payload, sharedMap);
+      const nav = root.querySelector("nav")!;
+      const monitoring = document.createElement("a");
+      monitoring.href = "/?view=monitor";
+      monitoring.textContent = "지속 감시";
+      nav.prepend(monitoring);
+      const menu = document.createElement("details");
+      menu.className = "utility-menu";
+      const summary = document.createElement("summary");
+      summary.textContent = "실험실";
+      const select = document.createElement("select");
+      select.setAttribute("aria-label", "사례 선택");
+      for (const [value, label] of [
+        ...(kind === "live" ? [["live", "선택한 UCDP 추이"]] : []),
+        ["synthetic", "Synthetic lab"],
+        ["alpha", "USGS Taiwan Alpha"],
+      ]) {
+        const o = document.createElement("option");
+        o.value = value;
+        o.textContent = label;
+        select.append(o);
+      }
+      select.value = kind;
+      select.onchange = () => navigate("?case=" + select.value);
+      menu.append(summary, select);
+      nav.append(menu);
+      accountCleanup = accountControl(nav);
+    } catch {
+      if (current === generation)
+        root.textContent = "사례를 불러올 수 없습니다. 새로고침해 주세요.";
     }
-    select.value = allowed;
-    select.onchange = () => {
-      history.replaceState(null, "", `?case=${select.value}`);
-      void load(select.value);
-    };
-    const monitoring=document.createElement('a');monitoring.href='/?view=monitor';monitoring.textContent='지속 감시';root.querySelector('nav')!.prepend(monitoring,select);
-  } catch {
-    root.textContent = "사례를 불러올 수 없습니다. 새로고침해 주세요.";
   }
+  if (current === generation) enhanceCleanup = enhanceControls(root);
 }
-if(new URL(location.href).searchParams.get('view')==='monitor')cleanup=mountMonitor(root);
-else void load(new URL(location.href).searchParams.get("case") ?? "synthetic");
+function navigate(href: string) {
+  history.pushState(null, "", href);
+  void render();
+}
+root.addEventListener("click", (event) => {
+  const a = (event.target as Element).closest<HTMLAnchorElement>("a[href]");
+  if (
+    !a ||
+    a.target ||
+    a.hasAttribute("download") ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.shiftKey
+  )
+    return;
+  const to = new URL(a.href);
+  if (
+    to.origin === location.origin &&
+    to.pathname === new URL(import.meta.env.BASE_URL, location.origin).pathname
+  ) {
+    event.preventDefault();
+    navigate(to.href);
+  }
+});
+window.addEventListener("popstate", () => void render());
+window.addEventListener("pagehide", () => {
+  cleanup?.();
+  disposeMap();
+});
+void render();
