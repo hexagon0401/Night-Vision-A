@@ -1,5 +1,11 @@
 # Run, deploy and roll back
 
+## Cloudflare Workers static deployment
+
+The public Alpha can also run as Worker static assets. Connect `feat/nv2-alpha-release`, set root directory to `frontend/nv-visualize`, build with `npm ci && npm run build`, and deploy with `npx wrangler deploy --name nightvision --assets ./dist`. Set build variables `NODE_VERSION=22` and `NV_BASE_PATH=/`. Keep preview builds disabled initially. `wrangler.json` explicitly enables the Worker's workers.dev route and disables version preview URLs; it publishes only the built public assets, with no Python API or private export jobs.
+
+The Cloudflare account must have a workers.dev subdomain registered. If it does not, register one in the account's Workers & Pages settings before retrying deployment. The actual URL is shown by Cloudflare after successful deployment; do not assume the account subdomain matches the GitHub username. A Git push triggers the connected build but does not prove that Cloudflare has completed it. Verify build logs and the published URL separately.
+
 ## Local development
 
 Use the root README for frozen npm installation and Python dependencies. Production/runtime versions tested in this session are pinned in requirements-runtime.txt; regenerate deliberately with tools/lock_runtime.py. Rebuild artifacts using tools/generate_contracts.py, tools/generate_map_demo.py, tools/build_alpha.py and tools/build_demo_exports.py. All --check paths are offline. Only tools/build_alpha.py --fetch performs an explicit public-source acquisition.
