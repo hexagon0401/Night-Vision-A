@@ -1,0 +1,10 @@
+{
+ "source_id":"un-news-rss",
+ "provider":"rss",
+ "endpoint":"https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+ "publisher":"United Nations News",
+ "publisher_family":"un",
+ "rights":{"statement":"UN News RSS headline metadata and links only; no full text or media redistribution. Review current UN terms before enabling.","terms_url":"https://www.un.org/en/about-us/terms-of-use","reviewed":false,"redistribution":"review_required"},
+ "enabled":false,
+ "max_records":100
+}

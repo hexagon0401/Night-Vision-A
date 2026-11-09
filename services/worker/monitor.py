@@ -78,6 +78,14 @@ def main():
                 finally:monitor.close()
         except Exception:
             run['providers']['ucdp']={'state':'failed','reason':'source acquisition or publication failed; previous data retained'}
+        if os.environ.get('NV_RSS_ENABLED')=='true':
+            try:
+                from nv_engine.monitor.rss import collect_official
+                records,metadata=collect_official(os.environ.get('NV_RSS_MANIFEST','configs/sources/un-news.json'),args.state.parent/'monitor-rss',enable=True,rights_reviewed=os.environ.get('NV_RSS_RIGHTS_REVIEWED')=='true')
+                snapshot=publisher.snapshot('un-news-rss',records,metadata)
+                run['providers']['rss']={'state':'complete','snapshot':snapshot,'records':len(records)}
+            except Exception:
+                run['providers']['rss']={'state':'failed','reason':'RSS fetch, rights review or publication failed; previous data retained'}
         run['state']='complete' if any(v['state']=='complete' for v in run['providers'].values()) else 'failed' if any(v['state']=='failed' for v in run['providers'].values()) else 'skipped'
         run['completed']=datetime.now(timezone.utc).isoformat();publisher.post('run',run)
         try:publisher.post('monitor-ai',{'run_id':run['id']})

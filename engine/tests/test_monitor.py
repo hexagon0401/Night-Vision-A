@@ -55,3 +55,26 @@ def test_schedule_supports_12_24_and_rejects_invalid():
  assert sum(module.due(NOW.replace(hour=h),12) for h in range(24))==12
  assert sum(module.due(NOW.replace(hour=h),24) for h in range(24))==24
  with pytest.raises(ValueError):module.due(NOW,25)
+
+def test_missing_candidate_is_not_fabricated(tmp_path):
+ s=MonitorState(tmp_path/'s.db');m=UCDPMonitor(s,'x',client=httpx.Client(transport=httpx.MockTransport(lambda r:httpx.Response(404))),now=NOW,sleep=lambda _:None)
+ assert m.discover() is None and m.used==3
+ m.close();s.close()
+
+def test_coverage_gap_is_not_zero_filled():
+ a=aggregate([normalize(row(1,date_start='2026-09-01',date_end='2026-09-01'),'26.1',NOW.isoformat()),normalize(row(2,date_start='2026-11-01',date_end='2026-11-01'),'26.0.11',NOW.isoformat())])
+ case=build_cases(a,NOW,coverage_intervals=[('2026-09-01','2026-09-01'),('2026-11-01','2026-11-01')])[0]['payload']
+ assert len(case['case']['observations'])==4
+ assert any('coverage gaps' in w for w in case['analysis']['warnings'])
+
+def test_rss_requires_explicit_approval(tmp_path):
+ from nv_engine.monitor.rss import collect_official
+ manifest=Path(__file__).resolve().parents[2]/'configs/sources/un-news.json'
+ with pytest.raises(ValueError,match='rights_or_enablement'):collect_official(manifest,tmp_path/'rss')
+ with pytest.raises(ValueError,match='rights_or_enablement'):collect_official(manifest,tmp_path/'rss',enable=True)
+
+def test_unchanged_snapshot_does_not_reupload_records():
+ spec=importlib.util.spec_from_file_location('scheduled_worker',Path(__file__).resolve().parents[2]/'services/worker/monitor.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ p=object.__new__(module.Publisher);calls=[]
+ def post(path,data):calls.append(path);return {'state':'published'}
+ p.post=post;p.snapshot('ucdp',[],{'records':0});assert calls==['start']
