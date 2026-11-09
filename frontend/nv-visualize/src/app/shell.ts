@@ -1,3 +1,6 @@
+import { traceView } from "../trace/view";
+import { sceneLinks } from "../cases/model";
+import type { Frame } from "../trace/player";
 import type { Source } from "../contracts/generated";
 import {
   candidates,
@@ -34,7 +37,7 @@ export function mount(
     links = candidateLinks(payload);
   const state: {
     selected: Candidate | null;
-    panel: "cases" | "sources" | "layers" | null;
+    panel: "cases" | "sources" | "layers" | "trace-sources" | null;
     pinned: boolean;
     query: string;
     markers: boolean;
@@ -48,7 +51,7 @@ export function mount(
     links: false,
   };
   root.innerHTML = `<main class="workspace" aria-label="Night Vision 탐색"><div class="map" role="region" aria-label="지정학 지도"></div>
- <header class="topbar"><a class="brand" href="/" aria-label="Night Vision 홈"><img src="/branding/night-vision-logo.png" alt="네 개 렌즈의 NV 헬멧"/><span>NIGHT VISION<small>CONTEXT THROUGH EVIDENCE</small></span></a><nav aria-label="지도 도구"><span class="mode">Explore</span><button class="trace" disabled title="Trace 준비 중">Trace</button><input type="search" aria-label="후보 검색" placeholder="Search candidates"/><button data-panel="cases">Cases</button><button data-panel="layers">Layers</button><button data-panel="sources">Sources</button></nav></header>
+ <header class="topbar"><a class="brand" href="/" aria-label="Night Vision 홈"><img src="/branding/night-vision-logo.png" alt="네 개 렌즈의 NV 헬멧"/><span>NIGHT VISION<small>CONTEXT THROUGH EVIDENCE</small></span></a><nav aria-label="지도 도구"><span class="mode">Explore</span><button class="trace">Trace</button><input type="search" aria-label="후보 검색" placeholder="Search candidates"/><button data-panel="cases">Cases</button><button data-panel="layers">Layers</button><button data-panel="sources">Sources</button></nav></header>
  <div class="demo-label">SYNTHETIC DATA <span>· 합성 탐지 실험</span></div><div class="map-message" role="status">지도를 불러오는 중입니다.</div>
  <section class="tool-panel" aria-label="탐색 도구" hidden></section><section class="evidence" aria-label="후보 증거" hidden></section>
  <footer class="statusbar"><span>OFFLINE DEMO <b>·</b> <span data-count></span></span><span class="footer-detail">UNCALIBRATED <b>·</b> EXPLORE</span><span>Natural Earth · WGS84</span></footer></main>`;
@@ -56,6 +59,59 @@ export function mount(
     evidence = root.querySelector<HTMLElement>(".evidence")!,
     message = root.querySelector<HTMLElement>(".map-message")!;
   let map: MapPort;
+  let currentFrame: Frame | null = null;
+  let previousStep = "";
+  const trace = traceView(
+    root,
+    (frame) => {
+      currentFrame = frame;
+      const target = frame.step.camera_target;
+      if (previousStep !== frame.step.step_id) {
+        previousStep = frame.step.step_id;
+        if (target)
+          map.focus([[target.longitude, target.latitude]], frame.playing);
+      }
+      updateMap();
+    },
+    () => map.stop?.(),
+    () => {
+      state.panel = "trace-sources";
+      render();
+    },
+    () => {
+      trace.close();
+      state.panel = null;
+      currentFrame = null;
+      previousStep = "";
+      render();
+    },
+  );
+  function updateMap() {
+    map.update({
+      candidates: currentFrame
+        ? filtered().filter(
+            (item) =>
+              item.anomaly.anomaly_id === state.selected?.anomaly.anomaly_id,
+          )
+        : filtered(),
+      links,
+      selected: state.selected?.anomaly.anomaly_id ?? null,
+      showMarkers: state.markers,
+      showLinks: state.links,
+      trace: currentFrame
+        ? {
+            paths: sceneLinks(payload, currentFrame.step.visible_relation_ids ?? []),
+            progress: currentFrame.progress,
+            point: currentFrame.step.camera_target
+              ? [
+                  currentFrame.step.camera_target.longitude,
+                  currentFrame.step.camera_target.latitude,
+                ]
+              : null,
+          }
+        : undefined,
+    });
+  }
   const filtered = () =>
     items.filter((item) =>
       (item.name + " " + item.anomaly.detector)
@@ -78,6 +134,11 @@ export function mount(
     render();
   };
   const select = (item: Candidate) => {
+    if (currentFrame) {
+      trace.close();
+      currentFrame = null;
+      previousStep = "";
+    }
     state.selected = item;
     state.panel = null;
     state.pinned = false;
@@ -110,7 +171,7 @@ export function mount(
         "지도를 표시할 수 없습니다. Cases에서 후보 증거를 열 수 있습니다.";
     },
     dismiss: () => {
-      if (state.selected && !state.pinned) close();
+      if (!currentFrame && state.selected && !state.pinned) close();
     },
   };
   map = factory(root.querySelector<HTMLElement>(".map")!, callbacks);
@@ -164,7 +225,7 @@ export function mount(
           "h2",
           state.panel === "cases"
             ? "탐지 후보"
-            : state.panel === "sources"
+            : state.panel === "sources" || state.panel === "trace-sources"
               ? "출처"
               : "레이어",
         ),
@@ -196,11 +257,26 @@ export function mount(
         if (!filtered().length)
           panel.append(text("p", "검색에 맞는 후보가 없습니다."));
       }
-      if (state.panel === "sources") {
+      if (state.panel === "sources" || state.panel === "trace-sources") {
         panel.append(
           text("p", "SYNTHETIC DATA · 출처·위치는 합성 입력입니다.", "muted"),
         );
-        renderSources(panel);
+        const ids =
+          state.panel === "trace-sources" && currentFrame
+            ? new Set(
+                payload.case.claims
+                  ?.filter((c) =>
+                    currentFrame!.step.evidence_claim_ids.includes(c.claim_id),
+                  )
+                  .flatMap((c) => c.provenance.source_ids),
+              )
+            : null;
+        renderSources(
+          panel,
+          ids
+            ? payload.case.sources.filter((s) => ids.has(s.source_id))
+            : payload.case.sources,
+        );
       }
       if (state.panel === "layers") {
         for (const [name, label] of [
@@ -224,10 +300,10 @@ export function mount(
         );
       }
     }
-    evidence.hidden = !state.selected;
+    evidence.hidden = !state.selected || currentFrame !== null;
     evidence.replaceChildren();
     evidence.classList.toggle("pinned", state.pinned);
-    if (state.selected) {
+    if (state.selected && !currentFrame) {
       const item = state.selected;
       const top = text("div", "", "card-heading");
       top.append(text("h2", item.name), button("×", close, "증거 닫기"));
@@ -285,13 +361,7 @@ export function mount(
         evidence.style.top = "";
       } else position();
     }
-    map.update({
-      candidates: filtered(),
-      links,
-      selected: state.selected?.anomaly.anomaly_id ?? null,
-      showMarkers: state.markers,
-      showLinks: state.links,
-    });
+    updateMap();
   }
   root.querySelectorAll<HTMLButtonElement>("[data-panel]").forEach(
     (e) =>
@@ -309,10 +379,24 @@ export function mount(
     state.query = (e.target as HTMLInputElement).value;
     render();
   };
+  root.querySelector<HTMLButtonElement>(".trace")!.onclick = () => {
+    const item = state.selected ?? items[0];
+    if (!item) return;
+    const narrative = payload.case.narratives?.find(
+      (n) => n.anomaly_id === item.anomaly.anomaly_id,
+    );
+    if (narrative) {
+      state.selected = item;
+      state.panel = null;
+      trace.start(narrative);
+      render();
+    }
+  };
   const escape = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
+      trace.pause();
       state.panel = null;
-      state.selected = null;
+      if(!currentFrame)state.selected = null;
       state.pinned = false;
       render();
     }
@@ -323,6 +407,7 @@ export function mount(
   return () => {
     window.removeEventListener("keydown", escape);
     window.removeEventListener("resize", position);
+    trace.destroy();
     map.destroy();
   };
 }

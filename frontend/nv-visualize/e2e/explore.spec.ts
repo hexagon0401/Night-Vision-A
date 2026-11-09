@@ -75,3 +75,33 @@ test("real deck cluster picking opens choices and sourced marker evidence", asyn
   );
   await expect(page.locator(".evidence")).toBeVisible();
 });
+
+test("Trace scenes, language, pause and Explore preserve the selected case", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator('[data-map-ready="true"]')).toBeVisible();
+  await page.getByRole("button", { name: "Trace", exact: true }).click();
+  const dock = page.getByRole("region", { name: "Trace 재생" });
+  await expect(dock).toBeVisible();
+  await page.getByRole("button", { name: "재생 전환" }).click();
+  await page.waitForTimeout(250);
+  await page.getByRole("button", { name: "재생 전환" }).click();
+  const progress = await dock.getAttribute("data-progress");
+  await page.waitForTimeout(250);
+  expect(await dock.getAttribute("data-progress")).toBe(progress);
+  await page.getByRole("button", { name: "다음 장면" }).click();
+  await expect(dock).toHaveAttribute("data-step", "1");
+  await page.getByRole("button", { name: "다음 장면" }).click();
+  await expect(dock).toHaveAttribute("data-step", "2");
+  await page.getByRole("button", { name: "이전 장면" }).click();
+  await expect(dock).toHaveAttribute("data-step", "1");
+  await page.getByRole("button", { name: "KO / EN" }).click();
+  await expect(page.locator(".trace-subtitle")).toContainText("uncalibrated");
+  await page.getByRole("button", { name: "Evidence", exact: true }).click();
+  await expect(page.locator(".source-record")).not.toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await dock.getByRole("button", { name: "Explore", exact: true }).click();
+  await expect(dock).toBeHidden();
+  await expect(page.locator(".evidence")).toBeVisible();
+});

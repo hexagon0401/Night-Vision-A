@@ -369,3 +369,4 @@ code {
     display: none;
   }
 }
+.trace-dock{position:absolute;z-index:3;bottom:62px;left:50%;transform:translateX(-50%);background:#101010;border:1px solid #343434;border-radius:18px;padding:14px 18px;width:min(740px,calc(100vw - 32px));text-align:center}.trace-subtitle{font-size:14px;line-height:1.6;min-height:2.5em;margin:0 0 12px}.trace-controls{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}.trace-count{font:10px ui-monospace,monospace;color:#929292;padding:0 8px}@media(max-width:760px){.trace{display:block}.trace-dock{bottom:56px;padding:12px}.trace-subtitle{font-size:12px}.trace-controls button{font-size:9px;padding:5px 9px}}

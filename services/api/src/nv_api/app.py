@@ -43,3 +43,19 @@ from nv_engine.detect.analysis import analyze
 def analyze_case(request: AnalysisRequest):
     """Bounded, stateless candidate analysis; never fetches, persists or publishes."""
     return analyze(request.case, request.configuration)
+
+
+from nv_engine.narrative.build import build_narrative
+from fastapi import HTTPException
+
+
+class NarrativeRequest(AnalysisRequest):
+    anomaly_id: str
+
+
+@app.post('/api/v2/narratives', response_model=CaseBundle)
+def narrative_case(request: NarrativeRequest):
+    try:
+        return build_narrative(request.case, request.anomaly_id)
+    except ValueError as error:
+        raise HTTPException(422, detail=str(error)) from None

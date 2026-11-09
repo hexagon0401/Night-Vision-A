@@ -16,7 +16,7 @@ export interface Candidate {
 export interface CandidateLink {
   id: string;
   points: Point[];
-  status: "inferred";
+  status: import("../contracts/generated").EvidenceStatus;
   explanation: string;
 }
 
@@ -147,4 +147,31 @@ export function safeSourceUrl(value: string): string | null {
   } catch {
     return null;
   }
+}
+
+export function sceneLinks(
+  payload: CasePayload,
+  ids: string[],
+): CandidateLink[] {
+  const entities = new Map(
+    payload.case.entities?.map((row) => [row.entity_id, row]),
+  );
+  return (payload.case.relations ?? [])
+    .filter((row) => ids.includes(row.relation_id))
+    .flatMap((row) => {
+      const a = entities.get(row.source_entity_id)?.location,
+        b = entities.get(row.target_entity_id)?.location;
+      if (a?.role !== "verified" || b?.role !== "verified") return [];
+      return [
+        {
+          id: row.relation_id,
+          points: [
+            [a.longitude, a.latitude],
+            [b.longitude, b.latitude],
+          ] as Point[],
+          status: row.evidence_status,
+          explanation: row.relation_type,
+        },
+      ];
+    });
 }

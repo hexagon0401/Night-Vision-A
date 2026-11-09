@@ -902,6 +902,27 @@
         "title": "Narrative",
         "type": "object"
       },
+      "NarrativeRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "anomaly_id": {
+            "title": "Anomaly Id",
+            "type": "string"
+          },
+          "case": {
+            "$ref": "#/components/schemas/CaseBundle"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/DetectionConfig"
+          }
+        },
+        "required": [
+          "case",
+          "anomaly_id"
+        ],
+        "title": "NarrativeRequest",
+        "type": "object"
+      },
       "NarrativeStep": {
         "additionalProperties": false,
         "properties": {
@@ -1453,6 +1474,44 @@
           }
         },
         "summary": "Validate Contract"
+      }
+    },
+    "/api/v2/narratives": {
+      "post": {
+        "operationId": "narrative_case_api_v2_narratives_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NarrativeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseBundle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Narrative Case"
       }
     },
     "/healthz": {

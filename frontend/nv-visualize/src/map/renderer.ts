@@ -16,10 +16,12 @@ export interface MapData {
   selected: string | null;
   showMarkers: boolean;
   showLinks: boolean;
+  trace?: { paths: CandidateLink[]; progress: number; point: Point | null };
 }
 export interface MapPort {
   update(data: MapData): void;
-  focus(points: Point[]): void;
+  focus(points: Point[], animate?: boolean): void;
+  stop?(): void;
   project(point: Point): { x: number; y: number };
   destroy(): void;
 }
@@ -109,6 +111,31 @@ export function createMap(
     showLinks: false,
   };
   let destroyed = false;
+  const arc = (points: Point[], progress: number): Point[] => {
+    if (points.length < 2) return points;
+    const start = points[0],
+      end: [number, number] = [points[1][0], points[1][1]];
+    while (end[0] - start[0] > 180) end[0] -= 360;
+    while (end[0] - start[0] < -180) end[0] += 360;
+    const a = map.project(start),
+      b = map.project(end),
+      dx = b.x - a.x,
+      dy = b.y - a.y,
+      length = Math.hypot(dx, dy) || 1;
+    const bend = Math.min(90, length * 0.2),
+      c = {
+        x: (a.x + b.x) / 2 - (dy / length) * bend,
+        y: (a.y + b.y) / 2 + (dx / length) * bend,
+      };
+    return Array.from({ length: 33 }, (_, i) => {
+      const t = (progress * i) / 32;
+      const p = map.unproject([
+        (1 - t) ** 2 * a.x + 2 * (1 - t) * t * c.x + t * t * b.x,
+        (1 - t) ** 2 * a.y + 2 * (1 - t) * t * c.y + t * t * b.y,
+      ]);
+      return [p.lng, p.lat] as Point;
+    });
+  };
   const render = () => {
     if (destroyed) return;
     const markers: Marker[] = [];
@@ -127,20 +154,44 @@ export function createMap(
             ids: [candidate.anomaly.anomaly_id],
           });
       }
+    if (data.trace?.point) {
+      markers.splice(0, markers.length, {
+        point: data.trace.point,
+        ids: data.selected ? [data.selected] : [],
+      });
+    }
     const pick = (info: { object?: Marker }) => {
       if (info.object) callbacks.pick(info.object.ids);
     };
+    const paths = data.trace?.paths ?? (data.showLinks ? data.links : []);
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const path = (d: CandidateLink) =>
+      data.trace ? arc(d.points, reduced ? 1 : data.trace.progress) : d.points;
     overlay.setProps({
       layers: [
+        new PathLayer<CandidateLink>({
+          id: "direct-relations",
+          data: paths.filter((d) =>
+            ["observed", "documented"].includes(d.status),
+          ),
+          getPath: path,
+          getColor: [236, 236, 232],
+          getWidth: 1.5,
+          widthUnits: "pixels",
+        }),
         new PathLayer<CandidateLink, PathStyleExtensionProps<CandidateLink>>({
           id: "candidate-relations",
-          data: data.showLinks ? data.links : [],
+          data: paths.filter(
+            (d) => !["observed", "documented"].includes(d.status),
+          ),
           pickable: false,
-          getPath: (d) => d.points,
+          getPath: path,
           getColor: [167, 167, 167],
           getWidth: 1.5,
           widthUnits: "pixels",
-          getDashArray: [5, 4],
+          getDashArray: (d) => (d.status === "scenario" ? [1, 5] : [5, 4]),
           dashJustified: true,
           extensions: [new PathStyleExtension({ dash: true })],
         }),
@@ -196,20 +247,27 @@ export function createMap(
       data = value;
       render();
     },
-    focus(points) {
+    stop() {
+      map.stop();
+    },
+    focus(points, animate = true) {
       if (!points.length) return;
       const reduce = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
       if (points.length === 1)
-        map.flyTo({ center: points[0], zoom: 9, duration: reduce ? 0 : 700 });
+        map.flyTo({
+          center: points[0],
+          zoom: 9,
+          duration: reduce || !animate ? 0 : 700,
+        });
       else {
         const bounds = new maplibregl.LngLatBounds(points[0], points[0]);
         for (const point of points) bounds.extend(point);
         map.fitBounds(bounds, {
           padding: 100,
           maxZoom: 9,
-          duration: reduce ? 0 : 700,
+          duration: reduce || !animate ? 0 : 700,
         });
       }
     },

@@ -6,7 +6,7 @@ Phase 0 established package boundaries. PR 1 adds canonical contracts, validatio
 2. PR 2 (implemented): GDELT/UCDP/FIRMS/RSS adapters, bounded retries/cache/pacing, versioned source policies, persistent dedup and synthetic replay. Live providers remain disabled by default; see ADR 0003.
 3. PR 3 (implemented): prior-only median/MAD, two-sided CUSUM, sourced-point clusters and evidence graph, with synthetic false-positive checks. Real historical calibration is outstanding.
 4. PR 4 (implemented): offline MapLibre/deck.gl Explore, real Natural Earth basemap, synthetic candidate markers and contextual evidence. Trace remains PR 5.
-5. PR 5: deterministic Trace, subtitles and camera/evidence synchronization.
+5. PR 5 (implemented): deterministic source-linked scenes, pause/seek/skip, KO/EN subtitles, camera/arc/evidence synchronization.
 6. PR 6: detached Foundry CSV ZIP adapter, validation, lineage and import guide; no account needed.
 7. PR 7: source-backed Alpha case, deployment and operations review.
 
