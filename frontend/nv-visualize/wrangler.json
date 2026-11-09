@@ -4,7 +4,18 @@
   "compatibility_date": "2026-01-01",
   "workers_dev": true,
   "preview_urls": false,
+  "main": "../../services/cloudflare/worker.js",
+  "keep_vars": true,
+  "d1_databases": [{"binding": "DB", "database_name": "nv-monitor", "migrations_dir": "../../services/cloudflare/migrations"}],
+  "vars": {
+    "MONITOR_RUNS_PER_DAY": "12",
+    "GITHUB_ALLOWED_USER_IDS": "82876856",
+    "NIM_MODEL": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "NIM_REVIEW_MODEL": "meta/llama-3.3-70b-instruct"
+  },
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
   }
 }
