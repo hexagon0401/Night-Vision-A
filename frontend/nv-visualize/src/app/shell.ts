@@ -152,6 +152,12 @@ export function mount(
     );
   };
   const callbacks: MapCallbacks = {
+    basemap(detailed) {
+      message.hidden = detailed;
+      if (!detailed) message.textContent = '상세 지도 연결 실패 · 윤곽 지도로 표시 중입니다. 도로·지명은 연결 복구 후 표시됩니다.';
+      const credit = root.querySelector('.statusbar > span:last-child');
+      if (credit) credit.textContent = detailed ? 'OpenFreeMap · OpenStreetMap · WGS84' : 'Natural Earth · 윤곽 지도';
+    },
     pick(ids) {
       const group = items.filter((item) =>
         ids.includes(item.anomaly.anomaly_id),

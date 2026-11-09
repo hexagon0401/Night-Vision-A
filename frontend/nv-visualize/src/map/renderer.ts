@@ -2,6 +2,7 @@ import maplibregl, {
   type StyleSpecification,
   type IControl,
 } from "maplibre-gl";
+import { DETAIL_STYLE, flatBlack } from './basemap';
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { ScatterplotLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import {
@@ -31,6 +32,7 @@ export interface MapCallbacks {
   ready(): void;
   error(): void;
   dismiss(): void;
+  basemap?(detailed: boolean): void;
 }
 interface Marker {
   point: Point;
@@ -80,7 +82,7 @@ export function createMap(
     center: [127, 35],
     zoom: 4.2,
     minZoom: 1,
-    maxZoom: 12,
+    maxZoom: 18,
     attributionControl: false,
     pitchWithRotate: false,
     dragRotate: false,
@@ -111,6 +113,16 @@ export function createMap(
     showLinks: false,
   };
   let destroyed = false;
+  let detailed = false;
+  let failedDetail = false;
+  const detailAbort = new AbortController();
+  const detailTimeout = setTimeout(() => detailAbort.abort(), 12000);
+  void fetch(DETAIL_STYLE, { signal: detailAbort.signal }).then(async response => {
+    if (!response.ok) throw new Error('map unavailable');
+    const value = flatBlack(await response.json());
+    if (!destroyed) { detailed = true; map.setStyle(value); }
+  }).catch(() => { if (!destroyed) { failedDetail = true; callbacks.basemap?.(false); } })
+    .finally(() => clearTimeout(detailTimeout));
   const arc = (points: Point[], progress: number): Point[] => {
     if (points.length < 2) return points;
     const start = points[0],
@@ -233,6 +245,7 @@ export function createMap(
     basemapLoaded = true;
     render();
   });
+  map.on('idle', () => { if (detailed && !failedDetail) { container.dataset.basemap = 'detailed'; callbacks.basemap?.(true); } });
   map.on("move", () => {
     render();
     callbacks.move();
@@ -241,7 +254,12 @@ export function createMap(
     if (!overlay.pickObject({ x: event.point.x, y: event.point.y, radius: 14 }))
       callbacks.dismiss();
   });
-  map.on("error", () => callbacks.error());
+  map.on("error", () => {
+    if (detailed && !failedDetail) {
+      failedDetail = true; detailed = false; map.setStyle(style);
+      container.dataset.basemap = 'fallback'; callbacks.basemap?.(false);
+    } else if (!failedDetail) callbacks.error();
+  });
   return {
     update(value) {
       data = value;
@@ -258,7 +276,7 @@ export function createMap(
       if (points.length === 1)
         map.flyTo({
           center: points[0],
-          zoom: 9,
+          zoom: 7,
           duration: reduce || !animate ? 0 : 700,
         });
       else {
@@ -266,7 +284,7 @@ export function createMap(
         for (const point of points) bounds.extend(point);
         map.fitBounds(bounds, {
           padding: 100,
-          maxZoom: 9,
+          maxZoom: 8,
           duration: reduce || !animate ? 0 : 700,
         });
       }
@@ -276,6 +294,7 @@ export function createMap(
     },
     destroy() {
       destroyed = true;
+      detailAbort.abort(); clearTimeout(detailTimeout);
       map.remove();
     },
   };

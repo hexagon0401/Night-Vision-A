@@ -1,0 +1,3 @@
+# Detailed map
+
+Runtime OpenFreeMap Liberty vector style, preserving upstream sources/glyphs/sprites/attribution, with original monochrome paint overrides. OpenFreeMap's public service is advertised free without keys; it has no availability guarantee. Style project: https://github.com/hyperknot/openfreemap-styles (inspect upstream license/asset notices when pinning or redistributing). No upstream or WorldMonitor source code is bundled. OSM data attribution remains in MapLibre's attribution control. Natural Earth is the explicit offline/error fallback; detailed-map completion requires live browser validation of the hosted vector service, not merely a successful local build.
