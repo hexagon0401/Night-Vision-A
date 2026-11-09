@@ -374,6 +374,7 @@ export async function publicData(url, env) {
       last_success: last?.completed ?? null,
       stale: !last || Date.now() - Date.parse(last.completed) > 5 * 3600000,
       ai_configured: !!nimKeys(env).primary,
+      runtime_version: env.CF_VERSION_METADATA?.id ?? null,
       ai_enabled: !!nimKeys(env).primary && env.NIM_ENABLED === "true",
       github_configured: !!(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
     });
