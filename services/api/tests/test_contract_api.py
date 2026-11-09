@@ -32,3 +32,13 @@ def test_openapi_uses_the_canonical_request_schema():
     operation = doc['paths']['/api/v2/contracts/validate']['post']
     assert operation['requestBody']['content']['application/json']['schema']['$ref'].endswith('/CaseBundle')
     assert set(doc['components']['schemas']['EvidenceStatus']['enum']) == {'observed','documented','reported','inferred','scenario','disputed','unverified'}
+
+
+def test_analysis_endpoint_exposes_only_uncalibrated_candidates():
+    payload=json.loads((ROOT/'data/fixtures/detection/case.json').read_text())
+    client=TestClient(app)
+    result=client.post('/api/v2/analysis',json={'case':payload})
+    assert result.status_code==200
+    assert result.json()['calibration']=='uncalibrated'
+    assert len(result.json()['anomalies'])==3
+    assert client.post('/api/v2/analysis',json={'case':payload,'configuration':{'mad_threshold':-1}}).status_code==422

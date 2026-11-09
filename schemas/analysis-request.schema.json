@@ -1,0 +1,1106 @@
+{
+  "$defs": {
+    "Anomaly": {
+      "additionalProperties": false,
+      "properties": {
+        "anomaly_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Anomaly Id",
+          "type": "string"
+        },
+        "baseline_description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Baseline Description",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "detector": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Detector",
+          "type": "string"
+        },
+        "detector_version": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Detector Version",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "impact": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "observation_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "severity": {
+          "$ref": "#/$defs/Grade"
+        },
+        "window_end_utc": {
+          "format": "date-time",
+          "title": "Window End Utc",
+          "type": "string"
+        },
+        "window_start_utc": {
+          "format": "date-time",
+          "title": "Window Start Utc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "anomaly_id",
+        "observation_ids",
+        "detector",
+        "detector_version",
+        "baseline_description",
+        "window_start_utc",
+        "window_end_utc",
+        "severity"
+      ],
+      "title": "Anomaly",
+      "type": "object"
+    },
+    "CaseBundle": {
+      "additionalProperties": false,
+      "properties": {
+        "anomalies": {
+          "items": {
+            "$ref": "#/$defs/Anomaly"
+          },
+          "title": "Anomalies",
+          "type": "array"
+        },
+        "case_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Claims",
+          "type": "array"
+        },
+        "data_origin": {
+          "enum": [
+            "synthetic",
+            "source_backed"
+          ],
+          "title": "Data Origin",
+          "type": "string"
+        },
+        "entities": {
+          "items": {
+            "$ref": "#/$defs/Entity"
+          },
+          "title": "Entities",
+          "type": "array"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/Event"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "hypotheses": {
+          "items": {
+            "$ref": "#/$defs/Hypothesis"
+          },
+          "title": "Hypotheses",
+          "type": "array"
+        },
+        "narratives": {
+          "items": {
+            "$ref": "#/$defs/Narrative"
+          },
+          "title": "Narratives",
+          "type": "array"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/Observation"
+          },
+          "title": "Observations",
+          "type": "array"
+        },
+        "relations": {
+          "items": {
+            "$ref": "#/$defs/Relation"
+          },
+          "title": "Relations",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "2.0.0",
+          "default": "2.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        },
+        "title": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "title",
+        "data_origin",
+        "sources"
+      ],
+      "title": "CaseBundle",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Assessment",
+          "type": "string"
+        },
+        "claim_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "counterevidence_claim_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Counterevidence Claim Ids",
+          "type": "array"
+        },
+        "event_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Event Ids",
+          "type": "array"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "observation_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "statement": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "claim_id",
+        "statement",
+        "assessment"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "DetectionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "cooldown_points": {
+          "default": 8,
+          "maximum": 128,
+          "minimum": 1,
+          "title": "Cooldown Points",
+          "type": "integer"
+        },
+        "cusum_drift": {
+          "default": 0.5,
+          "exclusiveMinimum": 0,
+          "maximum": 10,
+          "title": "Cusum Drift",
+          "type": "number"
+        },
+        "cusum_threshold": {
+          "default": 8.0,
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "title": "Cusum Threshold",
+          "type": "number"
+        },
+        "graph_edge_budget": {
+          "default": 512,
+          "maximum": 2048,
+          "minimum": 16,
+          "title": "Graph Edge Budget",
+          "type": "integer"
+        },
+        "history_window": {
+          "default": 64,
+          "maximum": 256,
+          "minimum": 4,
+          "title": "History Window",
+          "type": "integer"
+        },
+        "mad_threshold": {
+          "default": 6.0,
+          "exclusiveMinimum": 0,
+          "maximum": 100,
+          "title": "Mad Threshold",
+          "type": "number"
+        },
+        "min_history": {
+          "default": 8,
+          "maximum": 128,
+          "minimum": 4,
+          "title": "Min History",
+          "type": "integer"
+        },
+        "scale_floor": {
+          "default": 1.0,
+          "exclusiveMinimum": 0,
+          "title": "Scale Floor",
+          "type": "number"
+        },
+        "seasonality": {
+          "default": "none",
+          "enum": [
+            "none",
+            "hour_of_day_utc"
+          ],
+          "title": "Seasonality",
+          "type": "string"
+        },
+        "spatial_min_entities": {
+          "default": 3,
+          "maximum": 20,
+          "minimum": 3,
+          "title": "Spatial Min Entities",
+          "type": "integer"
+        },
+        "spatial_point_budget": {
+          "default": 256,
+          "maximum": 512,
+          "minimum": 3,
+          "title": "Spatial Point Budget",
+          "type": "integer"
+        },
+        "spatial_radius_km": {
+          "default": 25.0,
+          "exclusiveMinimum": 0,
+          "maximum": 500,
+          "title": "Spatial Radius Km",
+          "type": "number"
+        },
+        "spatial_window_seconds": {
+          "default": 3600,
+          "maximum": 86400,
+          "minimum": 1,
+          "title": "Spatial Window Seconds",
+          "type": "integer"
+        }
+      },
+      "title": "DetectionConfig",
+      "type": "object"
+    },
+    "Entity": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Entity Type",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Location"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "name": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Name",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "entity_id",
+        "entity_type",
+        "name"
+      ],
+      "title": "Entity",
+      "type": "object"
+    },
+    "Event": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "entity_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Entity Ids",
+          "type": "array"
+        },
+        "event_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_time_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event Time Utc"
+        },
+        "event_type": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Location"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "event_id",
+        "event_type",
+        "event_time_utc",
+        "description"
+      ],
+      "title": "Event",
+      "type": "object"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "observed",
+        "documented",
+        "reported",
+        "inferred",
+        "scenario",
+        "disputed",
+        "unverified"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "Grade": {
+      "enum": [
+        "unknown",
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "Grade",
+      "type": "string"
+    },
+    "Hypothesis": {
+      "additionalProperties": false,
+      "properties": {
+        "alternative_to": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Alternative To",
+          "type": "array"
+        },
+        "claim_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Claim Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "disconfirming_claim_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Disconfirming Claim Ids",
+          "type": "array"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "hypothesis_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Hypothesis Id",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "status": {
+          "enum": [
+            "open",
+            "supported",
+            "refuted"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "hypothesis_id",
+        "description",
+        "status",
+        "claim_ids"
+      ],
+      "title": "Hypothesis",
+      "type": "object"
+    },
+    "Location": {
+      "additionalProperties": false,
+      "properties": {
+        "accuracy_m": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accuracy M"
+        },
+        "crs": {
+          "const": "EPSG:4326",
+          "default": "EPSG:4326",
+          "title": "Crs",
+          "type": "string"
+        },
+        "latitude": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "role": {
+          "enum": [
+            "verified",
+            "symbolic"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude",
+        "role"
+      ],
+      "title": "Location",
+      "type": "object"
+    },
+    "Narrative": {
+      "additionalProperties": false,
+      "properties": {
+        "anomaly_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Anomaly Id",
+          "type": "string"
+        },
+        "narrative_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Narrative Id",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/NarrativeStep"
+          },
+          "minItems": 1,
+          "title": "Steps",
+          "type": "array"
+        },
+        "title": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "narrative_id",
+        "anomaly_id",
+        "title",
+        "steps"
+      ],
+      "title": "Narrative",
+      "type": "object"
+    },
+    "NarrativeStep": {
+      "additionalProperties": false,
+      "properties": {
+        "camera_target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Location"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "duration_ms": {
+          "maximum": 60000,
+          "minimum": 1,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "evidence_claim_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Claim Ids",
+          "type": "array"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "reduced_motion_fallback": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Reduced Motion Fallback",
+          "type": "string"
+        },
+        "scene_type": {
+          "enum": [
+            "focus_location",
+            "show_entity",
+            "draw_relation",
+            "show_evidence",
+            "compare_hypotheses",
+            "show_counterevidence",
+            "summarize"
+          ],
+          "title": "Scene Type",
+          "type": "string"
+        },
+        "step_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Step Id",
+          "type": "string"
+        },
+        "subtitle_en": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Subtitle En",
+          "type": "string"
+        },
+        "subtitle_ko": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Subtitle Ko",
+          "type": "string"
+        },
+        "visible_entity_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Visible Entity Ids",
+          "type": "array"
+        },
+        "visible_relation_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Visible Relation Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "step_id",
+        "scene_type",
+        "duration_ms",
+        "camera_target",
+        "subtitle_ko",
+        "subtitle_en",
+        "evidence_claim_ids",
+        "evidence_status",
+        "reduced_motion_fallback"
+      ],
+      "title": "NarrativeStep",
+      "type": "object"
+    },
+    "Observation": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Location"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metric": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Metric",
+          "type": "string"
+        },
+        "observation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "observed_at_utc": {
+          "format": "date-time",
+          "title": "Observed At Utc",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "source_record_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Record Id",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "observation_id",
+        "entity_id",
+        "observed_at_utc",
+        "metric",
+        "value",
+        "unit",
+        "source_record_id"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "corroborating_source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Corroborating Source Ids",
+          "type": "array"
+        },
+        "evidence_span_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Span Hash"
+        },
+        "extraction_method": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Extraction Method",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_ids",
+        "extraction_method"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Relation": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Claim Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "relation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Relation Id",
+          "type": "string"
+        },
+        "relation_type": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Relation Type",
+          "type": "string"
+        },
+        "source_entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Source Entity Id",
+          "type": "string"
+        },
+        "target_entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Target Entity Id",
+          "type": "string"
+        },
+        "valid_from_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid From Utc"
+        },
+        "valid_to_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid To Utc"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "relation_id",
+        "source_entity_id",
+        "target_entity_id",
+        "relation_type",
+        "claim_ids"
+      ],
+      "title": "Relation",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "access": {
+          "enum": [
+            "public",
+            "restricted",
+            "unknown"
+          ],
+          "title": "Access",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "extraction_method": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Extraction Method",
+          "type": "string"
+        },
+        "license": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "License",
+          "type": "string"
+        },
+        "published_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At Utc"
+        },
+        "publisher": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Publisher",
+          "type": "string"
+        },
+        "publisher_family": {
+          "pattern": "^[a-z0-9][a-z0-9_.:-]{0,127}$",
+          "title": "Publisher Family",
+          "type": "string"
+        },
+        "quality": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "retrieved_at_utc": {
+          "format": "date-time",
+          "title": "Retrieved At Utc",
+          "type": "string"
+        },
+        "source_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "url",
+        "publisher",
+        "publisher_family",
+        "published_at_utc",
+        "retrieved_at_utc",
+        "content_hash",
+        "license",
+        "access",
+        "extraction_method"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "case": {
+      "$ref": "#/$defs/CaseBundle"
+    },
+    "configuration": {
+      "$ref": "#/$defs/DetectionConfig"
+    }
+  },
+  "required": [
+    "case"
+  ],
+  "title": "AnalysisRequest",
+  "type": "object"
+}

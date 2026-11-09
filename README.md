@@ -6,7 +6,7 @@ A source-traceable geopolitical anomaly intelligence project: **Detect → Conne
 
 ## Current status / 현재 단계
 
-PR 1 contracts implemented: ten canonical Python models, provenance/geotime/reference validation, stateless validation API, generated JSON Schema/OpenAPI/TypeScript contracts and explicit snapshot database migrations. The frontend remains a Phase 0 shell. PR 2 adds bounded GDELT/UCDP/FIRMS/RSS collectors, explicit synthetic replay, retry/cache/pacing and persistent deduplication. Live sources remain disabled by default. Anomaly detection, real maps, Trace playback and Foundry export are **not implemented**. The shell shows no live intelligence. Historical data is unverified, not a production feed.
+PR 1 contracts implemented: ten canonical Python models, provenance/geotime/reference validation, stateless validation API, generated JSON Schema/OpenAPI/TypeScript contracts and explicit snapshot database migrations. The frontend remains a Phase 0 shell. PR 2 adds bounded GDELT/UCDP/FIRMS/RSS collectors, explicit synthetic replay, retry/cache/pacing and persistent deduplication. Live sources remain disabled by default. PR 3 adds uncalibrated median/MAD, CUSUM and sourced-point candidate analysis with an evidence graph. Real maps, Trace playback and Foundry export are **not implemented**. The shell shows no live intelligence. Historical data is unverified, not a production feed.
 
 ## Workspace
 
@@ -52,6 +52,14 @@ API readiness: `GET /healthz` must return `status: ok`, `phase: foundation`. Thi
 ```
 
 Use a fresh output directory for each run. The first run accepts two fictional article records from three input rows. Replaying into another output directory with the same state stores zero new records. `collection.json` preserves provenance, missing fields and partial-coverage counts; `case.json` is explicitly synthetic. No network is used. [Source policies and live prerequisites](configs/sources/README.md) · [Acquisition design/limits](docs/decisions/0003-bounded-acquisition.md).
+
+## Candidate analysis
+
+```sh
+.venv/bin/nv-engine analyze --input data/fixtures/detection/case.json --output-dir .local/detection-demo
+```
+
+Use a fresh output directory. `analysis.json` contains deterministic, uncalibrated candidates and provenance graph; `case.json` preserves the synthetic case with added candidates. POST `/api/v2/analysis` accepts `{case, configuration}` without persistence or network access. [Detection decisions](docs/decisions/0004-candidate-detection.md).
 
 ## Delivery and licensing
 

@@ -8,6 +8,7 @@ from nv_engine.models import CaseBundle
 from nv_engine.sources.config import Manifest
 from nv_engine.collect.types import CollectionResult
 from nv_api.app import app
+from nv_engine.detect.contracts import AnalysisReport, AnalysisRequest
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -20,6 +21,8 @@ def main():
         'schemas/case-bundle.schema.json': CaseBundle.model_json_schema(),
         'schemas/source-manifest.schema.json': Manifest.model_json_schema(),
         'schemas/collection-result.schema.json': CollectionResult.model_json_schema(),
+        'schemas/analysis-report.schema.json': AnalysisReport.model_json_schema(),
+        'schemas/analysis-request.schema.json': AnalysisRequest.model_json_schema(),
         'schemas/openapi.json': app.openapi(),
     }
     stale = []

@@ -33,3 +33,13 @@ def validate_contract(bundle: CaseBundle):
         data_origin=bundle.data_origin,
         counts={name: len(getattr(bundle, name)) for name in names},
     )
+
+
+from nv_engine.detect.contracts import AnalysisRequest, AnalysisReport
+from nv_engine.detect.analysis import analyze
+
+
+@app.post('/api/v2/analysis', response_model=AnalysisReport)
+def analyze_case(request: AnalysisRequest):
+    """Bounded, stateless candidate analysis; never fetches, persists or publishes."""
+    return analyze(request.case, request.configuration)

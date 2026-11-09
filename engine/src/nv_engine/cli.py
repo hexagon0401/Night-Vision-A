@@ -18,9 +18,43 @@ def main():
         if command == 'replay':
             child.add_argument('--input', type=Path, required=True)
             child.add_argument('--acquired-at', required=True, help='Explicit timezone-aware synthetic acquisition time')
+    analysis = sub.add_parser('analyze')
+    analysis.add_argument('--input', type=Path, required=True)
+    analysis.add_argument('--config', type=Path)
+    analysis.add_argument('--output-dir', type=Path, required=True)
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
+        return
+    if args.command == 'analyze':
+        import json
+        from nv_engine.models import CaseBundle
+        from nv_engine.detect.contracts import DetectionConfig
+        from nv_engine.detect.analysis import analyze
+        try:
+            if any((args.output_dir/name).exists() for name in ('analysis.json','case.json')):
+                raise FileExistsError('output_exists')
+            with args.input.open('rb') as stream:
+                data = stream.read(8000001)
+            if len(data)>8000000:
+                raise ValueError('analysis input size exceeded')
+            case = CaseBundle.model_validate_json(data)
+            config = DetectionConfig.model_validate_json(args.config.read_text()) if args.config else DetectionConfig()
+            report = analyze(case, config)
+            combined = {a.anomaly_id:a for a in case.anomalies}
+            for candidate in report.anomalies:
+                if candidate.anomaly_id in combined and combined[candidate.anomaly_id] != candidate:
+                    raise ValueError('anomaly ID collision')
+                combined[candidate.anomaly_id] = candidate
+            enriched = CaseBundle.model_validate(case.model_copy(update={'anomalies':list(combined.values())}).model_dump(mode='json'))
+            args.output_dir.mkdir(parents=True,exist_ok=True)
+            for name,value in [('analysis.json',report),('case.json',enriched)]:
+                with (args.output_dir/name).open('x') as stream:
+                    stream.write(value.model_dump_json(indent=2)+'\n')
+            print(json.dumps({'candidates':len(report.anomalies),'calibration':report.calibration,'warnings':report.warnings}))
+        except Exception as error:
+            print(f'analysis_failed:{type(error).__name__}',file=sys.stderr)
+            raise SystemExit(1) from None
         return
     try:
         from nv_engine.sources.config import Manifest
