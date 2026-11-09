@@ -6,7 +6,7 @@ A source-traceable geopolitical anomaly intelligence project: **Detect → Conne
 
 ## Current status / 현재 단계
 
-Phase 0 foundation only. Engine package, API health endpoint, frontend shell, and schema envelope are executable. Collectors, anomaly detection, real maps, Trace playback and Foundry export are **not implemented**. The shell shows no live intelligence. Historical data is unverified, not a production feed.
+PR 1 contracts implemented: ten canonical Python models, provenance/geotime/reference validation, stateless validation API, generated JSON Schema/OpenAPI/TypeScript contracts and explicit snapshot database migrations. The frontend remains a Phase 0 shell. Collectors, anomaly detection, real maps, Trace playback and Foundry export are **not implemented**. The shell shows no live intelligence. Historical data is unverified, not a production feed.
 
 ## Workspace
 
@@ -25,7 +25,7 @@ Python 3.12+ and Node 22+ are supported. No credentials or database are required
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install -e './engine[test]' -e './services/api[test]'
+.venv/bin/python -m pip install -e './engine[test,storage]' -e './services/api[test]'
 .venv/bin/python -m pytest engine/tests services/api/tests
 .venv/bin/nv-engine --version
 .venv/bin/python -m uvicorn nv_api.app:app --app-dir services/api/src --host 0.0.0.0 --port 8000
@@ -41,8 +41,10 @@ npm run build
 npm run dev -- --host 0.0.0.0
 ```
 
+Contracts: run `.venv/bin/python tools/generate_contracts.py --check` after `npm ci`. Local optional DB: `.venv/bin/alembic -c engine/alembic.ini upgrade head`, then `current`. No data is imported automatically. See [contract/storage decisions](docs/decisions/0002-canonical-contracts-and-storage.md) for limits.
+
 API readiness: `GET /healthz` must return `status: ok`, `phase: foundation`. This is process/package readiness, not ingestion readiness. Frontend: a flat-black foundation screen with provided NV branding, an explicit no-feed state and no fabricated case/map. Run `python3 tools/verify_migration.py` to verify every legacy file and archive.
 
 ## Delivery and licensing
 
-[Ordered roadmap](docs/architecture/README.md): PR 1 canonical schemas/provenance → collectors → detectors → real map → Trace → exporter → Alpha deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. No deployment or Foundry upload is included.
+[Ordered roadmap](docs/architecture/README.md): canonical schemas/provenance (implemented) → PR 2 collectors → detectors → real map → Trace → exporter → Alpha deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. No deployment or Foundry upload is included.

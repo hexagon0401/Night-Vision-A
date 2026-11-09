@@ -12,3 +12,6 @@ coverage/
 !.env.example
 
 .cache/
+
+*.local.sqlite3
+*.local.sqlite3-*

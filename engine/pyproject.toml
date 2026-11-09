@@ -7,10 +7,11 @@ name = "nv-engine"
 version = "2.0.0"
 description = "Night Vision intelligence engine foundation"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["pydantic>=2.9,<3"]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10"]
+test = ["pytest>=8,<10", "jsonschema[format-nongpl]>=4.23,<5", "sqlalchemy>=2.0,<3", "alembic>=1.14,<2"]
+storage = ["sqlalchemy>=2.0,<3", "alembic>=1.14,<2"]
 
 [project.scripts]
 nv-engine = "nv_engine.cli:main"

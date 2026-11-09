@@ -1,8 +1,8 @@
 # NV2 boundaries and roadmap
 
-Phase 0 establishes package boundaries, not an operational intelligence pipeline.
+Phase 0 established package boundaries. PR 1 adds canonical contracts, validation and an optional snapshot store; no operational intelligence pipeline is claimed.
 
-1. PR 1: canonical objects (Source, Observation, Event, Entity, Relation, Claim, Hypothesis, Anomaly, Narrative, NarrativeStep), UTC/WGS84 provenance validation, synthetic fixtures, schema generation and API/TS contracts. Storage and migration strategy follows these contracts.
+1. PR 1: canonical objects (Source, Observation, Event, Entity, Relation, Claim, Hypothesis, Anomaly, Narrative, NarrativeStep), UTC/WGS84 provenance validation, synthetic fixtures, schema generation and API/TS contracts. Implemented with content-addressed CaseBundle snapshots and an initial Alembic migration (see ADR 0002).
 2. PR 2: bounded provider adapters with retries, cache, licensing metadata and offline fixtures.
 3. PR 3: baselines/change-point detection and evidence graph, with false-positive checks.
 4. PR 4: MapLibre + deck.gl map-first interface and contextual evidence.
