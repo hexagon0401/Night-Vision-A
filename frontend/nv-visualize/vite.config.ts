@@ -6,8 +6,6 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("/node_modules/maplibre-gl/")) return "maplibre";
-          if (/node_modules\/@(deck|luma|loaders|math)\.gl\//.test(id))
-            return "visualization";
         },
       },
     },

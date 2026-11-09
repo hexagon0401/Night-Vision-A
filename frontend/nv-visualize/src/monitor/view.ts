@@ -1,3 +1,4 @@
+import { accountControl, readSession } from "../ui/controls";
 import { createMap, type MapPort } from "../map/renderer";
 interface EventRecord {
   id: string;
@@ -68,9 +69,12 @@ function when(value: string | null) {
     : "아직 없음";
 }
 
-export function mountMonitor(root: HTMLElement): () => void {
+export function mountMonitor(
+  root: HTMLElement,
+  factory: typeof createMap = createMap,
+): () => void {
   root.innerHTML =
-    '<main class="workspace monitor"><div class="map" role="region" aria-label="세계 분쟁 지도"></div><header class="topbar"><a class="brand" href="/?view=monitor">NIGHT VISION<small>출처 기반 지속 감시</small></a><nav aria-label="감시 도구"></nav></header><div class="map-message" role="status"></div><section class="monitor-panel" aria-label="감시 현황"></section><section class="monitor-evidence" aria-label="사건 상세" hidden></section><footer class="statusbar"><span>REPORTED · UNCALIBRATED</span><span>OpenFreeMap · OpenStreetMap</span></footer></main>';
+    '<main class="workspace monitor"><div class="map" role="region" aria-label="세계 분쟁 지도"></div><header class="topbar"><a class="brand" href="/?view=monitor"><img src="/branding/night-vision-logo.png" alt="네 렌즈의 NV 헬멧"/><span>NIGHT VISION<small>출처 기반 지속 감시</small></span></a><nav aria-label="감시 도구"></nav></header><div class="map-message" role="status"></div><section class="monitor-panel" aria-label="감시 현황"></section><section class="monitor-evidence" aria-label="사건 상세" hidden></section><footer class="statusbar"><span>REPORTED · UNCALIBRATED</span><span>OpenFreeMap · OpenStreetMap</span></footer></main>';
   const panel = root.querySelector<HTMLElement>(".monitor-panel")!,
     detail = root.querySelector<HTMLElement>(".monitor-evidence")!,
     nav = root.querySelector("nav")!,
@@ -80,7 +84,7 @@ export function mountMonitor(root: HTMLElement): () => void {
     selected: EventRecord | null = null,
     destroyed = false,
     user: any = null;
-  const map = createMap(root.querySelector<HTMLElement>(".map")!, {
+  const map = factory(root.querySelector<HTMLElement>(".map")!, {
     pick: () => {},
     move: () => {},
     dismiss: () => {},
@@ -104,11 +108,14 @@ export function mountMonitor(root: HTMLElement): () => void {
     b.onclick = action;
     return b;
   };
-  const login = link("GitHub 로그인", "/api/auth/github");
+  panel.hidden = true;
+  const accountCleanup = accountControl(nav);
   nav.append(
     link("합성 실험", "/?case=synthetic"),
     link("USGS Alpha", "/?case=alpha"),
-    login,
+    button("현황", () => {
+      panel.hidden = !panel.hidden;
+    }),
     button("새로고침", () => void refresh()),
     button("NIM 연결 진단", () => {
       if (!user) {
@@ -128,6 +135,17 @@ export function mountMonitor(root: HTMLElement): () => void {
         });
     }),
   );
+  const utility = document.createElement("details");
+  utility.className = "utility-menu";
+  const utilityTitle = el("summary", "메뉴"),
+    utilityItems = el("div", "", "menu-items");
+  const account = nav.querySelector(".account-control");
+  for (const node of Array.from(nav.children))
+    if (node !== account && node.textContent !== "현황")
+      utilityItems.append(node);
+  utility.append(utilityTitle, utilityItems);
+  nav.append(utility);
+  if (account) nav.append(account);
   const country = document.createElement("select");
   country.setAttribute("aria-label", "국가 선택");
   const all = el("option", "전 세계");
@@ -321,7 +339,14 @@ export function mountMonitor(root: HTMLElement): () => void {
   }
   async function refresh() {
     try {
-      const d = await api("/api/v2/status");
+      const [d, overview, caseData, me, s] = await Promise.all([
+        api("/api/v2/status"),
+        api("/api/v2/overview").catch(() => ({ countries: [] })),
+        api("/api/v2/cases").catch(() => ({ cases: [] })),
+        readSession(),
+        api("/api/v2/monitor-summary").catch(() => ({ result: null })),
+        loadEvents(),
+      ]);
       if (destroyed) return;
       status.replaceChildren(
         el(
@@ -363,7 +388,7 @@ export function mountMonitor(root: HTMLElement): () => void {
           el("p", `${when(r.started)} · ${r.state} · ${r.error ?? ""}`),
         );
       status.append(history);
-      const overview = await api("/api/v2/overview");
+
       const previous = country.value;
       country.replaceChildren(all);
       for (const r of overview.countries) {
@@ -372,24 +397,9 @@ export function mountMonitor(root: HTMLElement): () => void {
         country.append(o);
       }
       country.value = previous;
-      cases = (await api("/api/v2/cases")).cases;
-      const me = await api("/api/auth/me");
+      cases = caseData.cases;
       user = me.user;
-      login.textContent = user
-        ? `${user.login} · 로그아웃`
-        : me.configured
-          ? "GitHub 로그인"
-          : "로그인 연결 설정";
-      login.href = me.configured ? "/api/auth/github" : "/setup.html";
-      login.onclick = user
-        ? (e) => {
-            e.preventDefault();
-            void api("/api/auth/logout", {}).then(() => refresh());
-          }
-        : null;
-      const s = await api("/api/v2/monitor-summary");
       displayAI(summary, s.result);
-      await loadEvents();
     } catch (e) {
       if (!destroyed) {
         status.replaceChildren(
@@ -401,9 +411,13 @@ export function mountMonitor(root: HTMLElement): () => void {
   }
   void refresh();
   const timer = setInterval(() => void refresh(), 300000);
+  const authChanged = () => void refresh();
+  window.addEventListener("nv:auth-change", authChanged);
   return () => {
     destroyed = true;
     clearInterval(timer);
+    window.removeEventListener("nv:auth-change", authChanged);
+    accountCleanup();
     map.destroy();
   };
 }

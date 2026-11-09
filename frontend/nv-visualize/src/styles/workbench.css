@@ -1,0 +1,247 @@
+.topbar {
+  margin: 14px;
+  left: 0;
+  right: 0;
+  top: 0;
+  min-height: 58px;
+  padding: 10px 16px;
+  border: 1px solid #303030;
+  border-radius: 18px;
+  background: #0a0a0af5;
+  gap: 16px;
+  z-index: 12;
+}
+.topbar .brand {
+  min-width: 172px;
+}
+.topbar nav {
+  margin-left: auto;
+  gap: 6px;
+  align-items: center;
+  display: flex;
+}
+.topbar button,
+.topbar a:not(.brand),
+.topbar summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #c8c8c8;
+  background: transparent;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.topbar button:hover,
+.topbar a:hover,
+.topbar summary:hover {
+  background: #202020;
+  color: white;
+}
+.topbar svg {
+  flex: none;
+}
+.topbar .account-control {
+  min-width: 132px;
+  font-size: 12px;
+  color: #888;
+  border-left: 1px solid #333;
+  padding-left: 12px;
+  margin-left: 6px;
+}
+.github-login {
+  border-color: #444 !important;
+  background: #1c1c1c !important;
+}
+.github-login img {
+  filter: invert(1);
+}
+.account-menu,
+.utility-menu {
+  position: relative;
+}
+.account-menu[open],
+.utility-menu[open] {
+  background: #151515;
+  border-radius: 10px;
+}
+.account-menu[open] > a,
+.account-menu[open] > button,
+.utility-menu[open] > select,
+.utility-menu[open] > a,
+.utility-menu[open] > .menu-items {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  min-width: 180px;
+  padding: 12px;
+  background: #171717;
+  border: 1px solid #444;
+  z-index: 30;
+  border-radius: 10px;
+}
+.account-menu[open] > button {
+  top: 92px;
+}
+.topbar input[type="search"] {
+  width: 150px;
+  min-width: 0;
+  border-radius: 10px;
+  border: 1px solid #333;
+  background: #111;
+}
+.topbar :focus-visible {
+  outline: 2px solid #ddd;
+  outline-offset: 3px;
+}
+.monitor-panel,
+.monitor-evidence,
+.tool-panel,
+.evidence {
+  box-shadow: none;
+  border-color: #353535 !important;
+  background: #101010f5 !important;
+}
+.monitor-panel[hidden],
+.monitor-evidence[hidden] {
+  display: none !important;
+}
+.monitor-filters select,
+.monitor-filters input {
+  background: #181818;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 12px;
+}
+.monitor-events button {
+  border-radius: 10px;
+  border-color: #333;
+  padding: 12px;
+  font-size: 12px;
+}
+.monitor-events button:hover {
+  background: #222;
+}
+.monitor-status {
+  font-size: 12px;
+  color: #bbb;
+}
+.monitor-status p {
+  margin: 8px 0;
+}
+.monitor-panel h1 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+.statusbar {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+.trace-dock button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.map-message {
+  pointer-events: none;
+}
+.account-menu summary::-webkit-details-marker,
+.utility-menu summary::-webkit-details-marker {
+  display: none;
+}
+@media (max-width: 1000px) {
+  .topbar .brand {
+    min-width: auto;
+  }
+  .topbar .brand small {
+    display: none;
+  }
+  .topbar nav {
+    gap: 2px;
+  }
+  .topbar button,
+  .topbar a:not(.brand),
+  .topbar summary {
+    padding: 7px;
+    font-size: 11px;
+  }
+  .topbar input[type="search"] {
+    width: 100px;
+  }
+}
+@media (max-width: 760px) {
+  .topbar {
+    margin: 8px;
+    padding: 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-radius: 14px;
+  }
+  .topbar nav {
+    width: 100%;
+    overflow: visible;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .topbar .account-control {
+    margin-left: auto;
+    min-width: 110px;
+  }
+  .topbar button,
+  .topbar a:not(.brand),
+  .topbar summary {
+    min-height: 40px;
+  }
+  .topbar .brand {
+    font-size: 12px;
+  }
+  .topbar input[type="search"] {
+    flex: 1;
+    min-width: 100px;
+  }
+  .monitor-panel,
+  .monitor-evidence {
+    top: 148px !important;
+    bottom: 42px !important;
+  }
+  .demo-label {
+    top: 154px;
+  }
+  .tool-panel {
+    top: 154px;
+  }
+  .mode {
+    display: none;
+  }
+  .topbar svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+.monitor .topbar a {
+  margin: 0;
+}
+.utility-menu .menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.utility-menu .menu-items > a,
+.utility-menu .menu-items > button {
+  width: 100%;
+  justify-content: flex-start;
+}
+.account-control .account-control {
+  padding-left: 0;
+  margin-left: 0;
+  border: 0;
+}
+/* Panels must clear the measured toolbar height, including wrapped mobile labels. */
+.workspace .tool-panel,.workspace .demo-label,.workspace .monitor-panel,.workspace .monitor-evidence,.workspace .evidence.pinned{top:var(--nv-header-bottom,100px)!important}

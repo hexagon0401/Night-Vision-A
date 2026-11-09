@@ -66,6 +66,7 @@ for (const width of [1440, 390])
       });
     });
     await page.goto("/?view=monitor");
+    await page.getByRole("button", { name: "현황", exact: true }).click();
     await expect(
       page.getByRole("heading", { name: "세계 분쟁 감시" }),
     ).toBeVisible();
