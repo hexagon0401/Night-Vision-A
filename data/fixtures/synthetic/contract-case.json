@@ -1,0 +1,262 @@
+{
+  "schema_version": "2.0.0",
+  "case_id": "case:synthetic-contract",
+  "title": "SYNTHETIC DATA — contract validation only",
+  "data_origin": "synthetic",
+  "sources": [
+    {
+      "source_id": "src:synthetic-a",
+      "url": "https://example.invalid/synthetic/a",
+      "publisher": "Fictional fixture publisher a",
+      "publisher_family": "synthetic-a",
+      "published_at_utc": "2026-01-01T00:00:00Z",
+      "retrieved_at_utc": "2026-01-01T05:00:00Z",
+      "content_hash": "5c8c3b94970817942d0044cb0b9da358ab590a09a23c6b5ec1e40afc9bd91254",
+      "license": "Synthetic test fixture; no real intelligence",
+      "access": "public",
+      "extraction_method": "synthetic fixture generator",
+      "quality": "unknown"
+    },
+    {
+      "source_id": "src:synthetic-b",
+      "url": "https://example.invalid/synthetic/b",
+      "publisher": "Fictional fixture publisher b",
+      "publisher_family": "synthetic-b",
+      "published_at_utc": "2026-01-01T00:00:00Z",
+      "retrieved_at_utc": "2026-01-01T05:00:00Z",
+      "content_hash": "7c2e14fd24bcec34dfda50e9226514e6d351d75780087b14851e193466e3a397",
+      "license": "Synthetic test fixture; no real intelligence",
+      "access": "public",
+      "extraction_method": "synthetic fixture generator",
+      "quality": "unknown"
+    }
+  ],
+  "entities": [
+    {
+      "entity_id": "entity:alpha",
+      "entity_type": "synthetic_actor",
+      "name": "Fictional Alpha",
+      "location": null,
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    },
+    {
+      "entity_id": "entity:beta",
+      "entity_type": "synthetic_actor",
+      "name": "Fictional Beta",
+      "location": null,
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    }
+  ],
+  "events": [
+    {
+      "event_id": "event:sample",
+      "event_type": "synthetic_event",
+      "event_time_utc": "2026-01-01T02:00:00Z",
+      "description": "Synthetic event, not a real-world claim",
+      "entity_ids": [
+        "entity:alpha"
+      ],
+      "location": null,
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "observation_id": "observation:sample",
+      "entity_id": "entity:alpha",
+      "observed_at_utc": "2026-01-01T02:00:00Z",
+      "metric": "synthetic_metric",
+      "value": 12.5,
+      "unit": "test_units",
+      "source_record_id": "fixture-row-1",
+      "location": null,
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim:sample",
+      "statement": "Synthetic report for contract testing only",
+      "assessment": "Not assessed against real sources",
+      "event_ids": [
+        "event:sample"
+      ],
+      "observation_ids": [
+        "observation:sample"
+      ],
+      "counterevidence_claim_ids": [
+        "claim:counter"
+      ],
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    },
+    {
+      "claim_id": "claim:counter",
+      "statement": "Synthetic alternative report",
+      "assessment": "Counterevidence wiring fixture, not a conclusion",
+      "evidence_status": "disputed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "relation_id": "relation:sample",
+      "source_entity_id": "entity:alpha",
+      "target_entity_id": "entity:beta",
+      "relation_type": "synthetic_link",
+      "claim_ids": [
+        "claim:sample"
+      ],
+      "evidence_status": "inferred",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    }
+  ],
+  "hypotheses": [
+    {
+      "hypothesis_id": "hypothesis:sample",
+      "description": "Synthetic open hypothesis",
+      "status": "open",
+      "claim_ids": [
+        "claim:sample"
+      ],
+      "alternative_to": [],
+      "disconfirming_claim_ids": [
+        "claim:counter"
+      ],
+      "evidence_status": "scenario",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    }
+  ],
+  "anomalies": [
+    {
+      "anomaly_id": "anomaly:sample",
+      "observation_ids": [
+        "observation:sample"
+      ],
+      "detector": "synthetic_fixture",
+      "detector_version": "fixture-1",
+      "baseline_description": "Handwritten fixture only; not a calibrated detector",
+      "window_start_utc": "2026-01-01T01:00:00Z",
+      "window_end_utc": "2026-01-01T03:00:00Z",
+      "severity": "low",
+      "impact": "unknown",
+      "score": null,
+      "evidence_status": "unverified",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "src:synthetic-a"
+        ],
+        "corroborating_source_ids": [
+          "src:synthetic-b"
+        ],
+        "extraction_method": "synthetic fixture generator"
+      }
+    }
+  ],
+  "narratives": [
+    {
+      "narrative_id": "narrative:sample",
+      "anomaly_id": "anomaly:sample",
+      "title": "SYNTHETIC DATA",
+      "steps": [
+        {
+          "step_id": "step:sample",
+          "scene_type": "draw_relation",
+          "duration_ms": 1000,
+          "camera_target": null,
+          "visible_entity_ids": [
+            "entity:alpha",
+            "entity:beta"
+          ],
+          "visible_relation_ids": [
+            "relation:sample"
+          ],
+          "subtitle_ko": "합성 데이터: 실제 사건이나 검증된 관계가 아닙니다.",
+          "subtitle_en": "Synthetic data: not a real event or verified relationship.",
+          "evidence_claim_ids": [
+            "claim:sample"
+          ],
+          "evidence_status": "inferred",
+          "reduced_motion_fallback": "Show the synthetic relation without animation"
+        }
+      ]
+    }
+  ]
+}

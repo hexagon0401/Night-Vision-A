@@ -1,0 +1,69 @@
+old_path,new_path,sha256,status
+.DS_Store,archive/miscellaneous/.DS_Store,5eef44013a806bd3496faeb275bc7ca11a74d7e34890f969a54b04a8d85777f7,preserved
+00_Palantir_Foundry_Upload_Guide.md,docs/foundry/legacy-upload-guide.md,bc04821bd923b3b760da6c709fb588c2222cc8fe850aa335bd2b00a6250318a7,preserved
+NV_Alpha(Finetuned)/.DS_Store,archive/miscellaneous/NV_Alpha(Finetuned)/.DS_Store,c997f1870c7c2be3b9037781195b0ee85763a4fd579cacee8cf1dd26d22fee60,preserved
+NV_Alpha(Finetuned)/V1/Connector.md,extensions/promptpacks/global-v1/Connector.md,71ebc4462fa2a9dad97400cfb48e01bb113690a7a32c0855643ab163585cd57e,preserved
+NV_Alpha(Finetuned)/V1/MasterPrompt.md,extensions/promptpacks/global-v1/MasterPrompt.md,d52b69984024c28bc6bda29571adbb9a21f31ca058a8dd5576169424b4525893,preserved
+NV_Alpha(Finetuned)/V1/Navigator.md,extensions/promptpacks/global-v1/Navigator.md,48ca26d7c80cc2a4b41e501428f105a9096ea54f85a34b4699ac88b2c87df80f,preserved
+NV_Alpha(Finetuned)/V2_CHN_Finetuned/.DS_Store,extensions/promptpacks/china-v2/.DS_Store,079eb810ab50e2acc41d1417abfea04081a7b54ca2339b4cbace9c0e2c1a94b1,preserved
+NV_Alpha(Finetuned)/V2_CHN_Finetuned/Connector_CHN.md,extensions/promptpacks/china-v2/Connector_CHN.md,6f742b885ac8ad8b3399e9822247e93b2930f157c76fca7a38bd4c314f51d05e,preserved
+NV_Alpha(Finetuned)/V2_CHN_Finetuned/Navigator_CHN.md,extensions/promptpacks/china-v2/Navigator_CHN.md,5c14fe9c3a3d11699079b1619be25a7bbd4a0eacf6ebe84537118ad8e932293a,preserved
+NV_Alpha(Finetuned)/V2_CHN_Finetuned/Source_Finetuned_CHN.md,extensions/promptpacks/china-v2/Source_Finetuned_CHN.md,b1ecb29bf8418819ca21f53d013c1ed06d98fd8ef54d994fc5a233666f95190c,preserved
+Night Vision for Claude/.DS_Store,archive/miscellaneous/Night Vision for Claude/.DS_Store,1858135e15caf667cc332d70d79232e1cf8f3019a50cd07c71304731f323336f,preserved
+Night Vision for Claude/V1/.DS_Store,extensions/claude/v1/.DS_Store,d1de264404b68d3cda80bfcaaebba48988a8d827e9e69926f57694847893bc35,preserved
+Night Vision for Claude/V1/NightVisionForClaude/Framework.md,extensions/claude/v1/NightVisionForClaude/Framework.md,3f69de4870306b3162cfb3002a6cfc6ea72e2120e70733628a5a31d4e0f5f3de,preserved
+Night Vision for Claude/V1/NightVisionForClaude/Output from Claude.ai.md,extensions/claude/v1/NightVisionForClaude/Output from Claude.ai.md,cee4905aa8d34752cfee6778d368fe4a2ff9018536b1345ccd21167cf464dda2,preserved
+Night Vision for Claude/V1/NightVisionForClaude/SKILL.md,extensions/claude/v1/NightVisionForClaude/SKILL.md,d9df1e604d73dc82a53dd9521572da37ab7bcfe26045d489d141f1532fcbf79d,preserved
+Night Vision for Claude/V1/night-vision for claude V1.zip,extensions/claude/v1/night-vision for claude V1.zip,35b91a2a99e876099ea0f0c1caf94bbe3a9ed4cf47d8669d50df9e3167e25bbf,preserved
+Night Vision for Claude/V2/.DS_Store,extensions/claude/v2/.DS_Store,224303423a74e122d4173f088576c29c3ab548511dc7198b2e143071660d4cf9,preserved
+Night Vision for Claude/V2/night_vision.skill,extensions/claude/v2/night_vision.skill,5e53e26c0c3051532821d71a69c35e45a8da09637c1d4deecaf2a8fd9c8b6cd2,preserved
+Night Vision for Claude/V2/night_vision/.DS_Store,extensions/claude/v2/night_vision/.DS_Store,2a3d6b8d06823817db418fe651e6359577b8365b7c2b74f801b54292960f6135,preserved
+Night Vision for Claude/V2/night_vision/SKILL.md,extensions/claude/v2/night_vision/SKILL.md,83a031f24634a1d54ef7983771ee25f6d8427971ea9650ca557c463f439c8ec1,preserved
+Night Vision for Claude/V2/night_vision/references/framework.md,extensions/claude/v2/night_vision/references/framework.md,3f69de4870306b3162cfb3002a6cfc6ea72e2120e70733628a5a31d4e0f5f3de,preserved
+Night Vision for Claude/V2/night_vision/references/output.md,extensions/claude/v2/night_vision/references/output.md,cee4905aa8d34752cfee6778d368fe4a2ff9018536b1345ccd21167cf464dda2,preserved
+Night Vision for Claude/V3/night_vision_v3.skill,extensions/claude/v3/night_vision_v3.skill,5e553ec14af941db3a7db51d3d09b9a1ce2cd0b2bddfb1ca1f1ffb58869b560d,preserved
+Night Vision/.DS_Store,archive/miscellaneous/Night Vision/.DS_Store,2acb52750ec3393d46f3ad68dac23678e73ef9cab56240b6d8690224e5580a17,preserved
+Night Vision/Result/.DS_Store,data/legacy-cases/.DS_Store,1c853473ee9303a4e6972327e7956f85111c62047c04046e346cbe65a67ae2a8,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/.DS_Store,data/legacy-cases/EPIC FURY PACKAGE(4.5)/.DS_Store,ef38d3a593b81efa9ae904befdae196f9ed88b9e0bc588b88bc748c743002667,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package.zip,data/legacy-cases/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package.zip,a8464463cc4c6b056e73c9489b7b747c958c9cdf7cd756e2814e1426309dc0e4,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_conflict_zones.csv,data/legacy-cases/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_conflict_zones.csv,2dc020a3fa983f3fa61d65893b87372d8a5f0ad5cdce7a56e38fe8619311cccb,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_iran_retaliation.csv,data/legacy-cases/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_iran_retaliation.csv,a80328855136a3fb49b4f725fff11ffcfea0d92c8279704acccc687373fd97ea,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_op_timeline.csv,data/legacy-cases/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_op_timeline.csv,f2259dccc6d3f00a3cd1b231245609cfde3e08edbaafea52f3aa1f5a65489cfb,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_strike_routes.csv,data/legacy-cases/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_strike_routes.csv,71ee7ea1aeffe98acb92f1ee20a00bf5bcdab94c3bf2ef393b20b0af9d714e38,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_strike_targets.csv,data/legacy-cases/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_strike_targets.csv,e2bee293e6a736fc39657e4c758faa8152b97cd8f1aec3a3e92f1483c7aa5c53,preserved
+Night Vision/Result/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_us_force_posture.csv,data/legacy-cases/EPIC FURY PACKAGE(4.5)/Epic_Fury_Package/epic_fury_us_force_posture.csv,1b7c6743f104a7bcfde4248c9618ebf3bb61abd2765a94c564cd58336157a5fa,preserved
+Night Vision/V1/files.zip,archive/directives/v1/files.zip,5737bd3e23fcd58988dd53db5e7fba46f050d9c49915f451665187112dfda503,preserved
+Night Vision/V2/files.zip,archive/directives/v2/files.zip,0a7a3f7a19cb8c6da9c8b69096d391ae2735cd39714883d96e7eaab41c3375bd,preserved
+Night Vision/V3/.DS_Store,archive/directives/v3/.DS_Store,61f1077956660c014e0a0c789e0d801d4a62b70c3eef605f4f387718fe009e68,preserved
+Night Vision/V3/files.zip,archive/directives/v3/files.zip,f691769dca5b49692525646f56f28aa0764885042b73a284f689c06f1a30222d,preserved
+Night Vision/V3/files/Master_Directive.md,archive/directives/v3/files/Master_Directive.md,c14c5dbd74671850b5326b2e4534272274b86d8cd7bb2b1a641567c5f732910c,preserved
+Night Vision/V3/files/Relation.md,archive/directives/v3/files/Relation.md,84fc609d6837d61d3133c5fcf90f808279775b9ad74b3b0ab1215d0233f17292,preserved
+Night Vision/V3/files/Source.md,archive/directives/v3/files/Source.md,29bb016906fd18436df25d05220cdb0fbfde023117b7fe3a90bda8486c7f3250,preserved
+Night Vision/V3/files/TO_Foundry.md,archive/directives/v3/files/TO_Foundry.md,41e25575c4f555e565af07c6dc9d671bc82d2de047b8dbb4e98010f67fcf7ec1,preserved
+Night Vision/V4.5/TO_Foundry_v4.5.md,archive/directives/v4.5/TO_Foundry_v4.5.md,bd406d3cb6e4f8380800f6f99eaa2aede667f234a7156091a6bdc7fb20d8412d,preserved
+Night Vision/V4/TO_Foundry_v4 (1).md,archive/directives/v4/TO_Foundry_v4 (1).md,33112957c11447d4cd58d0645a9ad69f2820d86a9db221e2574497b01b609756,preserved
+Night Vision/V4/TO_Foundry_v4.md,archive/directives/v4/TO_Foundry_v4.md,33112957c11447d4cd58d0645a9ad69f2820d86a9db221e2574497b01b609756,preserved
+Night Vision/V5/TO_Foundry_v5.md Improvements Summary.md,archive/directives/v5/TO_Foundry_v5.md Improvements Summary.md,456ac9845db65303e765df9d7326f3e02ea65f135759a62f2f47fc5f8f1cae64,preserved
+Night Vision/V5/To_Foundry_v5.0.md,archive/directives/v5/To_Foundry_v5.0.md,c62350b172294302b2b573b96c312b7bce9d8726d499771f35a99bd1dec4b0b6,preserved
+Night Vision/V6/TO_Foundry_v6.0.md,archive/directives/v6/TO_Foundry_v6.0.md,e43f4ac229a189e29105f12db737863a6c4a9a52a5a739e7fe5b8210569b78f8,preserved
+Night Vision/V6/팔란티어 파운드리 데이터 통합 및 시각화 업데이트.md,archive/directives/v6/팔란티어 파운드리 데이터 통합 및 시각화 업데이트.md,b6c508afadbf104b62ab8b59986737015eb0a1b8337df2203e0f9f8a1c5a374f,preserved
+README.md,archive/README-pre-v2.md,f2276dd4f19413bfc43eedecd903bc9eef1dae055160542eafb44e8e563c2aaf,preserved
+TMP/.DS_Store,archive/miscellaneous/TMP/.DS_Store,4c7623fe9cbf9f5048f11f73e0c7ea863dd5fc395a22cb3d019e24085a3ac2a0,preserved
+TMP/Source.txt.rtf,archive/miscellaneous/TMP/Source.txt.rtf,a93c1901de248ab31fac9c63aa41562e99dc19fd1f95f6bcad458c3c46721b7f,preserved
+TMP/V1/.DS_Store,data/fixtures/legacy/V1/.DS_Store,24f83e7d993f4711f6acf882e0ce9b7a8b45d43754f73922ffdcc4a06e20ee62,preserved
+TMP/V1/Data v1 -claude/01_US_Military_Bases_Middle_East.csv,data/fixtures/legacy/V1/Data v1 -claude/01_US_Military_Bases_Middle_East.csv,e3d00511337b4068357488dd6d7eb875d62bc9b1a196539705743a92e1e2d61f,preserved
+TMP/V1/Data v1 -claude/02_Iran_Military_Naval_Facilities.csv,data/fixtures/legacy/V1/Data v1 -claude/02_Iran_Military_Naval_Facilities.csv,5492d16b8aebab922e435870caae80c1216c7965c95cae3dfc3ed442cb4e1ffd,preserved
+TMP/V1/Data v1 -claude/03_Iran_Oil_Export_Ports_Chokepoints.csv,data/fixtures/legacy/V1/Data v1 -claude/03_Iran_Oil_Export_Ports_Chokepoints.csv,7914499ecd945303e9f8286a04b3cdbc1fdda96b80e62474cde4a4abc9e96611,preserved
+TMP/V1/Data v1 -claude/04_China_Iran_Oil_Import_Routes.csv,data/fixtures/legacy/V1/Data v1 -claude/04_China_Iran_Oil_Import_Routes.csv,3a19c9456f9d4dbdb68cc58417047c62b5ddd42ca36da580bc95a28ef6ad1e11,preserved
+TMP/V1/Data v1 -claude/05_Gulf_Ports_At_Risk_FIXED.csv,data/fixtures/legacy/V1/Data v1 -claude/05_Gulf_Ports_At_Risk_FIXED.csv,5427e4754797edd21ea28e6eeb1f8482a3fe36e8721c2785e76a331b3c570161,preserved
+TMP/V1/Data v2 -claude edit/01_US_Military_Bases_Middle_East_GEO.csv,data/fixtures/legacy/V1/Data v2 -claude edit/01_US_Military_Bases_Middle_East_GEO.csv,bb4ea6c8563f6b525f729ec511f897a3e2cfb9a0f21691151dac2a708921e182,preserved
+TMP/V1/Data v2 -claude edit/02_Iran_Military_Naval_Facilities_GEO.csv,data/fixtures/legacy/V1/Data v2 -claude edit/02_Iran_Military_Naval_Facilities_GEO.csv,352615788ebc97a07c4b31580f4bfd022def2c392c2c278712b60587213aaa63,preserved
+TMP/V1/Data v2 -claude edit/03_Iran_Oil_Export_Ports_Chokepoints_GEO.csv,data/fixtures/legacy/V1/Data v2 -claude edit/03_Iran_Oil_Export_Ports_Chokepoints_GEO.csv,8eaa2126be6f855a3ec3a885b730d33fb07d01131ec7c5931e3679ac3ff98589,preserved
+TMP/V1/Data v2 -claude edit/04_China_Iran_Oil_Import_Routes_GEO.csv,data/fixtures/legacy/V1/Data v2 -claude edit/04_China_Iran_Oil_Import_Routes_GEO.csv,dd574abf941b12afdf84e717c8727f2feb5abd976a33a1dea0adf5fd84b33b14,preserved
+TMP/V1/Data v2 -claude edit/05_Gulf_Ports_At_Risk_FIXED_GEO.csv,data/fixtures/legacy/V1/Data v2 -claude edit/05_Gulf_Ports_At_Risk_FIXED_GEO.csv,029d61bf1dbc69ab61eae1f3c3fd2663359b4d3087673e0b4e2dd140143e93fd,preserved
+TMP/v0_test/CHN ports.csv,data/fixtures/legacy/v0_test/CHN ports.csv,4c69134dad11d490615b46cfe0149f5e93842296c51b84dbee593cb827a0a4d0,preserved
+TMP/v0_test/IRN ports.csv,data/fixtures/legacy/v0_test/IRN ports.csv,44ba90db49a7e9c62bc84430292a5e362bbacf63fe965245a047bd0501413c8f,preserved
+TMP/v0_test/Ports.csv,data/fixtures/legacy/v0_test/Ports.csv,2c3cc249684106f2f0b26568945f5e14a66a0a4a69e7490db8e9d282bcf4b4f9,preserved
+TMP/v0_test/UAE ports.csv,data/fixtures/legacy/v0_test/UAE ports.csv,69830890bf921e03570b654342263cd155e7af65bd951ba05969ae7a53a7ea63,preserved
+TMP/v0_test/USA foriegn ports.csv,data/fixtures/legacy/v0_test/USA foriegn ports.csv,d9e0beaa623d24351a09171a99ba7f7c9f2b375ab3bdfa075ef044b959565251,preserved
+TMP/v0_test/현대사회와철학_개요.pdf,archive/miscellaneous/TMP/v0_test/현대사회와철학_개요.pdf,f6a1855e69c70b97bab70f1ee9fb787be3e0982e43523a12704d72a953de84c4,preserved

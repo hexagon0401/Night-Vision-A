@@ -1,0 +1,4450 @@
+{
+  "schema_version": "2.0.0",
+  "case_id": "case:synthetic-detection",
+  "title": "SYNTHETIC DATA / 합성 탐지 실험",
+  "data_origin": "synthetic",
+  "sources": [
+    {
+      "source_id": "fixture-source:alpha",
+      "url": "https://example.invalid/synthetic/alpha",
+      "publisher": "Synthetic fixture publisher",
+      "publisher_family": "synthetic-shared",
+      "published_at_utc": null,
+      "retrieved_at_utc": "2026-01-04T00:00:00Z",
+      "content_hash": "f39c54bdb739b0a7b54b7e8443e8abf035e29bfc6a82812cbfdab8ea0ff77935",
+      "license": "Handwritten synthetic fixture; not real intelligence",
+      "access": "public",
+      "extraction_method": "deterministic synthetic fixture",
+      "quality": "unknown"
+    },
+    {
+      "source_id": "fixture-source:beta",
+      "url": "https://example.invalid/synthetic/beta",
+      "publisher": "Synthetic fixture publisher",
+      "publisher_family": "synthetic-shared",
+      "published_at_utc": null,
+      "retrieved_at_utc": "2026-01-04T00:00:00Z",
+      "content_hash": "513154604d73f22ab2f07f1ab856d0ceaf7deb06fe812992d50306e50080f22f",
+      "license": "Handwritten synthetic fixture; not real intelligence",
+      "access": "public",
+      "extraction_method": "deterministic synthetic fixture",
+      "quality": "unknown"
+    },
+    {
+      "source_id": "fixture-source:gamma",
+      "url": "https://example.invalid/synthetic/gamma",
+      "publisher": "Synthetic fixture publisher",
+      "publisher_family": "synthetic-shared",
+      "published_at_utc": null,
+      "retrieved_at_utc": "2026-01-04T00:00:00Z",
+      "content_hash": "19e4a739030855a80fef06d4489025f97961abbecfe631130f8d92c1719d2ec8",
+      "license": "Handwritten synthetic fixture; not real intelligence",
+      "access": "public",
+      "extraction_method": "deterministic synthetic fixture",
+      "quality": "unknown"
+    }
+  ],
+  "entities": [
+    {
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "entity_id": "fixture-entity:alpha",
+      "entity_type": "synthetic_sensor",
+      "name": "합성 센서 ALPHA",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "entity_id": "fixture-entity:beta",
+      "entity_type": "synthetic_sensor",
+      "name": "합성 센서 BETA",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "entity_id": "fixture-entity:gamma",
+      "entity_type": "synthetic_sensor",
+      "name": "합성 센서 GAMMA",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    }
+  ],
+  "events": [],
+  "observations": [
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:000",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-0",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:001",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T01:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-1",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:002",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T02:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-2",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:003",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T03:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-3",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:004",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T04:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-4",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:005",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T05:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-5",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:006",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T06:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-6",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:007",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T07:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-7",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:008",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T08:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-8",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:009",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T09:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-9",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:010",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T10:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-10",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:011",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T11:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-11",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:012",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T12:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-12",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:013",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T13:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-13",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:014",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T14:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-14",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:015",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T15:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-15",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:016",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T16:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-16",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:017",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T17:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-17",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:018",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T18:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-18",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:019",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T19:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-19",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:020",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T20:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-20",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:021",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T21:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-21",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:022",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T22:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-22",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:023",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-01T23:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-23",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:024",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-24",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:025",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T01:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-25",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:026",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T02:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-26",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:027",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T03:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-27",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:028",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T04:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-28",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:029",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T05:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-29",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:030",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T06:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-30",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:031",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T07:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-31",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:032",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T08:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-32",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:033",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T09:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-33",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:034",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T10:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-34",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:035",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T11:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-35",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:036",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T12:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-36",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:037",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T13:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-37",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:038",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T14:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-38",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:039",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T15:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-39",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:040",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T16:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-40",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:041",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T17:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-41",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:042",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T18:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-42",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:043",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T19:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-43",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:044",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T20:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-44",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:045",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T21:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-45",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:046",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T22:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-46",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:047",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-02T23:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-47",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:alpha:048",
+      "entity_id": "fixture-entity:alpha",
+      "observed_at_utc": "2026-01-03T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 45.0,
+      "unit": "fixture_units",
+      "source_record_id": "alpha-48",
+      "location": {
+        "latitude": 35.0,
+        "longitude": 127.0,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:alpha",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:000",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-0",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:001",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T01:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-1",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:002",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T02:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-2",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:003",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T03:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-3",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:004",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T04:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-4",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:005",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T05:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-5",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:006",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T06:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-6",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:007",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T07:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-7",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:008",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T08:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-8",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:009",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T09:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-9",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:010",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T10:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-10",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:011",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T11:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-11",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:012",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T12:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-12",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:013",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T13:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-13",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:014",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T14:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-14",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:015",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T15:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-15",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:016",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T16:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-16",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:017",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T17:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-17",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:018",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T18:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-18",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:019",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T19:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-19",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:020",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T20:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-20",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:021",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T21:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-21",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:022",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T22:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-22",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:023",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-01T23:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-23",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:024",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-24",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:025",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T01:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-25",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:026",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T02:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-26",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:027",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T03:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-27",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:028",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T04:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-28",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:029",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T05:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-29",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:030",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T06:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-30",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:031",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T07:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-31",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:032",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T08:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-32",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:033",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T09:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-33",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:034",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T10:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-34",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:035",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T11:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-35",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:036",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T12:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-36",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:037",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T13:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-37",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:038",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T14:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-38",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:039",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T15:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-39",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:040",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T16:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-40",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:041",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T17:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-41",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:042",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T18:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-42",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:043",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T19:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-43",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:044",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T20:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-44",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:045",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T21:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-45",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:046",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T22:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-46",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:047",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-02T23:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-47",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:beta:048",
+      "entity_id": "fixture-entity:beta",
+      "observed_at_utc": "2026-01-03T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 13.0,
+      "unit": "fixture_units",
+      "source_record_id": "beta-48",
+      "location": {
+        "latitude": 35.1,
+        "longitude": 127.1,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:beta",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:000",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-0",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:001",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T01:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-1",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:002",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T02:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-2",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:003",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T03:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-3",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:004",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T04:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-4",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:005",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T05:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-5",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:006",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T06:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-6",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:007",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T07:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-7",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:008",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T08:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-8",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:009",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T09:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-9",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:010",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T10:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-10",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:011",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T11:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-11",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:012",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T12:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-12",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:013",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T13:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-13",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:014",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T14:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-14",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:015",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T15:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-15",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:016",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T16:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-16",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:017",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T17:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-17",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:018",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T18:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-18",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:019",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T19:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-19",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:020",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T20:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-20",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:021",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T21:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-21",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:022",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T22:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-22",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:023",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-01T23:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-23",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:024",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-24",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:025",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T01:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-25",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:026",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T02:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-26",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:027",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T03:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-27",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:028",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T04:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-28",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:029",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T05:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-29",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:030",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T06:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-30",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:031",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T07:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-31",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:032",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T08:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-32",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:033",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T09:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-33",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:034",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T10:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-34",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:035",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T11:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-35",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:036",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T12:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-36",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:037",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T13:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-37",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:038",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T14:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-38",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:039",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T15:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-39",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:040",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T16:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-40",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:041",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T17:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-41",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:042",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T18:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-42",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:043",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T19:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-43",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:044",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T20:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-44",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:045",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T21:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-45",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:046",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T22:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 11.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-46",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:047",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-02T23:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 9.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-47",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    },
+    {
+      "evidence_status": "observed",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "observation_id": "fixture-observation:gamma:048",
+      "entity_id": "fixture-entity:gamma",
+      "observed_at_utc": "2026-01-03T00:00:00Z",
+      "metric": "synthetic_measurement",
+      "value": 10.0,
+      "unit": "fixture_units",
+      "source_record_id": "gamma-48",
+      "location": {
+        "latitude": 35.2,
+        "longitude": 127.2,
+        "crs": "EPSG:4326",
+        "role": "verified",
+        "source_id": "fixture-source:gamma",
+        "accuracy_m": null,
+        "note": "SYNTHETIC fixture point; no real asset or sensor"
+      }
+    }
+  ],
+  "claims": [
+    {
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:alpha"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "claim_id": "fixture-claim:alpha",
+      "statement": "SYNTHETIC DATA — fictional alpha measurements",
+      "assessment": "Not a real source-backed case",
+      "event_ids": [],
+      "observation_ids": [
+        "fixture-observation:alpha:000",
+        "fixture-observation:alpha:001",
+        "fixture-observation:alpha:002",
+        "fixture-observation:alpha:003",
+        "fixture-observation:alpha:004",
+        "fixture-observation:alpha:005",
+        "fixture-observation:alpha:006",
+        "fixture-observation:alpha:007",
+        "fixture-observation:alpha:008",
+        "fixture-observation:alpha:009",
+        "fixture-observation:alpha:010",
+        "fixture-observation:alpha:011",
+        "fixture-observation:alpha:012",
+        "fixture-observation:alpha:013",
+        "fixture-observation:alpha:014",
+        "fixture-observation:alpha:015",
+        "fixture-observation:alpha:016",
+        "fixture-observation:alpha:017",
+        "fixture-observation:alpha:018",
+        "fixture-observation:alpha:019",
+        "fixture-observation:alpha:020",
+        "fixture-observation:alpha:021",
+        "fixture-observation:alpha:022",
+        "fixture-observation:alpha:023",
+        "fixture-observation:alpha:024",
+        "fixture-observation:alpha:025",
+        "fixture-observation:alpha:026",
+        "fixture-observation:alpha:027",
+        "fixture-observation:alpha:028",
+        "fixture-observation:alpha:029",
+        "fixture-observation:alpha:030",
+        "fixture-observation:alpha:031",
+        "fixture-observation:alpha:032",
+        "fixture-observation:alpha:033",
+        "fixture-observation:alpha:034",
+        "fixture-observation:alpha:035",
+        "fixture-observation:alpha:036",
+        "fixture-observation:alpha:037",
+        "fixture-observation:alpha:038",
+        "fixture-observation:alpha:039",
+        "fixture-observation:alpha:040",
+        "fixture-observation:alpha:041",
+        "fixture-observation:alpha:042",
+        "fixture-observation:alpha:043",
+        "fixture-observation:alpha:044",
+        "fixture-observation:alpha:045",
+        "fixture-observation:alpha:046",
+        "fixture-observation:alpha:047",
+        "fixture-observation:alpha:048"
+      ],
+      "counterevidence_claim_ids": []
+    },
+    {
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:beta"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "claim_id": "fixture-claim:beta",
+      "statement": "SYNTHETIC DATA — fictional beta measurements",
+      "assessment": "Not a real source-backed case",
+      "event_ids": [],
+      "observation_ids": [
+        "fixture-observation:beta:000",
+        "fixture-observation:beta:001",
+        "fixture-observation:beta:002",
+        "fixture-observation:beta:003",
+        "fixture-observation:beta:004",
+        "fixture-observation:beta:005",
+        "fixture-observation:beta:006",
+        "fixture-observation:beta:007",
+        "fixture-observation:beta:008",
+        "fixture-observation:beta:009",
+        "fixture-observation:beta:010",
+        "fixture-observation:beta:011",
+        "fixture-observation:beta:012",
+        "fixture-observation:beta:013",
+        "fixture-observation:beta:014",
+        "fixture-observation:beta:015",
+        "fixture-observation:beta:016",
+        "fixture-observation:beta:017",
+        "fixture-observation:beta:018",
+        "fixture-observation:beta:019",
+        "fixture-observation:beta:020",
+        "fixture-observation:beta:021",
+        "fixture-observation:beta:022",
+        "fixture-observation:beta:023",
+        "fixture-observation:beta:024",
+        "fixture-observation:beta:025",
+        "fixture-observation:beta:026",
+        "fixture-observation:beta:027",
+        "fixture-observation:beta:028",
+        "fixture-observation:beta:029",
+        "fixture-observation:beta:030",
+        "fixture-observation:beta:031",
+        "fixture-observation:beta:032",
+        "fixture-observation:beta:033",
+        "fixture-observation:beta:034",
+        "fixture-observation:beta:035",
+        "fixture-observation:beta:036",
+        "fixture-observation:beta:037",
+        "fixture-observation:beta:038",
+        "fixture-observation:beta:039",
+        "fixture-observation:beta:040",
+        "fixture-observation:beta:041",
+        "fixture-observation:beta:042",
+        "fixture-observation:beta:043",
+        "fixture-observation:beta:044",
+        "fixture-observation:beta:045",
+        "fixture-observation:beta:046",
+        "fixture-observation:beta:047",
+        "fixture-observation:beta:048"
+      ],
+      "counterevidence_claim_ids": []
+    },
+    {
+      "evidence_status": "reported",
+      "confidence": "unknown",
+      "provenance": {
+        "source_ids": [
+          "fixture-source:gamma"
+        ],
+        "corroborating_source_ids": [],
+        "extraction_method": "synthetic series",
+        "evidence_span_hash": null
+      },
+      "claim_id": "fixture-claim:gamma",
+      "statement": "SYNTHETIC DATA — fictional gamma measurements",
+      "assessment": "Not a real source-backed case",
+      "event_ids": [],
+      "observation_ids": [
+        "fixture-observation:gamma:000",
+        "fixture-observation:gamma:001",
+        "fixture-observation:gamma:002",
+        "fixture-observation:gamma:003",
+        "fixture-observation:gamma:004",
+        "fixture-observation:gamma:005",
+        "fixture-observation:gamma:006",
+        "fixture-observation:gamma:007",
+        "fixture-observation:gamma:008",
+        "fixture-observation:gamma:009",
+        "fixture-observation:gamma:010",
+        "fixture-observation:gamma:011",
+        "fixture-observation:gamma:012",
+        "fixture-observation:gamma:013",
+        "fixture-observation:gamma:014",
+        "fixture-observation:gamma:015",
+        "fixture-observation:gamma:016",
+        "fixture-observation:gamma:017",
+        "fixture-observation:gamma:018",
+        "fixture-observation:gamma:019",
+        "fixture-observation:gamma:020",
+        "fixture-observation:gamma:021",
+        "fixture-observation:gamma:022",
+        "fixture-observation:gamma:023",
+        "fixture-observation:gamma:024",
+        "fixture-observation:gamma:025",
+        "fixture-observation:gamma:026",
+        "fixture-observation:gamma:027",
+        "fixture-observation:gamma:028",
+        "fixture-observation:gamma:029",
+        "fixture-observation:gamma:030",
+        "fixture-observation:gamma:031",
+        "fixture-observation:gamma:032",
+        "fixture-observation:gamma:033",
+        "fixture-observation:gamma:034",
+        "fixture-observation:gamma:035",
+        "fixture-observation:gamma:036",
+        "fixture-observation:gamma:037",
+        "fixture-observation:gamma:038",
+        "fixture-observation:gamma:039",
+        "fixture-observation:gamma:040",
+        "fixture-observation:gamma:041",
+        "fixture-observation:gamma:042",
+        "fixture-observation:gamma:043",
+        "fixture-observation:gamma:044",
+        "fixture-observation:gamma:045",
+        "fixture-observation:gamma:046",
+        "fixture-observation:gamma:047",
+        "fixture-observation:gamma:048"
+      ],
+      "counterevidence_claim_ids": []
+    }
+  ],
+  "relations": [],
+  "hypotheses": [],
+  "anomalies": [],
+  "narratives": []
+}

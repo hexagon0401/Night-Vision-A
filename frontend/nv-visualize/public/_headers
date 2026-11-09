@@ -1,0 +1,5 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.openfreemap.org https://assets.openfreemap.com; connect-src 'self' https://*.openfreemap.org https://assets.openfreemap.com; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'

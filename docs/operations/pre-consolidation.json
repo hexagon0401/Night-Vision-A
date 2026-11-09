@@ -1,0 +1,220 @@
+{
+  "recorded_at_utc": "2026-11-09T11:17:02.973833+00:00",
+  "production_branch": "feat/nv2-alpha-release",
+  "production_sha": "84042dded26445360c2d827ebc5c8e764b82735f",
+  "repository": "hexagon0401/Night-Vision-A",
+  "branches": [
+    {
+      "name": "feat/nv2-alpha-release",
+      "sha": "84042dded26445360c2d827ebc5c8e764b82735f",
+      "protected": false
+    },
+    {
+      "name": "feat/nv2-collectors",
+      "sha": "62ee6d512bfa9889323e09c7292d0a40090f0388",
+      "protected": false
+    },
+    {
+      "name": "feat/nv2-contracts",
+      "sha": "d033a6e4f2f5eb8626555e58ebf9f17221ec2a53",
+      "protected": false
+    },
+    {
+      "name": "feat/nv2-detection",
+      "sha": "e53e463847ddcf61aa6f1cb559c0efd7d1311dfa",
+      "protected": false
+    },
+    {
+      "name": "feat/nv2-foundry-export",
+      "sha": "61ed25a910ee998c1f8dff39b5e9ad15f7ac294b",
+      "protected": false
+    },
+    {
+      "name": "feat/nv2-map-explore",
+      "sha": "a9870d3edc230f27acc5ac5859c9d17d0faa50cc",
+      "protected": false
+    },
+    {
+      "name": "feat/nv2-trace",
+      "sha": "633a98834c06b9db94a44ea0fdc84c2cdd0e08c6",
+      "protected": false
+    },
+    {
+      "name": "feat/nv3-auth-nim",
+      "sha": "56e7c44cd94da42755f18c9bb6d3a5ff2c633d9b",
+      "protected": false
+    },
+    {
+      "name": "feat/nv3-detail-map",
+      "sha": "e1204e763c9db38b44053437e62954b0ef5fccbd",
+      "protected": false
+    },
+    {
+      "name": "feat/nv3-monitor-console",
+      "sha": "5b3a208b770ddd29365d80864f6f7c5f5dd8ac4c",
+      "protected": false
+    },
+    {
+      "name": "feat/nv3-monitor-data",
+      "sha": "ba70390a282a678d6a8dda7c3dedbe45e501184e",
+      "protected": false
+    },
+    {
+      "name": "feat/nv3-official-rss",
+      "sha": "7dac53bde706aab67f43ff7d675e4036264db5f4",
+      "protected": false
+    },
+    {
+      "name": "fix/nim-runtime-key-aliases",
+      "sha": "84042dded26445360c2d827ebc5c8e764b82735f",
+      "protected": false
+    },
+    {
+      "name": "main",
+      "sha": "19e6b81a4ce228f3ce9318ef60e668781981b274",
+      "protected": false
+    },
+    {
+      "name": "ops/nv3-monitor-schedule",
+      "sha": "9f1886afd71f4c0b4e81561b4023cd401577e11a",
+      "protected": false
+    },
+    {
+      "name": "pages/nv2-alpha-3d41bd947f68",
+      "sha": "a62c0df28d7d5180efa731576770d659f2618d0e",
+      "protected": false
+    },
+    {
+      "name": "refactor/nv2-foundation",
+      "sha": "903f80d1abf7cb9ee19437db81903b49b137eb74",
+      "protected": false
+    },
+    {
+      "name": "review/nv3-baseline",
+      "sha": "a4ec75ef975a681404826c4f4d0ab0addff43a4b",
+      "protected": false
+    }
+  ],
+  "pull_requests": [
+    {
+      "number": 15,
+      "state": "open",
+      "draft": false,
+      "head": "fix/nim-runtime-key-aliases",
+      "sha": "84042dded26445360c2d827ebc5c8e764b82735f",
+      "base": "feat/nv3-official-rss"
+    },
+    {
+      "number": 14,
+      "state": "open",
+      "draft": false,
+      "head": "ops/nv3-monitor-schedule",
+      "sha": "9f1886afd71f4c0b4e81561b4023cd401577e11a",
+      "base": "main"
+    },
+    {
+      "number": 13,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv3-official-rss",
+      "sha": "7dac53bde706aab67f43ff7d675e4036264db5f4",
+      "base": "feat/nv3-monitor-console"
+    },
+    {
+      "number": 12,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv3-monitor-console",
+      "sha": "5b3a208b770ddd29365d80864f6f7c5f5dd8ac4c",
+      "base": "feat/nv3-auth-nim"
+    },
+    {
+      "number": 11,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv3-auth-nim",
+      "sha": "56e7c44cd94da42755f18c9bb6d3a5ff2c633d9b",
+      "base": "feat/nv3-monitor-data"
+    },
+    {
+      "number": 10,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv3-monitor-data",
+      "sha": "ba70390a282a678d6a8dda7c3dedbe45e501184e",
+      "base": "feat/nv3-detail-map"
+    },
+    {
+      "number": 9,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv3-detail-map",
+      "sha": "e1204e763c9db38b44053437e62954b0ef5fccbd",
+      "base": "review/nv3-baseline"
+    },
+    {
+      "number": 8,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv2-alpha-release",
+      "sha": "84042dded26445360c2d827ebc5c8e764b82735f",
+      "base": "feat/nv2-foundry-export"
+    },
+    {
+      "number": 7,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv2-foundry-export",
+      "sha": "61ed25a910ee998c1f8dff39b5e9ad15f7ac294b",
+      "base": "feat/nv2-trace"
+    },
+    {
+      "number": 6,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv2-trace",
+      "sha": "633a98834c06b9db94a44ea0fdc84c2cdd0e08c6",
+      "base": "feat/nv2-map-explore"
+    },
+    {
+      "number": 5,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv2-map-explore",
+      "sha": "a9870d3edc230f27acc5ac5859c9d17d0faa50cc",
+      "base": "feat/nv2-detection"
+    },
+    {
+      "number": 4,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv2-detection",
+      "sha": "e53e463847ddcf61aa6f1cb559c0efd7d1311dfa",
+      "base": "feat/nv2-collectors"
+    },
+    {
+      "number": 3,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv2-collectors",
+      "sha": "62ee6d512bfa9889323e09c7292d0a40090f0388",
+      "base": "feat/nv2-contracts"
+    },
+    {
+      "number": 2,
+      "state": "open",
+      "draft": true,
+      "head": "feat/nv2-contracts",
+      "sha": "d033a6e4f2f5eb8626555e58ebf9f17221ec2a53",
+      "base": "refactor/nv2-foundation"
+    },
+    {
+      "number": 1,
+      "state": "open",
+      "draft": true,
+      "head": "refactor/nv2-foundation",
+      "sha": "903f80d1abf7cb9ee19437db81903b49b137eb74",
+      "base": "main"
+    }
+  ]
+}

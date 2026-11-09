@@ -1,94 +1,76 @@
-# Night Vision — Global Intelligence Extraction & Visualization System
+# Night Vision 2.0
 
-> OSINT-based geopolitical intelligence extraction, fusion, and visualization pipeline  
-> designed for Palantir Foundry AIP integration.
+출처를 추적할 수 있는 지정학 이상징후 분석 체계. 공개정보를 검증하고 연결해 지도와 내러티브로 설명하는 프로젝트입니다.
 
----
+A source-traceable geopolitical anomaly intelligence project: **Detect → Connect → Explain**.
 
-## 1. Overview
+## Current status / 현재 단계
 
-Night Vision is an automated intelligence pipeline that extracts, validates, and structures geopolitically significant data from open sources, then routes it for visualization in Palantir Foundry's Ontology, Map, and Workshop layers.
+The engine provides ten canonical models, provenance/geotime/reference validation, versioned API/TypeScript contracts and optional snapshot migrations. Bounded GDELT/UCDP/FIRMS/RSS collectors support synthetic replay, retries, cache and dedup. Median/MAD, CUSUM and sourced-point candidate analysis produce an explicit evidence graph with uncalibrated scores.
 
-The system covers military posture, conflict events, energy infrastructure, sanctions networks, arms transfers, and satellite assets across global theaters.
+NV Visualize provides a Flat Black MapLibre/deck.gl Explore map over real offline cartography, a clearly synthetic lab case and an archived USGS Taiwan-region Alpha. Sources, Layers, search and user-controlled evidence pinning open on demand.
 
-**Core Design Principles**
-- **Anti-hallucination**: Every data point must be traceable to a `source_id`. Unverifiable coordinates are flagged `pending_verification` — never fabricated.
-- **Source tiering**: Official government/UN documents (A) → Major think tanks (B) → OSINT web sources (W)
-- **Full domain coverage**: 11 intelligence domains from military assets to global conflict monitoring
+Live sources remain disabled by default. Source-linked KO/EN Trace playback and audited Foundry CSV ZIP export are implemented. An archived, source-backed USGS Alpha case completes the demonstration pipeline. Historical data remains unverified; no live global intelligence feed or real historical detection accuracy is claimed.
 
-**Intelligence Domains**
+## Workspace
 
-| Domain | Coverage |
-|--------|----------|
-| D1–D2 | Strategy & Policy, Military Assets & OOB |
-| D3–D4 | Military Facilities & Basing, Arms Transfers |
-| D5–D6 | Conflict Events, Sanctions & Criminal Networks |
-| D7–D8 | Satellite & Space Assets, Energy Infrastructure |
-| D9–D11 | Public Opinion & Economics, US Posture, Global Conflict Monitor |
-| D0 | OSINT Fallback — any unregistered topic |
+- [NV Engine](engine/) — independent Python package, version 2.0.0.
+- [NV Visualize](frontend/nv-visualize/) — TypeScript/Vite application with MapLibre + deck.gl Explore and Trace.
+- [API](services/api/) and [worker boundary](services/worker/).
+- [Contracts](schemas/) and [source configuration boundary](configs/sources/).
+- [Claude extensions v1–v3](extensions/claude/) and [global/China prompt packs](extensions/promptpacks/).
+- [Historical directives v1–v6 (including v4.5)](archive/directives/), [old README](archive/README-pre-v2.md), [Foundry guide](docs/foundry/legacy-upload-guide.md).
+- [Unverified case files](data/legacy-cases/) and [legacy experimental fixtures](data/fixtures/legacy/).
+- [Exact migration map](docs/migration/MIGRATION_MAP.md), [architecture](docs/architecture/README.md), [approved handoff](docs/design/nv2-handoff/NV2_CODEX_HANDOFF.md).
 
----
+## Develop
 
-## 2. Night Vision
+Python 3.12+ and Node 22+ are supported. Offline development requires no service credentials or running database.
 
-The core pipeline from source routing to Foundry CSV ingestion.
-
-```
-OSINT Sources
-    ↓
-Navigator        ← Source tier selection + OSINT fallback protocol
-    ↓
-Master Directive ← CASE A–K classification + OODA loop execution
-    ↓
-Relation         ← Domain CSV schemas (D0–D11)
-    ↓
-TO_Foundry       ← Parser config · Ontology mapping · Map layer routing
-    ↓
-Palantir Foundry ← Ontology → Map → Workshop
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -c requirements-runtime.txt -e './engine[test,storage,collect]' -e './services/api[test]'
+.venv/bin/python -m pytest engine/tests services/api/tests
+.venv/bin/nv-engine --version
+.venv/bin/python -m uvicorn nv_api.app:app --app-dir services/api/src --host 0.0.0.0 --port 8000
 ```
 
-**TO_Foundry Version History**
+In a second terminal:
 
-| Version | Key Changes |
-|---------|-------------|
-| v4 / v4.5 | Full Foundry Map coverage (28 sub-pages), layer decision tree |
-| v5.0 | Geopoint string format, initial Track modeling |
-| **v6.0** (current) | GeoJSON escaping fix, H3 dual-index, geotemporal Track architecture, CRS normalization |
+```sh
+cd frontend/nv-visualize
+npm ci
+npm test
+npm run build
+npm run dev -- --host 0.0.0.0
+```
 
-**v6.0 Technical Standards**
-- GeoJSON fields: internal quotes doubled (`""`), entire string wrapped in outer quotes
-- H3: dual-column mandatory — `h3_cell_id` (render) + `h3_geojson` as `geoshape` (spatial search index)
-- Track data: discrete rows per `object_id` + timestamp — never pre-merged into LineString
-- Parser: `MULTILINE_CSV_PARSER` for all geospatial datasets
-- Coordinate system: WGS 84 (EPSG:4326) input; Web Mercator (EPSG:3857) rendering
+Contracts: run `.venv/bin/python tools/generate_contracts.py --check` after `npm ci`. Local optional DB: `.venv/bin/alembic -c engine/alembic.ini upgrade head`, then `current`. No data is imported automatically. See [contract/storage decisions](docs/decisions/0002-canonical-contracts-and-storage.md) for limits.
 
----
+API readiness: `GET /healthz` must return `status: ok`, `phase: foundation`. This is process/package readiness, not ingestion readiness. Frontend: a Flat Black Explore map using pinned real cartography and an explicitly synthetic case; Sources, Layers, search and evidence pinning open on demand. Run `python3 tools/verify_migration.py` to verify every legacy file and archive.
 
-## 3. NV_Alpha (Finetuned)
+## Offline collector demo
 
-Claude-based intelligence assistant that drives the Night Vision pipeline.  
-Composed of a global base (V1) and a China-specific patch (V2).
+```sh
+.venv/bin/nv-engine replay --manifest configs/sources/gdelt.json --input data/fixtures/providers/gdelt.json --acquired-at 2026-01-01T05:00:00Z --state-dir .local/collector-demo --output-dir .local/gdelt-demo
+```
 
-**V1 — Global Intelligence Assistant**
+Use a fresh output directory for each run. The first run accepts two fictional article records from three input rows. Replaying into another output directory with the same state stores zero new records. `collection.json` preserves provenance, missing fields and partial-coverage counts; `case.json` is explicitly synthetic. No network is used. [Source policies and live prerequisites](configs/sources/README.md) · [Acquisition design/limits](docs/decisions/0003-bounded-acquisition.md).
 
-Loads in order: MasterPrompt → Navigator → Connector. Handles all regions and domains.
+## Candidate analysis
 
-- **Navigator**: Source tier prioritization and automatic OSINT fallback trigger
-- **Connector**: Four-stage pipeline — Data Fusion → Inference → Prediction → Visualization
-  - *Inference*: Capability-intent gap analysis, conflict escalation indicators, sanctions evasion network detection, strategic posture shift detection
-  - *Prediction*: Three-tier probability output — LIKELY / POSSIBLE / SPECULATIVE (specific date prediction prohibited)
+```sh
+.venv/bin/nv-engine analyze --input data/fixtures/detection/case.json --output-dir .local/detection-demo
+```
 
-**V2 — China Finetuned Patch**
+Use a fresh output directory. `analysis.json` contains deterministic, uncalibrated candidates and provenance graph; `case.json` preserves the synthetic case with added candidates. POST `/api/v2/analysis` accepts `{case, configuration}` without persistence or network access. [Detection decisions](docs/decisions/0004-candidate-detection.md).
 
-Layered on top of V1. Adds PRC-specific sources and inference templates.
+## Delivery and licensing
 
-| Template | Coverage |
-|----------|----------|
-| CI-01 | PRC Five-Year Plan trajectory analysis |
-| CI-02 | PLA purge → combat readiness degradation model |
-| CI-03 | ECS/SCS salami tactics escalation score |
-| CI-04 | Korea-China economic leverage index |
-| CI-05 | PRC proxy/TOC state ambiguity assessment |
-| CI-06 | BRI debt → political leverage pathway model |
+The next operational increment adds an OpenFreeMap detailed basemap and a public monitoring route at `/?view=monitor`. Its Cloudflare D1 data, GitHub OAuth and NIM capabilities remain setup-gated until the owner registers service credentials. See the deployed `/setup.html` guide and [monitoring operations](docs/implementation/NV3-operations.md). GitHub Actions monitoring defaults to 12 daily slots and must be enabled on the default branch; no paid plan is automatically activated.
 
-Extended source registry: Korean perspective (K01–K05), PRC government originals (CG01–CG09), think tank extensions (CT01–CT05), statistical extensions (QC01–QC03).
+[Ordered roadmap](docs/architecture/README.md): canonical schemas/provenance → bounded collectors → detectors → real map → Trace → exporter → source-backed Alpha. All seven implementation phases are delivered; see [release operations](deploy/README.md) for container and isolated static-preview deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. Foundry enrollment upload and production operation remain outside the Alpha.
+
+## Trace, export and deployment
+
+Select a case and candidate, then Trace for evidence-linked scenes. Play/Pause, previous/next, skip animation, Evidence and KO/EN are available; Explore restores context. Export downloads the selected case's prebuilt scoped ZIP. Custom case/time/track exports use nv-engine export-foundry or the authenticated job API. See [release operations](deploy/README.md) and [actual Alpha source/method](data/alpha/README.md). No source credentials, Foundry account or live server is required for the public static demo.

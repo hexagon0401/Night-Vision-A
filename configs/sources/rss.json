@@ -1,0 +1,14 @@
+{
+  "source_id": "nasa-rss",
+  "provider": "rss",
+  "endpoint": "https://www.nasa.gov/feed/",
+  "publisher": "NASA",
+  "publisher_family": "nasa",
+  "rights": {
+    "statement": "NASA feed metadata; content/media may have separate rights and identifier restrictions; review required",
+    "terms_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+    "reviewed": false,
+    "redistribution": "review_required"
+  },
+  "enabled": false
+}

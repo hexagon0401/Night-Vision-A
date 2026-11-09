@@ -1,0 +1,41 @@
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS snapshots (
+ id TEXT PRIMARY KEY, provider TEXT NOT NULL, created TEXT NOT NULL,
+ expected INTEGER NOT NULL CHECK(expected BETWEEN 0 AND 20000),
+ state TEXT NOT NULL DEFAULT 'staging', metadata TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS heads (provider TEXT PRIMARY KEY, snapshot TEXT NOT NULL REFERENCES snapshots(id));
+CREATE TABLE IF NOT EXISTS records (
+ snapshot TEXT NOT NULL REFERENCES snapshots(id) ON DELETE CASCADE,
+ id TEXT NOT NULL, country TEXT NOT NULL, day TEXT NOT NULL,
+ lat REAL, lon REAL, kind TEXT NOT NULL, body TEXT NOT NULL,
+ PRIMARY KEY(snapshot,id)
+);
+CREATE INDEX IF NOT EXISTS record_country_day ON records(snapshot,country,day);
+CREATE INDEX IF NOT EXISTS record_day ON records(snapshot,day);
+CREATE TABLE IF NOT EXISTS cases (
+ snapshot TEXT NOT NULL REFERENCES snapshots(id) ON DELETE CASCADE,
+ id TEXT NOT NULL, country TEXT NOT NULL, body TEXT NOT NULL, priority REAL NOT NULL DEFAULT 0,
+ PRIMARY KEY(snapshot,id)
+);
+CREATE TABLE IF NOT EXISTS aggregates (
+ provider TEXT NOT NULL, country TEXT NOT NULL, day TEXT NOT NULL,
+ body TEXT NOT NULL, PRIMARY KEY(provider,country,day)
+);
+CREATE TABLE IF NOT EXISTS exports (
+ snapshot TEXT NOT NULL REFERENCES snapshots(id) ON DELETE CASCADE,
+ id TEXT NOT NULL, scope TEXT NOT NULL, body TEXT NOT NULL,
+ PRIMARY KEY(snapshot,id,scope)
+);
+CREATE TABLE IF NOT EXISTS runs (
+ id TEXT PRIMARY KEY, started TEXT NOT NULL, completed TEXT,
+ state TEXT NOT NULL, body TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS oauth_states (hash TEXT PRIMARY KEY, expires INTEGER NOT NULL, verifier TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sessions (hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, login TEXT NOT NULL, expires INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS quotas (day TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(day,bucket));
+CREATE TABLE IF NOT EXISTS ai_results (
+ cache_key TEXT PRIMARY KEY, created TEXT NOT NULL, model TEXT NOT NULL,
+ body TEXT NOT NULL, kind TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);

@@ -1,0 +1,19 @@
+{
+  "source_id": "ucdp-ged",
+  "provider": "ucdp",
+  "endpoint": "https://ucdpapi.pcr.uu.se/api/gedevents/26.1",
+  "publisher": "Uppsala Conflict Data Program",
+  "publisher_family": "ucdp",
+  "params": {
+    "pagesize": "100",
+    "page": "1"
+  },
+  "credential_env": "UCDP_ACCESS_TOKEN",
+  "rights": {
+    "statement": "UCDP GED; version-specific citation and reuse terms must be reviewed",
+    "terms_url": "https://ucdp.uu.se/downloads/",
+    "reviewed": false,
+    "redistribution": "review_required"
+  },
+  "enabled": false
+}

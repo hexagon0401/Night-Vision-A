@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>SYNTHETIC DATA — not a real NASA feed</title>
+<item><guid>synthetic-rss-1</guid><title>합성 RSS 계약 테스트</title><link>https://www.nasa.gov/synthetic-test-only</link><pubDate>Thu, 01 Jan 2026 09:00:00 +0900</pubDate><description>Entirely fictional fixture.</description></item>
+<item><guid>synthetic-rss-2</guid><title>Unknown publication time fixture</title><link>https://www.nasa.gov/synthetic-test-only-2</link></item>
+</channel></rss>

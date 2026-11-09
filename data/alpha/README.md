@@ -1,0 +1,9 @@
+# Source-backed USGS Alpha archive
+
+This is actual public USGS earthquake catalog metadata, captured with an explicit bounded HTTPS request by tools/build_alpha.py --fetch. capture.json retains exact request scope, acquisition time and response SHA-256. usgs-response.json is the unchanged response; all source/event times come from it. There are 135 records, below the 250-record cap. No article, media, private feed or personal account credential was collected.
+
+The scope is a geographic Taiwan-region bounding box, not a claim about political boundaries or a complete seismic history. The reported magnitude 7.4 mww event us7000m9g4 at 2024-04-02T23:58:12.173Z is included. The normalizer preserves mb/mwr/mww units; the detector does not combine these scales. The region/catalog is a logical series entity, never a fabricated physical asset. Point coordinates are provider-reported event positions with unknown independent accuracy.
+
+Source attribution: U.S. Geological Survey, FDSN Event service https://earthquake.usgs.gov/fdsnws/event/1/ . Event URLs remain in each source. Federal USGS data are generally public domain with third-party exceptions; the general USGS copyright/FAQ pages timed out during this session, so no claim is made that every linked third-party material was reviewed. Only catalog metadata/facts and attribution are redistributed here, not third-party media. The exported report still separates reuse review from structural validity and never asserts a verified Foundry import.
+
+Default rebuild is offline: tools/build_alpha.py and --check verify the captured bytes and regenerate the case, uncalibrated candidates and source-linked Trace. --fetch is a deliberate new acquisition, not a background scheduler. A detection is a sample-relative statistic, not seismic prediction, geopolitical intent or real-world impact assessment.

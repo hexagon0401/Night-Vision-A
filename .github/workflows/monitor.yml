@@ -1,0 +1,53 @@
+name: NV scheduled monitor
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nv-monitor-production
+  cancel-in-progress: false
+jobs:
+  monitor:
+    if: vars.NV_MONITOR_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MONITOR_RUNS_PER_DAY: ${{ vars.MONITOR_RUNS_PER_DAY || '12' }}
+      NV_WORKER_ORIGIN: ${{ vars.NV_WORKER_ORIGIN }}
+      NV_UCDP_ENABLED: ${{ vars.NV_UCDP_ENABLED }}
+      UCDP_ANNUAL_VERSION: ${{ vars.UCDP_ANNUAL_VERSION || '26.1' }}
+      NV_RSS_ENABLED: ${{ vars.NV_RSS_ENABLED }}
+      NV_RSS_RIGHTS_REVIEWED: ${{ vars.NV_RSS_RIGHTS_REVIEWED }}
+      UCDP_ACCESS_TOKEN: ${{ secrets.UCDP_ACCESS_TOKEN }}
+      NV_INGEST_TOKEN: ${{ secrets.NV_INGEST_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache/restore@v4
+        id: state
+        with:
+          path: |
+            .local/monitor.sqlite
+            .local/monitor-rss
+          key: nv-monitor-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: nv-monitor-v1-
+      - run: python -m pip install -c requirements-runtime.txt -e './engine[collect]'
+      - name: Run scheduled slot
+        if: github.event_name == 'schedule'
+        run: python services/worker/monitor.py --scheduled
+      - name: Run manual cycle
+        if: github.event_name != 'schedule'
+        run: python services/worker/monitor.py
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            .local/monitor.sqlite
+            .local/monitor-rss
+          key: nv-monitor-v1-${{ github.run_id }}-${{ github.run_attempt }}
