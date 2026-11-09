@@ -53,7 +53,7 @@ class MonitorState:
 class UCDPMonitor:
     def __init__(self,state,token,client=None,now=None,max_requests=500,sleep=time.sleep,permit=None):
         self.state=state;self.token=token;self.client=client or httpx.Client(timeout=30,follow_redirects=False);self.owned=client is None
-        self.now=now or datetime.now(timezone.utc);self.max_requests=max_requests;self.sleep=sleep;self.used=0;self.permit=permit
+        self.now=now or datetime.now(timezone.utc);self.max_requests=max_requests;self.sleep=sleep;self.used=0;self.permit=permit;self.candidate_cached=False
     def get(self,version,page=1,size=250,window=None):
         if not self.token:raise ValueError('missing_UCDP_ACCESS_TOKEN')
         if self.permit:self.permit()
@@ -72,7 +72,7 @@ class UCDPMonitor:
         except (ValueError,AttributeError):raise ValueError('ucdp_invalid_response') from None
         if not isinstance(records,list):raise ValueError('ucdp_invalid_response')
         return d,records
-    def discover(self):
+    def discover(self,annual='26.1'):
         # Probe only the current and previous two monthly Candidate versions, never follow NextPageUrl.
         year,month=self.now.year,self.now.month
         for _ in range(3):
@@ -80,6 +80,12 @@ class UCDPMonitor:
             if result and result[1]:return f'{year-2000}.0.{month}'
             month-=1
             if month==0:month=12;year-=1
+        # Temporary discovery gaps must not erase the last completed monthly data.
+        cutoff=int(annual.split('.')[0])+1999
+        cached=[v for (v,) in self.state.db.execute('SELECT version FROM cursors WHERE complete=1') if '.0.' in v and int(v.split('.')[0])+2000>cutoff]
+        if cached:
+            self.candidate_cached=True
+            return max(cached,key=lambda v:tuple(map(int,v.split('.'))))
         return None
     def sync(self,version,max_pages=10):
         db=self.state.db;now=self.now.isoformat();window=(self.now.date()-timedelta(days=396)).isoformat()

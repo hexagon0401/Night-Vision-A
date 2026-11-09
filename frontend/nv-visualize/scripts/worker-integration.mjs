@@ -35,7 +35,7 @@ const mf = new Miniflare(
           NVIDIA_API_KEY: "test-nim",
           NIM_ENABLED: "true",
           NIM_MODEL: "test-model",
-          NIM_REVIEW_MODEL: "test-review",
+          NIM_REVIEW_MODEL: "test-model",
         },
         outboundService: async (request) => {
           const u = new URL(request.url);
@@ -252,6 +252,12 @@ try {
   assert.equal(nimCalls, callsAfterPause);
   await db.prepare("DELETE FROM settings WHERE key LIKE 'nim-paused:%'").run();
   nimStatus = 200;
+  const beforeReview=nimCalls;
+  const reviewed=await(await internal('monitor-ai',{})).json();
+  assert.equal(reviewed.reviewed,1);
+  assert.equal(nimCalls-beforeReview,3,'monitor summary, primary case interpretation and reviewer must be distinct even with the same model');
+  assert.equal((await db.prepare("SELECT count FROM quotas WHERE day=date('now') AND bucket='review'").first()).count,1);
+  await db.prepare('UPDATE snapshots SET metadata=? WHERE id=?').bind(JSON.stringify({coverage:'new test evidence'}),snapshot.id).run();
   // Race competing global reservations using actual D1 transactions.
   await db
     .prepare("INSERT OR REPLACE INTO quotas VALUES(date('now'),'nim',39)")

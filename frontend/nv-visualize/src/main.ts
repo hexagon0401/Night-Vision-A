@@ -16,6 +16,7 @@ async function load(kind: string) {
     cleanup = mount(root, readPayload(await response.json()));
     const select = document.createElement("select");
     select.setAttribute("aria-label", "사례 선택");
+    if(allowed==='live'){const option=document.createElement('option');option.value='live';option.textContent='선택한 UCDP 추이';select.append(option);}
     for (const [value, label] of [
       ["synthetic", "Synthetic lab"],
       ["alpha", "USGS Taiwan Alpha"],

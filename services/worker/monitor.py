@@ -53,9 +53,9 @@ def main():
             else:
                 monitor=UCDPMonitor(state,token,now=now,permit=lambda:publisher.post('ucdp-permit',{}))
                 try:
-                    annual=os.environ.get('UCDP_ANNUAL_VERSION','26.1');candidate=monitor.discover()
+                    annual=os.environ.get('UCDP_ANNUAL_VERSION','26.1');candidate=monitor.discover(annual)
                     complete=monitor.sync(annual,max_pages=15)
-                    if candidate:complete=monitor.sync(candidate,max_pages=10) and complete
+                    if candidate and not monitor.candidate_cached:complete=monitor.sync(candidate,max_pages=10) and complete
                     run['requests']=monitor.used
                     if complete:
                         all_records=monitor.merged(annual,candidate);aggregates=aggregate(all_records)
@@ -70,6 +70,7 @@ def main():
                             version_rows=[r for r in all_records if r['version']==version]
                             if version_rows:intervals.append((min(r['day'] for r in version_rows),max(r['end_day'] for r in version_rows)))
                         metadata['coverage_intervals']=intervals
+                        metadata['candidate_cached']=monitor.candidate_cached
                         cases=build_cases(aggregates,now,coverage_intervals=intervals) if aggregates else []
                         for case in cases:case['payload']['map_context']=[r for r in recent if r['country']==case['country'] and r['lat'] is not None][-250:]
                         snapshot=publisher.snapshot('ucdp',recent,metadata,cases)

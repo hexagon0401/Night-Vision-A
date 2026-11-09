@@ -67,7 +67,7 @@ export async function reserve(db, user, review = false) {
     stmt(db, "INSERT OR IGNORE INTO quotas VALUES(?,?,0)", day, bucket),
     stmt(db, "INSERT OR IGNORE INTO quotas VALUES(?,?,0)", day, "review"),
   ]);
-  const limit = user === "scheduled" ? 27 : 10;
+  const limit = user === "scheduled" ? 30 : 10;
   const result = await db.batch([
     stmt(
       db,
@@ -114,7 +114,13 @@ export async function reason(
   const input = JSON.stringify(evidence);
   requireValue(input.length <= 18000, "ai_evidence_budget", 413);
   const cacheKey = await sha(
-    JSON.stringify(["nv-nim:1", model, kind, evidence]),
+    JSON.stringify([
+      "nv-nim:1",
+      model,
+      kind,
+      review ? "review" : "primary",
+      evidence,
+    ]),
   );
   const cached = await stmt(
     env.DB,
@@ -262,7 +268,16 @@ export async function analyzeCase(env, id, user, review = false) {
     id,
   ).first();
   requireValue(row, "unknown_case", 404);
-  return reason(env, caseEvidence(JSON.parse(row.body)), user, "case", review);
+  const evidence = caseEvidence(JSON.parse(row.body));
+  if (!review) return reason(env, evidence, user, "case");
+  const proposed = await reason(env, evidence, user, "case");
+  return reason(
+    env,
+    { ...evidence, proposed_interpretation: proposed.result },
+    user,
+    "case-review",
+    true,
+  );
 }
 
 export async function monitorSummary(env) {
@@ -298,6 +313,12 @@ export async function monitorSummary(env) {
     (c) => JSON.parse(c.body).analysis.anomalies.length > 0,
   )) {
     if (reviewed.length >= 3) break;
+    const quota = await stmt(
+      env.DB,
+      "SELECT count FROM quotas WHERE day=? AND bucket='review'",
+      utcDay(),
+    ).first();
+    if ((quota?.count ?? 0) >= 3) break;
     try {
       const result = await analyzeCase(env, c.id, "scheduled", true);
       if (!result.cached) reviewed.push(result);

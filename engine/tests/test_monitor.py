@@ -61,6 +61,12 @@ def test_missing_candidate_is_not_fabricated(tmp_path):
  assert m.discover() is None and m.used==3
  m.close();s.close()
 
+def test_discovery_gap_preserves_completed_candidate(tmp_path):
+ s=MonitorState(tmp_path/'s.db');s.db.execute("INSERT INTO cursors VALUES('26.0.10',2,1,?,?)",(NOW.isoformat(),'2026-01-01'))
+ m=UCDPMonitor(s,'x',client=httpx.Client(transport=httpx.MockTransport(lambda r:httpx.Response(404))),now=NOW)
+ assert m.discover('26.1')=='26.0.10' and m.candidate_cached
+ m.close();s.close()
+
 def test_coverage_gap_is_not_zero_filled():
  a=aggregate([normalize(row(1,date_start='2026-09-01',date_end='2026-09-01'),'26.1',NOW.isoformat()),normalize(row(2,date_start='2026-11-01',date_end='2026-11-01'),'26.0.11',NOW.isoformat())])
  case=build_cases(a,NOW,coverage_intervals=[('2026-09-01','2026-09-01'),('2026-11-01','2026-11-01')])[0]['payload']

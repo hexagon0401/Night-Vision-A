@@ -4,6 +4,7 @@ export const DETAIL_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 // Runtime styling of the upstream style; retain its sources, attribution and fonts.
 export function flatBlack(input: StyleSpecification): StyleSpecification {
   const style = structuredClone(input);
+  delete style.terrain;
   for (const layer of style.layers) {
     if (layer.type === "background")
       layer.paint = { "background-color": "#050505" };
@@ -26,7 +27,7 @@ export function flatBlack(input: StyleSpecification): StyleSpecification {
         "text-halo-width": 1,
       };
     // OSM buildings remain flat; no terrain/extrusion or satellite imagery.
-    if (layer.type === "fill-extrusion")
+    if (["fill-extrusion", "raster", "hillshade"].includes(layer.type))
       layer.layout = { ...layer.layout, visibility: "none" };
   }
   return style;
