@@ -3,7 +3,16 @@ from pydantic import BaseModel, ConfigDict
 from nv_engine import __version__
 from nv_engine.models import CaseBundle
 
-app = FastAPI(title='NV API', version=__version__)
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app):
+    yield
+    from nv_api import exports
+    if exports._registry is not None:
+        exports._registry.close();exports._registry=None
+
+app = FastAPI(title='NV API', version=__version__, lifespan=lifespan)
 
 
 class ValidationSummary(BaseModel):
@@ -59,3 +68,7 @@ def narrative_case(request: NarrativeRequest):
         return build_narrative(request.case, request.anomaly_id)
     except ValueError as error:
         raise HTTPException(422, detail=str(error)) from None
+
+
+from nv_api.exports import router as exports_router
+app.include_router(exports_router)

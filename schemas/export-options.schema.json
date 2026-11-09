@@ -1,0 +1,62 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "coordinate_precision": {
+      "default": 6,
+      "maximum": 8,
+      "minimum": 0,
+      "title": "Coordinate Precision",
+      "type": "integer"
+    },
+    "diagnostic": {
+      "default": false,
+      "title": "Diagnostic",
+      "type": "boolean"
+    },
+    "end_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "End Utc"
+    },
+    "include_inferred": {
+      "default": false,
+      "title": "Include Inferred",
+      "type": "boolean"
+    },
+    "rights_reviewed": {
+      "default": false,
+      "title": "Rights Reviewed",
+      "type": "boolean"
+    },
+    "start_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Start Utc"
+    },
+    "track_entity_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Track Entity Ids",
+      "type": "array"
+    }
+  },
+  "title": "ExportOptions",
+  "type": "object"
+}

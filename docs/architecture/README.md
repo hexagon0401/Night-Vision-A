@@ -7,7 +7,7 @@ Phase 0 established package boundaries. PR 1 adds canonical contracts, validatio
 3. PR 3 (implemented): prior-only median/MAD, two-sided CUSUM, sourced-point clusters and evidence graph, with synthetic false-positive checks. Real historical calibration is outstanding.
 4. PR 4 (implemented): offline MapLibre/deck.gl Explore, real Natural Earth basemap, synthetic candidate markers and contextual evidence. Trace remains PR 5.
 5. PR 5 (implemented): deterministic source-linked scenes, pause/seek/skip, KO/EN subtitles, camera/arc/evidence synchronization.
-6. PR 6: detached Foundry CSV ZIP adapter, validation, lineage and import guide; no account needed.
+6. PR 6 (implemented): detached validated CSV ZIP, lineage/link tables, typed schema, CLI, authenticated bounded jobs and static demo downloads; no Foundry account needed.
 7. PR 7: source-backed Alpha case, deployment and operations review.
 
 No WorldMonitor code imported. PostgreSQL/PostGIS and optional queue/cache services are deferred until their interfaces are implemented. License, bounded first case and private-data scope remain product decisions. The supplied concept imagery is synthetic and never GIS evidence.

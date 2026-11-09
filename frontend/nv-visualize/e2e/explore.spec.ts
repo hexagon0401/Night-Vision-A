@@ -105,3 +105,18 @@ test("Trace scenes, language, pause and Explore preserve the selected case", asy
   await expect(dock).toBeHidden();
   await expect(page.locator(".evidence")).toBeVisible();
 });
+
+test("Foundry export defaults to observed scope and downloads a real ZIP", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator('[data-map-ready="true"]')).toBeVisible();
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  const link = page.getByRole("link", { name: "Download Foundry CSV ZIP" });
+  await expect(link).toHaveAttribute("href", "/exports/synthetic-observed.zip");
+  const response = await page.request.get("/exports/synthetic-observed.zip");
+  expect(response.ok()).toBe(true);
+  expect((await response.body()).subarray(0, 2).toString()).toBe("PK");
+  await page.getByLabel("추론·시나리오 포함").check();
+  await expect(link).toHaveAttribute("href", "/exports/synthetic-all.zip");
+});

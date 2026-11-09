@@ -18,6 +18,14 @@ def main():
         if command == 'replay':
             child.add_argument('--input', type=Path, required=True)
             child.add_argument('--acquired-at', required=True, help='Explicit timezone-aware synthetic acquisition time')
+    exporter=sub.add_parser('export-foundry')
+    exporter.add_argument('--input',type=Path,required=True)
+    exporter.add_argument('--output',type=Path,required=True)
+    exporter.add_argument('--include-inferred',action='store_true')
+    exporter.add_argument('--rights-reviewed',action='store_true')
+    exporter.add_argument('--diagnostic',action='store_true')
+    exporter.add_argument('--start');exporter.add_argument('--end')
+    exporter.add_argument('--track-entity',action='append',default=[])
     analysis = sub.add_parser('analyze')
     analysis.add_argument('--input', type=Path, required=True)
     analysis.add_argument('--config', type=Path)
@@ -25,6 +33,23 @@ def main():
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
+        return
+    if args.command=='export-foundry':
+        from nv_engine.models import CaseBundle
+        from nv_engine.export.foundry.bundle import ExportOptions,export_bundle
+        try:
+            if args.output.exists():raise FileExistsError('output_exists')
+            with args.input.open('rb') as stream:data=stream.read(8000001)
+            if len(data)>8000000:raise ValueError('input budget')
+            case=CaseBundle.model_validate_json(data)
+            options=ExportOptions(include_inferred=args.include_inferred,rights_reviewed=args.rights_reviewed,diagnostic=args.diagnostic,
+                start_utc=args.start,end_utc=args.end,track_entity_ids=args.track_entity)
+            artifact=export_bundle(case,options)
+            args.output.parent.mkdir(parents=True,exist_ok=True)
+            with args.output.open('xb') as stream:stream.write(artifact)
+            print('Foundry import-shaped ZIP written; review validation_report.json before import.')
+        except Exception as error:
+            print(f'export_failed:{type(error).__name__}',file=sys.stderr);raise SystemExit(1) from None
         return
     if args.command == 'analyze':
         import json

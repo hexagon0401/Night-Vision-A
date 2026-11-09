@@ -37,7 +37,7 @@ export function mount(
     links = candidateLinks(payload);
   const state: {
     selected: Candidate | null;
-    panel: "cases" | "sources" | "layers" | "trace-sources" | null;
+    panel: "cases" | "sources" | "layers" | "trace-sources" | "export" | null;
     pinned: boolean;
     query: string;
     markers: boolean;
@@ -51,7 +51,7 @@ export function mount(
     links: false,
   };
   root.innerHTML = `<main class="workspace" aria-label="Night Vision 탐색"><div class="map" role="region" aria-label="지정학 지도"></div>
- <header class="topbar"><a class="brand" href="/" aria-label="Night Vision 홈"><img src="/branding/night-vision-logo.png" alt="네 개 렌즈의 NV 헬멧"/><span>NIGHT VISION<small>CONTEXT THROUGH EVIDENCE</small></span></a><nav aria-label="지도 도구"><span class="mode">Explore</span><button class="trace">Trace</button><input type="search" aria-label="후보 검색" placeholder="Search candidates"/><button data-panel="cases">Cases</button><button data-panel="layers">Layers</button><button data-panel="sources">Sources</button></nav></header>
+ <header class="topbar"><a class="brand" href="/" aria-label="Night Vision 홈"><img src="/branding/night-vision-logo.png" alt="네 개 렌즈의 NV 헬멧"/><span>NIGHT VISION<small>CONTEXT THROUGH EVIDENCE</small></span></a><nav aria-label="지도 도구"><span class="mode">Explore</span><button class="trace">Trace</button><input type="search" aria-label="후보 검색" placeholder="Search candidates"/><button data-panel="cases">Cases</button><button data-panel="layers">Layers</button><button data-panel="sources">Sources</button><button data-panel="export">Export</button></nav></header>
  <div class="demo-label">SYNTHETIC DATA <span>· 합성 탐지 실험</span></div><div class="map-message" role="status">지도를 불러오는 중입니다.</div>
  <section class="tool-panel" aria-label="탐색 도구" hidden></section><section class="evidence" aria-label="후보 증거" hidden></section>
  <footer class="statusbar"><span>OFFLINE DEMO <b>·</b> <span data-count></span></span><span class="footer-detail">UNCALIBRATED <b>·</b> EXPLORE</span><span>Natural Earth · WGS84</span></footer></main>`;
@@ -100,7 +100,10 @@ export function mount(
       showLinks: state.links,
       trace: currentFrame
         ? {
-            paths: sceneLinks(payload, currentFrame.step.visible_relation_ids ?? []),
+            paths: sceneLinks(
+              payload,
+              currentFrame.step.visible_relation_ids ?? [],
+            ),
             progress: currentFrame.progress,
             point: currentFrame.step.camera_target
               ? [
@@ -300,6 +303,38 @@ export function mount(
         );
       }
     }
+    if (state.panel === "export") {
+      panel.querySelector("h2")!.textContent = "Foundry CSV Bundle";
+      panel.append(
+        text(
+          "p",
+          "추론·시나리오는 기본 제외됩니다. ZIP의 검증 보고서와 출처 정보를 먼저 확인하세요.",
+          "muted",
+        ),
+      );
+      const include = document.createElement("input");
+      include.type = "checkbox";
+      const label = text("label", "", "check-row");
+      label.append(include, document.createTextNode("추론·시나리오 포함"));
+      panel.append(label);
+      const link = text("a", "Download Foundry CSV ZIP");
+      link.className = "export-download";
+      link.download = "";
+      const kind =
+        payload.case.data_origin === "synthetic" ? "synthetic" : "alpha";
+      const update = () =>
+        (link.href = `/exports/${kind}-${include.checked ? "all" : "observed"}.zip`);
+      include.onchange = update;
+      update();
+      panel.append(
+        link,
+        text(
+          "p",
+          "실제 Foundry 업로드·온톨로지 생성은 별도 검증이 필요합니다.",
+          "muted",
+        ),
+      );
+    }
     evidence.hidden = !state.selected || currentFrame !== null;
     evidence.replaceChildren();
     evidence.classList.toggle("pinned", state.pinned);
@@ -396,7 +431,7 @@ export function mount(
     if (e.key === "Escape") {
       trace.pause();
       state.panel = null;
-      if(!currentFrame)state.selected = null;
+      if (!currentFrame) state.selected = null;
       state.pinned = false;
       render();
     }
