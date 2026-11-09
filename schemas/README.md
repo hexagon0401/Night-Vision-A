@@ -4,6 +4,7 @@ Source of truth: `engine/src/nv_engine/models/canonical.py`. Current schema vers
 
 - case-bundle.schema.json: JSON Schema for all ten canonical types, helper types and complete case bundles.
 - openapi.json: generated from the actual FastAPI app, including the contract validation request/summary and standard 422 responses.
+- source-manifest.schema.json and collection-result.schema.json: version 1.0.0 collector policies and bounded-acquisition outputs; no public ingestion endpoint is implied.
 - health.schema.json: Phase 0 process-readiness contract, unchanged.
 - ../frontend/nv-visualize/src/contracts/generated.ts: generated structural TypeScript types.
 

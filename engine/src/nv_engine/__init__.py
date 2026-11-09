@@ -1,2 +1,2 @@
-"""NV Engine foundation. No collectors or detectors are implemented yet."""
+"""NV Engine contracts and bounded collection. No automatic acquisition or detectors."""
 __version__ = "2.0.0"

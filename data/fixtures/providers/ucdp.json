@@ -1,0 +1,18 @@
+{
+  "TotalCount": 1,
+  "NextPageUrl": null,
+  "Result": [
+    {
+      "id": 900000001,
+      "country": "Fictional Test Country",
+      "latitude": 35.0,
+      "longitude": 127.0,
+      "where_prec": 1,
+      "date_start": "2026-01-01",
+      "date_end": "2026-01-02",
+      "best": 3,
+      "side_a": "Fictional A",
+      "side_b": "Fictional B"
+    }
+  ]
+}

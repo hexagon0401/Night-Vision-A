@@ -1,0 +1,26 @@
+{
+  "articles": [
+    {
+      "url": "https://news.example.invalid/article?utm_source=fixture",
+      "title": "합성 테스트: 항만 보고",
+      "seendate": "20260101T010203Z",
+      "domain": "news.example.invalid",
+      "language": "Korean",
+      "sourcecountry": "Fixture"
+    },
+    {
+      "url": "https://news.example.invalid/other",
+      "title": "Synthetic provider fixture — not real news",
+      "seendate": "20260101T020304Z",
+      "domain": "news.example.invalid"
+    },
+    {
+      "url": "https://news.example.invalid/article?utm_source=fixture",
+      "title": "합성 테스트: 항만 보고",
+      "seendate": "20260101T010203Z",
+      "domain": "news.example.invalid",
+      "language": "Korean",
+      "sourcecountry": "Fixture"
+    }
+  ]
+}

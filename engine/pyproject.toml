@@ -10,7 +10,8 @@ requires-python = ">=3.12"
 dependencies = ["pydantic>=2.9,<3"]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10", "jsonschema[format-nongpl]>=4.23,<5", "sqlalchemy>=2.0,<3", "alembic>=1.14,<2"]
+collect = ["httpx>=0.28,<1", "defusedxml>=0.7,<1"]
+test = ["httpx>=0.28,<1", "defusedxml>=0.7,<1", "pytest>=8,<10", "jsonschema[format-nongpl]>=4.23,<5", "sqlalchemy>=2.0,<3", "alembic>=1.14,<2"]
 storage = ["sqlalchemy>=2.0,<3", "alembic>=1.14,<2"]
 
 [project.scripts]

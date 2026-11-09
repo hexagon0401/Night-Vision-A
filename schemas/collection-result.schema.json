@@ -1,0 +1,821 @@
+{
+  "$defs": {
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Assessment",
+          "type": "string"
+        },
+        "claim_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "counterevidence_claim_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Counterevidence Claim Ids",
+          "type": "array"
+        },
+        "event_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Event Ids",
+          "type": "array"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "observation_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "statement": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "claim_id",
+        "statement",
+        "assessment"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "CollectedRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/Claim"
+        },
+        "data_gaps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Data Gaps",
+          "type": "array"
+        },
+        "data_origin": {
+          "enum": [
+            "synthetic",
+            "source_backed"
+          ],
+          "title": "Data Origin",
+          "type": "string"
+        },
+        "date_precision": {
+          "default": "unknown",
+          "enum": [
+            "instant",
+            "day",
+            "unknown"
+          ],
+          "title": "Date Precision",
+          "type": "string"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Entity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Event"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "event_date_end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Date End"
+        },
+        "event_date_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Date Start"
+        },
+        "license_terms_url": {
+          "title": "License Terms Url",
+          "type": "string"
+        },
+        "observation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Observation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "payload_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Payload Hash",
+          "type": "string"
+        },
+        "provider_endpoint": {
+          "title": "Provider Endpoint",
+          "type": "string"
+        },
+        "provider_id": {
+          "title": "Provider Id",
+          "type": "string"
+        },
+        "provider_parameters": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Provider Parameters",
+          "type": "object"
+        },
+        "provider_seen_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Seen At Utc"
+        },
+        "record_key": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Record Key",
+          "type": "string"
+        },
+        "response_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Response Hash",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "story_key": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Story Key",
+          "type": "string"
+        },
+        "upstream_record_id": {
+          "title": "Upstream Record Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "data_origin",
+        "record_key",
+        "story_key",
+        "provider_id",
+        "provider_endpoint",
+        "provider_parameters",
+        "license_terms_url",
+        "upstream_record_id",
+        "response_hash",
+        "payload_hash",
+        "source",
+        "claim"
+      ],
+      "title": "CollectedRecord",
+      "type": "object"
+    },
+    "CollectionReport": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "title": "Accepted",
+          "type": "integer"
+        },
+        "considered": {
+          "title": "Considered",
+          "type": "integer"
+        },
+        "duplicates": {
+          "title": "Duplicates",
+          "type": "integer"
+        },
+        "fetched_at_utc": {
+          "format": "date-time",
+          "title": "Fetched At Utc",
+          "type": "string"
+        },
+        "from_cache": {
+          "title": "From Cache",
+          "type": "boolean"
+        },
+        "input_mode": {
+          "enum": [
+            "replay",
+            "live"
+          ],
+          "title": "Input Mode",
+          "type": "string"
+        },
+        "license_terms_url": {
+          "title": "License Terms Url",
+          "type": "string"
+        },
+        "limited": {
+          "title": "Limited",
+          "type": "boolean"
+        },
+        "newly_stored": {
+          "title": "Newly Stored",
+          "type": "integer"
+        },
+        "next_page_available": {
+          "default": false,
+          "title": "Next Page Available",
+          "type": "boolean"
+        },
+        "provider_endpoint": {
+          "title": "Provider Endpoint",
+          "type": "string"
+        },
+        "provider_id": {
+          "title": "Provider Id",
+          "type": "string"
+        },
+        "provider_parameters": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Provider Parameters",
+          "type": "object"
+        },
+        "redistribution": {
+          "enum": [
+            "review_required",
+            "permitted",
+            "restricted"
+          ],
+          "title": "Redistribution",
+          "type": "string"
+        },
+        "response_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Response Hash",
+          "type": "string"
+        },
+        "rights_reviewed": {
+          "title": "Rights Reviewed",
+          "type": "boolean"
+        },
+        "skip_reasons": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Skip Reasons",
+          "type": "object"
+        },
+        "skipped": {
+          "title": "Skipped",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "provider_id",
+        "provider_endpoint",
+        "provider_parameters",
+        "license_terms_url",
+        "rights_reviewed",
+        "redistribution",
+        "input_mode",
+        "response_hash",
+        "fetched_at_utc",
+        "from_cache",
+        "considered",
+        "accepted",
+        "newly_stored",
+        "duplicates",
+        "skipped",
+        "limited"
+      ],
+      "title": "CollectionReport",
+      "type": "object"
+    },
+    "Entity": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Entity Type",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Location"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "name": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Name",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "entity_id",
+        "entity_type",
+        "name"
+      ],
+      "title": "Entity",
+      "type": "object"
+    },
+    "Event": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "entity_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Entity Ids",
+          "type": "array"
+        },
+        "event_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_time_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event Time Utc"
+        },
+        "event_type": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Location"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "event_id",
+        "event_type",
+        "event_time_utc",
+        "description"
+      ],
+      "title": "Event",
+      "type": "object"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "observed",
+        "documented",
+        "reported",
+        "inferred",
+        "scenario",
+        "disputed",
+        "unverified"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "Grade": {
+      "enum": [
+        "unknown",
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "Grade",
+      "type": "string"
+    },
+    "Location": {
+      "additionalProperties": false,
+      "properties": {
+        "accuracy_m": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accuracy M"
+        },
+        "crs": {
+          "const": "EPSG:4326",
+          "default": "EPSG:4326",
+          "title": "Crs",
+          "type": "string"
+        },
+        "latitude": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "role": {
+          "enum": [
+            "verified",
+            "symbolic"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude",
+        "role"
+      ],
+      "title": "Location",
+      "type": "object"
+    },
+    "Observation": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Location"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metric": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Metric",
+          "type": "string"
+        },
+        "observation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "observed_at_utc": {
+          "format": "date-time",
+          "title": "Observed At Utc",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "source_record_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source Record Id",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "evidence_status",
+        "provenance",
+        "observation_id",
+        "entity_id",
+        "observed_at_utc",
+        "metric",
+        "value",
+        "unit",
+        "source_record_id"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "corroborating_source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Corroborating Source Ids",
+          "type": "array"
+        },
+        "evidence_span_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Span Hash"
+        },
+        "extraction_method": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Extraction Method",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_ids",
+        "extraction_method"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "access": {
+          "enum": [
+            "public",
+            "restricted",
+            "unknown"
+          ],
+          "title": "Access",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "extraction_method": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Extraction Method",
+          "type": "string"
+        },
+        "license": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "License",
+          "type": "string"
+        },
+        "published_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At Utc"
+        },
+        "publisher": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Publisher",
+          "type": "string"
+        },
+        "publisher_family": {
+          "pattern": "^[a-z0-9][a-z0-9_.:-]{0,127}$",
+          "title": "Publisher Family",
+          "type": "string"
+        },
+        "quality": {
+          "$ref": "#/$defs/Grade",
+          "default": "unknown"
+        },
+        "retrieved_at_utc": {
+          "format": "date-time",
+          "title": "Retrieved At Utc",
+          "type": "string"
+        },
+        "source_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "url",
+        "publisher",
+        "publisher_family",
+        "published_at_utc",
+        "retrieved_at_utc",
+        "content_hash",
+        "license",
+        "access",
+        "extraction_method"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "collector_schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Collector Schema Version",
+      "type": "string"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/CollectedRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "report": {
+      "$ref": "#/$defs/CollectionReport"
+    }
+  },
+  "required": [
+    "report",
+    "records"
+  ],
+  "title": "CollectionResult",
+  "type": "object"
+}

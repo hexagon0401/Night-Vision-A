@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install -e './engine[test,storage]' -e './services/api[test]'
+      - run: python -m pip install -e './engine[test,storage,collect]' -e './services/api[test]'
       - run: python -m pytest engine/tests services/api/tests
       - run: python tools/verify_migration.py
       - uses: actions/setup-node@v4

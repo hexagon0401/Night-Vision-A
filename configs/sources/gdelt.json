@@ -1,0 +1,21 @@
+{
+  "source_id": "gdelt-doc",
+  "provider": "gdelt",
+  "endpoint": "https://api.gdeltproject.org/api/v2/doc/doc",
+  "publisher": "GDELT article index",
+  "publisher_family": "gdelt",
+  "params": {
+    "query": "shipping",
+    "mode": "artlist",
+    "format": "json",
+    "maxrecords": "100",
+    "timespan": "1h"
+  },
+  "rights": {
+    "statement": "GDELT index metadata; linked article content retains publisher rights; review required",
+    "terms_url": "https://www.gdeltproject.org/about.html",
+    "reviewed": false,
+    "redistribution": "review_required"
+  },
+  "enabled": false
+}

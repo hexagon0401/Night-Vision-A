@@ -1,0 +1,15 @@
+{
+  "source_id": "firms-viirs",
+  "provider": "firms",
+  "endpoint": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{credential}/VIIRS_SNPP_NRT/120,30,121,31/1",
+  "publisher": "NASA FIRMS VIIRS S-NPP NRT",
+  "publisher_family": "nasa-firms",
+  "credential_env": "FIRMS_MAP_KEY",
+  "rights": {
+    "statement": "NASA FIRMS satellite detections; review product attribution and use terms; not causal evidence",
+    "terms_url": "https://www.earthdata.nasa.gov/data/tools/firms",
+    "reviewed": false,
+    "redistribution": "review_required"
+  },
+  "enabled": false
+}

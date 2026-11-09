@@ -15,3 +15,5 @@ coverage/
 
 *.local.sqlite3
 *.local.sqlite3-*
+
+.local/

@@ -1,0 +1,180 @@
+{
+  "$defs": {
+    "Rights": {
+      "additionalProperties": false,
+      "properties": {
+        "redistribution": {
+          "default": "review_required",
+          "enum": [
+            "review_required",
+            "permitted",
+            "restricted"
+          ],
+          "title": "Redistribution",
+          "type": "string"
+        },
+        "reviewed": {
+          "default": false,
+          "title": "Reviewed",
+          "type": "boolean"
+        },
+        "statement": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        },
+        "terms_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Terms Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "statement",
+        "terms_url"
+      ],
+      "title": "Rights",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "credential_env": {
+      "anyOf": [
+        {
+          "enum": [
+            "UCDP_ACCESS_TOKEN",
+            "FIRMS_MAP_KEY"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Credential Env"
+    },
+    "enabled": {
+      "default": false,
+      "title": "Enabled",
+      "type": "boolean"
+    },
+    "endpoint": {
+      "title": "Endpoint",
+      "type": "string"
+    },
+    "manifest_schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Manifest Schema Version",
+      "type": "string"
+    },
+    "max_attempts": {
+      "default": 3,
+      "maximum": 4,
+      "minimum": 1,
+      "title": "Max Attempts",
+      "type": "integer"
+    },
+    "max_bytes": {
+      "default": 2000000,
+      "maximum": 10000000,
+      "minimum": 1024,
+      "title": "Max Bytes",
+      "type": "integer"
+    },
+    "max_records": {
+      "default": 100,
+      "maximum": 250,
+      "minimum": 1,
+      "title": "Max Records",
+      "type": "integer"
+    },
+    "max_retry_delay_seconds": {
+      "default": 60.0,
+      "maximum": 300,
+      "minimum": 1,
+      "title": "Max Retry Delay Seconds",
+      "type": "number"
+    },
+    "min_interval_seconds": {
+      "default": 5.0,
+      "maximum": 3600,
+      "minimum": 0.1,
+      "title": "Min Interval Seconds",
+      "type": "number"
+    },
+    "params": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Params",
+      "type": "object"
+    },
+    "provider": {
+      "enum": [
+        "gdelt",
+        "ucdp",
+        "firms",
+        "rss"
+      ],
+      "title": "Provider",
+      "type": "string"
+    },
+    "publisher": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Publisher",
+      "type": "string"
+    },
+    "publisher_families": {
+      "additionalProperties": {
+        "pattern": "^[a-z0-9][a-z0-9_.:-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Publisher Families",
+      "type": "object"
+    },
+    "publisher_family": {
+      "pattern": "^[a-z0-9][a-z0-9_.:-]{0,127}$",
+      "title": "Publisher Family",
+      "type": "string"
+    },
+    "rights": {
+      "$ref": "#/$defs/Rights"
+    },
+    "source_id": {
+      "pattern": "^[a-z0-9][a-z0-9_.:-]{0,31}$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "default": 20.0,
+      "maximum": 60,
+      "minimum": 1,
+      "title": "Timeout Seconds",
+      "type": "number"
+    },
+    "ttl_seconds": {
+      "default": 300,
+      "maximum": 86400,
+      "minimum": 0,
+      "title": "Ttl Seconds",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "source_id",
+    "provider",
+    "endpoint",
+    "publisher",
+    "publisher_family",
+    "rights"
+  ],
+  "title": "Manifest",
+  "type": "object"
+}
