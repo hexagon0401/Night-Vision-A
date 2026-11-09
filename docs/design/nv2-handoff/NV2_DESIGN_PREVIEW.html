@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Night Vision 2.0 — Flat Black Design Review</title>
+  <style>
+    :root { color-scheme:dark; font-family:Inter,Geist,ui-sans-serif,system-ui,-apple-system,sans-serif; background:#050505; color:#f2f2f0; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; min-height:100%; }
+    button { font:inherit; cursor:pointer; }
+    button:focus-visible { outline:2px solid #f2f2f0; outline-offset:4px; }
+    .shell { min-height:100vh; display:grid; grid-template-rows:72px minmax(0,1fr) auto; background:#050505; }
+    header { display:flex; justify-content:space-between; gap:20px; align-items:center; padding:0 clamp(20px,4vw,60px); border-bottom:1px solid #303030; }
+    .brand { display:flex; gap:12px; align-items:center; min-width:0; }
+    .brand img { display:block; width:43px; height:43px; object-fit:contain; }
+    .brand strong { font-size:15px; letter-spacing:.11em; white-space:nowrap; }
+    .brand span { display:block; margin-top:5px; color:#858585; font:10px ui-monospace,SFMono-Regular,monospace; letter-spacing:.1em; }
+    nav { display:flex; align-items:center; gap:8px; }
+    nav button, .download { background:#141414; border:1px solid #555; border-radius:9999px; color:#dbdbd9; min-height:35px; padding:0 17px; font-size:12px; font-weight:600; }
+    nav button[aria-selected="true"] { background:#efefeb; border-color:#efefeb; color:#080808; }
+    main { padding:clamp(15px,2vw,28px) clamp(15px,4vw,60px); display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; }
+    .visual { width:min(100%,1540px); border:1px solid #383838; background:#000; position:relative; }
+    .visual img { display:block; width:100%; height:auto; aspect-ratio:1672/941; object-fit:contain; }
+    .caption { display:flex; align-items:center; justify-content:space-between; width:min(100%,1540px); gap:18px; color:#a3a3a3; font-size:12px; line-height:1.5; }
+    .caption p { margin:0; }
+    .caption b { color:#eee; margin-right:12px; letter-spacing:.05em; }
+    .note { border-top:1px solid #303030; padding:14px clamp(20px,4vw,60px); color:#858585; font-size:11px; line-height:1.5; display:flex; justify-content:space-between; gap:20px; }
+    @media (max-width:730px) { .shell{grid-template-rows:auto minmax(0,1fr) auto} header{padding:14px;align-items:flex-start;flex-wrap:wrap;} nav{width:100%;overflow:auto} nav button{flex:1;white-space:nowrap;padding:0 12px}.caption{flex-direction:column;align-items:flex-start}.note{flex-direction:column}.brand img{width:35px;height:35px} }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><img src="assets/night-vision-logo.png" alt="Night Vision four-tube FAST helmet icon" /><div><strong>NIGHT VISION 2.0</strong><span>FLAT BLACK / DESIGN REVIEW</span></div></div>
+      <nav role="tablist" aria-label="Design states">
+        <button type="button" role="tab" aria-selected="true" data-scene="0">01 · EXPLORE</button>
+        <button type="button" role="tab" aria-selected="false" data-scene="1">02 · EVIDENCE</button>
+        <button type="button" role="tab" aria-selected="false" data-scene="2">03 · TRACE</button>
+      </nav>
+    </header>
+    <main>
+      <div class="visual"><img id="preview" src="assets/01-cinematic-overview.png" alt="Night Vision fullscreen black outline map concept with relationship arcs" /></div>
+      <div class="caption"><p><b id="scene-title">EXPLORE / MAP FIRST</b><span id="scene-description">Default: border hairlines, two circular actors, quiet single-row status bar.</span></p><span id="page">01 / 03</span></div>
+    </main>
+    <footer class="note"><span>CONCEPT ONLY · Imagery is AI-generated; geographic details and evidence connections are not verified source data. Production must use real GIS geometries and cited sources.</span><span>Arrow ← → switches mockups. Source of truth: NV2_CODEX_HANDOFF.md</span></footer>
+  </div>
+  <script>
+    const views=[
+      ['assets/01-cinematic-overview.png','EXPLORE / MAP FIRST','Default: border hairlines, two circular actors, quiet single-row status bar.'],
+      ['assets/02-contextual-evidence.png','EVIDENCE / ON DEMAND','A selected entity opens one contextual source card; the map still dominates.'],
+      ['assets/03-narrative-trace.png','TRACE / NARRATIVE','Stepwise relation arcs, compact subtitle and accessible playback state.']
+    ];
+    let current=0;
+    function show(i){current=(i+views.length)%views.length;const v=views[current];document.getElementById('preview').src=v[0];document.getElementById('scene-title').textContent=v[1];document.getElementById('scene-description').textContent=v[2];document.getElementById('page').textContent=String(current+1).padStart(2,'0')+' / 03';document.querySelectorAll('[data-scene]').forEach((b,j)=>b.setAttribute('aria-selected',String(j===current)));}
+    document.querySelectorAll('[data-scene]').forEach((b,i)=>b.addEventListener('click',()=>show(i)));
+    window.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(current+1);if(e.key==='ArrowLeft')show(current-1);});
+  </script>
+</body>
+</html>

@@ -1,94 +1,48 @@
-# Night Vision — Global Intelligence Extraction & Visualization System
+# Night Vision 2.0
 
-> OSINT-based geopolitical intelligence extraction, fusion, and visualization pipeline  
-> designed for Palantir Foundry AIP integration.
+출처를 추적할 수 있는 지정학 이상징후 분석 체계. 공개정보를 검증하고 연결해 지도와 내러티브로 설명하는 프로젝트입니다.
 
----
+A source-traceable geopolitical anomaly intelligence project: **Detect → Connect → Explain**.
 
-## 1. Overview
+## Current status / 현재 단계
 
-Night Vision is an automated intelligence pipeline that extracts, validates, and structures geopolitically significant data from open sources, then routes it for visualization in Palantir Foundry's Ontology, Map, and Workshop layers.
+Phase 0 foundation only. Engine package, API health endpoint, frontend shell, and schema envelope are executable. Collectors, anomaly detection, real maps, Trace playback and Foundry export are **not implemented**. The shell shows no live intelligence. Historical data is unverified, not a production feed.
 
-The system covers military posture, conflict events, energy infrastructure, sanctions networks, arms transfers, and satellite assets across global theaters.
+## Workspace
 
-**Core Design Principles**
-- **Anti-hallucination**: Every data point must be traceable to a `source_id`. Unverifiable coordinates are flagged `pending_verification` — never fabricated.
-- **Source tiering**: Official government/UN documents (A) → Major think tanks (B) → OSINT web sources (W)
-- **Full domain coverage**: 11 intelligence domains from military assets to global conflict monitoring
+- [NV Engine](engine/) — independent Python package, version 2.0.0.
+- [NV Visualize](frontend/nv-visualize/) — separate TypeScript/Vite shell; future MapLibre + deck.gl interface.
+- [API](services/api/) and [worker boundary](services/worker/).
+- [Contracts](schemas/) and [source configuration boundary](configs/sources/).
+- [Claude extensions v1–v3](extensions/claude/) and [global/China prompt packs](extensions/promptpacks/).
+- [Historical directives v1–v6 (including v4.5)](archive/directives/), [old README](archive/README-pre-v2.md), [Foundry guide](docs/foundry/legacy-upload-guide.md).
+- [Unverified case files](data/legacy-cases/) and [legacy experimental fixtures](data/fixtures/legacy/).
+- [Exact migration map](docs/migration/MIGRATION_MAP.md), [architecture](docs/architecture/README.md), [approved handoff](docs/design/nv2-handoff/NV2_CODEX_HANDOFF.md).
 
-**Intelligence Domains**
+## Develop
 
-| Domain | Coverage |
-|--------|----------|
-| D1–D2 | Strategy & Policy, Military Assets & OOB |
-| D3–D4 | Military Facilities & Basing, Arms Transfers |
-| D5–D6 | Conflict Events, Sanctions & Criminal Networks |
-| D7–D8 | Satellite & Space Assets, Energy Infrastructure |
-| D9–D11 | Public Opinion & Economics, US Posture, Global Conflict Monitor |
-| D0 | OSINT Fallback — any unregistered topic |
+Python 3.12+ and Node 22+ are supported. No credentials or database are required for Phase 0.
 
----
-
-## 2. Night Vision
-
-The core pipeline from source routing to Foundry CSV ingestion.
-
-```
-OSINT Sources
-    ↓
-Navigator        ← Source tier selection + OSINT fallback protocol
-    ↓
-Master Directive ← CASE A–K classification + OODA loop execution
-    ↓
-Relation         ← Domain CSV schemas (D0–D11)
-    ↓
-TO_Foundry       ← Parser config · Ontology mapping · Map layer routing
-    ↓
-Palantir Foundry ← Ontology → Map → Workshop
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -e './engine[test]' -e './services/api[test]'
+.venv/bin/python -m pytest engine/tests services/api/tests
+.venv/bin/nv-engine --version
+.venv/bin/python -m uvicorn nv_api.app:app --app-dir services/api/src --host 0.0.0.0 --port 8000
 ```
 
-**TO_Foundry Version History**
+In a second terminal:
 
-| Version | Key Changes |
-|---------|-------------|
-| v4 / v4.5 | Full Foundry Map coverage (28 sub-pages), layer decision tree |
-| v5.0 | Geopoint string format, initial Track modeling |
-| **v6.0** (current) | GeoJSON escaping fix, H3 dual-index, geotemporal Track architecture, CRS normalization |
+```sh
+cd frontend/nv-visualize
+npm ci
+npm test
+npm run build
+npm run dev -- --host 0.0.0.0
+```
 
-**v6.0 Technical Standards**
-- GeoJSON fields: internal quotes doubled (`""`), entire string wrapped in outer quotes
-- H3: dual-column mandatory — `h3_cell_id` (render) + `h3_geojson` as `geoshape` (spatial search index)
-- Track data: discrete rows per `object_id` + timestamp — never pre-merged into LineString
-- Parser: `MULTILINE_CSV_PARSER` for all geospatial datasets
-- Coordinate system: WGS 84 (EPSG:4326) input; Web Mercator (EPSG:3857) rendering
+API readiness: `GET /healthz` must return `status: ok`, `phase: foundation`. This is process/package readiness, not ingestion readiness. Frontend: a flat-black foundation screen with provided NV branding, an explicit no-feed state and no fabricated case/map. Run `python3 tools/verify_migration.py` to verify every legacy file and archive.
 
----
+## Delivery and licensing
 
-## 3. NV_Alpha (Finetuned)
-
-Claude-based intelligence assistant that drives the Night Vision pipeline.  
-Composed of a global base (V1) and a China-specific patch (V2).
-
-**V1 — Global Intelligence Assistant**
-
-Loads in order: MasterPrompt → Navigator → Connector. Handles all regions and domains.
-
-- **Navigator**: Source tier prioritization and automatic OSINT fallback trigger
-- **Connector**: Four-stage pipeline — Data Fusion → Inference → Prediction → Visualization
-  - *Inference*: Capability-intent gap analysis, conflict escalation indicators, sanctions evasion network detection, strategic posture shift detection
-  - *Prediction*: Three-tier probability output — LIKELY / POSSIBLE / SPECULATIVE (specific date prediction prohibited)
-
-**V2 — China Finetuned Patch**
-
-Layered on top of V1. Adds PRC-specific sources and inference templates.
-
-| Template | Coverage |
-|----------|----------|
-| CI-01 | PRC Five-Year Plan trajectory analysis |
-| CI-02 | PLA purge → combat readiness degradation model |
-| CI-03 | ECS/SCS salami tactics escalation score |
-| CI-04 | Korea-China economic leverage index |
-| CI-05 | PRC proxy/TOC state ambiguity assessment |
-| CI-06 | BRI debt → political leverage pathway model |
-
-Extended source registry: Korean perspective (K01–K05), PRC government originals (CG01–CG09), think tank extensions (CT01–CT05), statistical extensions (QC01–QC03).
+[Ordered roadmap](docs/architecture/README.md): PR 1 canonical schemas/provenance → collectors → detectors → real map → Trace → exporter → Alpha deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. No deployment or Foundry upload is included.

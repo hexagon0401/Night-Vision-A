@@ -1,0 +1,2 @@
+@import url("./base.css");
+:root{color-scheme:dark;--background:#050505;--panel:#101010;--text:#F2F2F0;--muted:#929292;--border:#343434;font-family:Inter,system-ui,sans-serif;color:var(--text);background:var(--background)}

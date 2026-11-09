@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NV foundation readiness",
+  "type": "object",
+  "required": [
+    "status",
+    "phase",
+    "engine_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "const": "ok"
+    },
+    "phase": {
+      "const": "foundation"
+    },
+    "engine_version": {
+      "const": "2.0.0"
+    }
+  }
+}
