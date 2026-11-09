@@ -90,7 +90,7 @@ export function createMap(
     dragRotate: false,
   });
   map.addControl(
-    new maplibregl.AttributionControl({ compact: true }),
+    new maplibregl.AttributionControl({ compact: true,customAttribution:'<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://github.com/hyperknot/openfreemap-styles/blob/main/LICENSE.md">Liberty / OpenMapTiles style</a> (CC BY 4.0, monochrome adaptation)' }),
     "bottom-right",
   );
   let basemapLoaded = false;

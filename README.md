@@ -67,6 +67,8 @@ Use a fresh output directory. `analysis.json` contains deterministic, uncalibrat
 
 ## Delivery and licensing
 
+The next operational increment adds an OpenFreeMap detailed basemap and a public monitoring route at `/?view=monitor`. Its Cloudflare D1 data, GitHub OAuth and NIM capabilities remain setup-gated until the owner registers service credentials. See the deployed `/setup.html` guide and [monitoring operations](docs/implementation/NV3-operations.md). GitHub Actions monitoring defaults to 12 daily slots and must be enabled on the default branch; no paid plan is automatically activated.
+
 [Ordered roadmap](docs/architecture/README.md): canonical schemas/provenance → bounded collectors → detectors → real map → Trace → exporter → source-backed Alpha. All seven implementation phases are delivered; see [release operations](deploy/README.md) for container and isolated static-preview deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. Foundry enrollment upload and production operation remain outside the Alpha.
 
 ## Trace, export and deployment
