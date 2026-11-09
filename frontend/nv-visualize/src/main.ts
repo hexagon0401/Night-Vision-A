@@ -6,6 +6,7 @@ import { readPayload } from "./cases/model";
 import { mountMonitor } from "./monitor/view";
 import { sharedMap, disposeMap } from "./map/shared";
 import { accountControl, enhanceControls } from "./ui/controls";
+import {mountBeta} from './beta/view';
 const root = document.querySelector<HTMLDivElement>("#app")!;
 let cleanup: (() => void) | undefined,
   enhanceCleanup: (() => void) | undefined,
@@ -17,7 +18,8 @@ async function render() {
   cleanup?.();
   enhanceCleanup?.();
   accountCleanup?.();
-  if (url.searchParams.get("view") === "monitor")
+  if(url.searchParams.get('view')==='beta')cleanup=mountBeta(root);
+  else if (url.searchParams.get("view") === "monitor")
     cleanup = mountMonitor(root, sharedMap);
   else {
     const kind =
@@ -62,7 +64,7 @@ async function render() {
       select.value = kind;
       select.onchange = () => navigate("?case=" + select.value);
       menu.append(summary, select);
-      nav.append(menu);
+      const beta=document.createElement('a');beta.href='/?view=beta';beta.textContent='베타 비교';menu.append(beta);nav.append(menu);
       accountCleanup = accountControl(nav);
     } catch {
       if (current === generation)

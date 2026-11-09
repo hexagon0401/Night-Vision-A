@@ -12,6 +12,8 @@ import { ingest, publicData } from "./data.js";
 import { auth, requireUser } from "./auth.js";
 import { analyzeCase, monitorSummary, reason } from "./ai.js";
 import { initialize } from "./database.js";
+import {betaAuthorization} from './workload.js';
+import {betaRoute} from './beta.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -41,6 +43,13 @@ export default {
           503,
         );
       await initialize(env.DB);
+      if(url.pathname.startsWith('/api/internal/beta/')){
+        requireValue(request.method==='POST','method_not_allowed',405);
+        const actor=await betaAuthorization(request,env);return await betaRoute(request,env,url.pathname,actor);
+      }
+      if(url.pathname==='/api/v2/beta'||url.pathname.startsWith('/api/v2/beta/')){
+        requireValue(request.method==='GET','method_not_allowed',405);return await betaRoute(request,env,url.pathname);
+      }
       if (url.pathname.startsWith("/api/auth/"))
         return await auth(request, env, url);
       if (url.pathname.startsWith("/api/internal/")) {

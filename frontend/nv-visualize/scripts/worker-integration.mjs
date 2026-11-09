@@ -2,6 +2,8 @@ import { Miniflare, convertV4MiniflareOptions } from "miniflare";
 import { build } from "esbuild";
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
+import {fileURLToPath} from 'node:url';
+process.chdir(fileURLToPath(new URL('..',import.meta.url)));
 const built = await build({
   entryPoints: ["../../services/cloudflare/worker.js"],
   bundle: true,
@@ -15,6 +17,9 @@ const script = built.outputFiles[0].text.replace(
   '"service_unavailable"',
   "String(error.stack)",
 );
+const rsa=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+const jwk={...await crypto.subtle.exportKey('jwk',rsa.publicKey),kid:'beta-test-key',alg:'RS256'};
+async function workload(overrides={}){const now=Math.floor(Date.now()/1000);const header=Buffer.from(JSON.stringify({alg:'RS256',kid:jwk.kid})).toString('base64url');const claims=Buffer.from(JSON.stringify({iss:'https://token.actions.githubusercontent.com',aud:'https://example.test/beta',iat:now,exp:now+300,repository:'hexagon0401/Night-Vision-A',repository_id:'1204033173',ref:'refs/heads/main',event_name:'workflow_dispatch',workflow_ref:'hexagon0401/Night-Vision-A/.github/workflows/beta-comparison.yml@refs/heads/main',run_id:'42',sha:'test-sha',...overrides})).toString('base64url');const signature=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',rsa.privateKey,new TextEncoder().encode(header+'.'+claims));return header+'.'+claims+'.'+Buffer.from(signature).toString('base64url');}
 let nimCalls = 0;
 let profileId = 82876856;
 let nimStatus = 200;
@@ -40,6 +45,7 @@ const mf = new Miniflare(
         },
         outboundService: async (request) => {
           const u = new URL(request.url);
+          if(u.hostname==='token.actions.githubusercontent.com')return Response.json({keys:[jwk]});
           if (u.hostname === "github.com")
             return Response.json({ access_token: "test-provider-token" });
           if (u.hostname === "api.github.com")
@@ -48,7 +54,7 @@ const mf = new Miniflare(
             const input = await request.json();
             const reviewing = input.messages[0].content.includes(
               "Review reasoning errors",
-            );
+            ) || input.messages[0].content.includes("critique agent");
             assert.equal(
               request.headers.get("Authorization"),
               reviewing ? "Bearer test-nim-B" : "Bearer test-nim-A",
@@ -56,6 +62,13 @@ const mf = new Miniflare(
             nimCalls++;
             if (nimStatus !== 200)
               return new Response("provider limit", { status: nimStatus });
+            if(input.messages[0].content.includes('Framework: NV Engine 2.0')){
+             const packet=JSON.parse(input.messages[1].content),round=Number(input.messages[0].content.match(/iteration (\d)\/3/)[1]);
+             if(reviewing)assert.ok(packet.previous_analysis);
+             if(!reviewing&&round>1)assert.ok(packet.previous_evaluation);
+             const report=reviewing?{verdict:'revise',critique:'Synthetic critique [S:src_beta_test]',source_ids:['src_beta_test'],rubric:Array.from({length:9},(_,i)=>({criterion:'test '+i,score:1,max:2})),research_requests:[]}:{sections:Object.fromEntries(['PLANNER','L0','L1','L2','L2.5','L3','L4','RETRO'].map(p=>[p,'Synthetic source-bound test '+p+' [S:src_beta_test]'])),source_ids:['src_beta_test'],hypotheses:[{id:'H1',claim:'synthetic claim',falsifier:'counterexample',status:'open'}],changes:'test revision',research_requests:[]};
+             return Response.json({model:'resolved-test-model',usage:{prompt_tokens:100,completion_tokens:50},choices:[{finish_reason:'stop',message:{content:JSON.stringify(report)}}]});
+            }
             return Response.json({
               choices: [
                 {
@@ -285,6 +298,23 @@ try {
     .prepare("UPDATE snapshots SET metadata=? WHERE id=?")
     .bind(JSON.stringify({ coverage: "new test evidence" }), snapshot.id)
     .run();
+  // Workload-authenticated full beta loop, not a public AI bypass.
+  const betaInput={topic:'SYNTHETIC TEST red sea',cutoff:new Date(Date.now()-1000).toISOString(),framework_sha256:'a'.repeat(64),sources:[{id:'src_beta_test',title:'SYNTHETIC TEST',url:'https://www.imo.org/test',excerpt:'SYNTHETIC TEST evidence only',publisher_family:'imo.org',published_at:'2026-01-01T00:00:00Z'}]};
+  assert.equal((await req('/api/internal/beta/start',betaInput)).status,401);
+  assert.equal((await req('/api/internal/beta/start',betaInput,{Authorization:'Bearer '+await workload({ref:'refs/heads/fork'})})).status,403);
+  assert.equal((await req('/api/internal/beta/start',betaInput,{Authorization:'Bearer '+await workload({exp:Math.floor(Date.now()/1000)-1})})).status,401);
+  const betaHeaders={Authorization:'Bearer '+await workload()};
+  const begin=await req('/api/internal/beta/start',betaInput,betaHeaders);assert.equal(begin.status,200,await begin.clone().text());const beta=await begin.json();
+  assert.equal((await req('/api/internal/beta/step',{id:beta.id,step:1},betaHeaders)).status,409);
+  await db.prepare("UPDATE quotas SET count=0 WHERE day=date('now') AND bucket='review'").run();
+  const betaBefore=nimCalls;
+  const first=await Promise.all([req('/api/internal/beta/step',{id:beta.id,step:0},betaHeaders),req('/api/internal/beta/step',{id:beta.id,step:0},betaHeaders)]);
+  assert.deepEqual(first.map(r=>r.status).sort(),[200,409]);
+  for(let step=1;step<6;step++){const response=await req('/api/internal/beta/step',{id:beta.id,step},betaHeaders);assert.equal(response.status,200,await response.clone().text());}
+  assert.equal(nimCalls-betaBefore,6);
+  assert.equal((await req('/api/internal/beta/step',{id:beta.id,step:5},betaHeaders)).status,200);assert.equal(nimCalls-betaBefore,6,'resume must not charge completed steps');
+  const final=await(await req('/api/v2/beta/'+beta.id)).json();assert.equal(final.state,'complete');assert.equal(final.steps.length,6);assert.equal(final.steps[5].output.provider_model,'resolved-test-model');
+  assert.equal((await req('/api/internal/beta/start',{...betaInput,topic:'different'},betaHeaders)).status,429);
   // Race competing global reservations using actual D1 transactions.
   await db
     .prepare("INSERT OR REPLACE INTO quotas VALUES(date('now'),'nim',39)")

@@ -144,6 +144,7 @@ export function mountMonitor(
     if (node !== account && node.textContent !== "현황")
       utilityItems.append(node);
   utility.append(utilityTitle, utilityItems);
+  utilityItems.append(link('베타 비교','/?view=beta'));
   nav.append(utility);
   if (account) nav.append(account);
   const country = document.createElement("select");

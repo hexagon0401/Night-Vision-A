@@ -1,0 +1,41 @@
+name: NV beta comparison
+on:
+  workflow_dispatch:
+    inputs:
+      cutoff:
+        description: 'UTC cutoff ISO timestamp, empty freezes at job start'
+        required: false
+        type: string
+      resume_id:
+        description: 'Existing beta run ID to resume, otherwise empty'
+        required: false
+        type: string
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: nv-beta-production
+  cancel-in-progress: false
+jobs:
+  beta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NV_WORKER_ORIGIN: ${{ vars.NV_WORKER_ORIGIN || 'https://nightvision.hexagon0401.workers.dev' }}
+      BETA_CUTOFF: ${{ inputs.cutoff }}
+      BETA_RESUME_ID: ${{ inputs.resume_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -c requirements-runtime.txt -e './engine[collect]'
+      - run: python services/worker/beta.py --cutoff "$BETA_CUTOFF" --resume-id "$BETA_RESUME_ID" --out .local/beta-output
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nv-beta-${{ github.run_id }}
+          path: .local/beta-output/
+          retention-days: 14
