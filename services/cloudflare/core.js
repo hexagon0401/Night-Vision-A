@@ -109,3 +109,36 @@ export function schedule(now = new Date(), runs = 12) {
     timing: "best_effort",
   };
 }
+
+export function unconfirmedSlots(now, runs, history) {
+  if (!history.length) return [];
+  const first = Math.min(...history.map((r) => Date.parse(r.started)));
+  const midnight = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+  );
+  const slots = [];
+  for (const offset of [-1, 0])
+    for (let i = 0; i < Number(runs); i++) {
+      const at =
+        midnight +
+        offset * 86400000 +
+        (Math.floor((i * 24) / Number(runs)) * 60 + 17) * 60000;
+      if (
+        at < first ||
+        at < now.getTime() - 86400000 ||
+        at > now.getTime() - 1800000
+      )
+        continue;
+      if (
+        !history.some(
+          (r) =>
+            Date.parse(r.started) >= at - 900000 &&
+            Date.parse(r.started) <= at + 5400000,
+        )
+      )
+        slots.push(new Date(at).toISOString());
+    }
+  return slots;
+}

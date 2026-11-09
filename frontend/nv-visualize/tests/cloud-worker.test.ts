@@ -1,7 +1,10 @@
 import { test, expect } from "vitest";
 import { validateAnswer } from "../../../services/cloudflare/ai.js";
 import { validateRecord } from "../../../services/cloudflare/data.js";
-import { schedule } from "../../../services/cloudflare/core.js";
+import {
+  schedule,
+  unconfirmedSlots,
+} from "../../../services/cloudflare/core.js";
 test("AI rejects invented citations, links and coordinate pairs", () => {
   const good = {
     summary: [{ text: "자료에 기록됨", source_ids: ["source:1"] }],
@@ -34,6 +37,17 @@ test("day schedule defaults to 12 and supports 24 without invalid rates", () => 
     "2026-01-01T01:17:00.000Z",
   );
   expect(() => schedule(new Date(), 25)).toThrow();
+});
+test("unconfirmed slots are distinguished from a never-activated monitor", () => {
+  const now = new Date("2026-01-01T08:00:00Z");
+  expect(unconfirmedSlots(now, 12, [])).toEqual([]);
+  expect(
+    unconfirmedSlots(now, 12, [{ started: "2026-01-01T00:17:00Z" }]),
+  ).toEqual([
+    "2026-01-01T02:17:00.000Z",
+    "2026-01-01T04:17:00.000Z",
+    "2026-01-01T06:17:00.000Z",
+  ]);
 });
 test("ingestion rejects credential URLs and invalid geography", () => {
   const record = {

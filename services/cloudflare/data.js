@@ -6,6 +6,7 @@ import {
   rows,
   json,
   schedule,
+  unconfirmedSlots,
 } from "./core.js";
 const ident = (s) =>
   typeof s === "string" && /^[a-zA-Z0-9_.:-]{1,180}$/.test(s);
@@ -359,6 +360,11 @@ export async function publicData(url, env) {
     return json({
       configured: true,
       ...schedule(new Date(), env.MONITOR_RUNS_PER_DAY ?? 12),
+      unconfirmed_slots: unconfirmedSlots(
+        new Date(),
+        env.MONITOR_RUNS_PER_DAY ?? 12,
+        runs,
+      ),
       providers: providers.map((p) => ({
         ...p,
         metadata: JSON.parse(p.metadata),

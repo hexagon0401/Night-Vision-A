@@ -40,7 +40,25 @@ async function api(path: string, body?: unknown) {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const d = await r.json();
-  if (!r.ok) throw new Error(d.error ?? "연결 실패");
+  if (!r.ok) {
+    const messages: Record<string, string> = {
+      database_not_configured: "데이터베이스 연결이 필요합니다.",
+      github_login_required: "GitHub 로그인이 필요합니다.",
+      github_not_configured: "GitHub 로그인 앱 연결이 필요합니다.",
+      nim_not_enabled: "NIM 키 등록과 무료 API 활성화가 필요합니다.",
+      nim_quota_or_model_unavailable:
+        "모델 접근 권한 또는 무료 한도를 확인하세요.",
+      nim_quota_or_access_paused:
+        "무료 한도 또는 접근 오류로 오늘의 새 AI 호출이 중단됐습니다.",
+      ai_daily_budget_exhausted: "오늘의 AI 사용 한도에 도달했습니다.",
+      service_unavailable:
+        "서비스 연결을 확인할 수 없습니다. 기존 자료는 유지됩니다.",
+    };
+    throw new Error(
+      messages[d.error] ??
+        "요청을 처리할 수 없습니다. 잠시 후 다시 시도하세요.",
+    );
+  }
   return d;
 }
 function when(value: string | null) {
@@ -319,6 +337,14 @@ export function mountMonitor(root: HTMLElement): () => void {
         status.append(
           el("p", "정상 분석이 없거나 5시간 이상 지났습니다.", "muted"),
         );
+      if (d.unconfirmed_slots?.length)
+        status.append(
+          el(
+            "p",
+            `최근 24시간 실행 기록 미확인 ${d.unconfirmed_slots.length}회 · 비활성화·지연·누락 여부를 실행 이력에서 확인하세요.`,
+            "muted",
+          ),
+        );
       for (const p of d.providers) {
         const m = p.metadata;
         status.append(
@@ -349,7 +375,12 @@ export function mountMonitor(root: HTMLElement): () => void {
       cases = (await api("/api/v2/cases")).cases;
       const me = await api("/api/auth/me");
       user = me.user;
-      login.textContent = user ? `${user.login} · 로그아웃` : "GitHub 로그인";
+      login.textContent = user
+        ? `${user.login} · 로그아웃`
+        : me.configured
+          ? "GitHub 로그인"
+          : "로그인 연결 설정";
+      login.href = me.configured ? "/api/auth/github" : "/setup.html";
       login.onclick = user
         ? (e) => {
             e.preventDefault();
