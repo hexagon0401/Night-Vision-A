@@ -45,3 +45,9 @@ jobs:
       - run: python3 ../../tools/verify_release_assets.py
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: nv-browser-failure-${{ github.run_id }}
+          path: frontend/nv-visualize/test-results/
+          retention-days: 7

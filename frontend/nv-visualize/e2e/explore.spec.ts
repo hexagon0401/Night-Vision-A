@@ -33,6 +33,9 @@ for (const viewport of [
     );
     await page.getByRole("button", { name: "증거 고정 전환" }).click();
     await expect(page.locator(".evidence.pinned")).toBeVisible();
+    const toolbar=await page.locator('.topbar').boundingBox();
+    const pinned=await page.locator('.evidence.pinned').boundingBox();
+    expect(pinned!.y).toBeGreaterThanOrEqual(toolbar!.y+toolbar!.height);
     const card = await page.locator(".evidence").boundingBox();
     expect(card!.x).toBeGreaterThanOrEqual(0);
     expect(card!.x + card!.width).toBeLessThanOrEqual(viewport.width);
