@@ -50,6 +50,10 @@ export function icon(node: IconNode) {
   });
 }
 export function enhanceControls(root: HTMLElement) {
+  let disposed=false;
+  const measure=()=>{if(disposed)return;const header=root.querySelector<HTMLElement>('.topbar');if(header)root.style.setProperty('--nv-header-bottom',Math.ceil(header.getBoundingClientRect().bottom-root.getBoundingClientRect().top+12)+'px');};
+  const sizeObserver=new ResizeObserver(measure);
+  const header=root.querySelector('.topbar');if(header)sizeObserver.observe(header);
   const apply = () => {
     for (const element of Array.from(
       root.querySelectorAll<HTMLElement>("button,nav a,summary"),
@@ -70,8 +74,10 @@ export function enhanceControls(root: HTMLElement) {
     observer.observe(root, { childList: true, subtree: true });
   });
   apply();
+  measure();
+  const frame=requestAnimationFrame(measure);
   observer.observe(root, { childList: true, subtree: true });
-  return () => observer.disconnect();
+  return () => {disposed=true;observer.disconnect();sizeObserver.disconnect();cancelAnimationFrame(frame);};
 }
 let session: Promise<any> | undefined;
 let checked = 0;

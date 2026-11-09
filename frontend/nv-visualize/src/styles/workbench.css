@@ -243,3 +243,5 @@
   margin-left: 0;
   border: 0;
 }
+/* Panels must clear the measured toolbar height, including wrapped mobile labels. */
+.workspace .tool-panel,.workspace .demo-label,.workspace .monitor-panel,.workspace .monitor-evidence,.workspace .evidence.pinned{top:var(--nv-header-bottom,100px)!important}
