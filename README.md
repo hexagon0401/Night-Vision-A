@@ -15,7 +15,7 @@ Live sources remain disabled by default. Source-linked KO/EN Trace playback and 
 ## Workspace
 
 - [NV Engine](engine/) — independent Python package, version 2.0.0.
-- [NV Visualize](frontend/nv-visualize/) — separate TypeScript/Vite shell; future MapLibre + deck.gl interface.
+- [NV Visualize](frontend/nv-visualize/) — TypeScript/Vite application with MapLibre + deck.gl Explore and Trace.
 - [API](services/api/) and [worker boundary](services/worker/).
 - [Contracts](schemas/) and [source configuration boundary](configs/sources/).
 - [Claude extensions v1–v3](extensions/claude/) and [global/China prompt packs](extensions/promptpacks/).
@@ -67,7 +67,7 @@ Use a fresh output directory. `analysis.json` contains deterministic, uncalibrat
 
 ## Delivery and licensing
 
-[Ordered roadmap](docs/architecture/README.md): canonical schemas/provenance (implemented) → bounded collectors (implemented) → PR 3 detectors → detectors → real map → Trace → exporter → Alpha deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. No deployment or Foundry upload is included.
+[Ordered roadmap](docs/architecture/README.md): canonical schemas/provenance → bounded collectors → detectors → real map → Trace → exporter → source-backed Alpha. All seven implementation phases are delivered; see [release operations](deploy/README.md) for container and isolated static-preview deployment. No WorldMonitor code was imported. A project license remains undecided; do not assume permission to republish third-party code or datasets. Foundry enrollment upload and production operation remain outside the Alpha.
 
 ## Trace, export and deployment
 
