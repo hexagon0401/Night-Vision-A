@@ -24,7 +24,8 @@ class Publisher:
         if r.status_code!=200:raise ValueError('publication_failed_'+str(r.status_code))
         return r.json()
     def snapshot(self,provider,records,metadata,cases=None):
-        identity='snapshot:'+digest([provider,records,metadata]);self.post('start',{'id':identity,'provider':provider,'expected':len(records),'metadata':metadata})
+        identity='snapshot:'+digest([provider,records,metadata]);status=self.post('start',{'id':identity,'provider':provider,'expected':len(records),'metadata':metadata})
+        if status.get('state')=='published':return identity
         for at in range(0,len(records),50):self.post('batch',{'id':identity,'records':records[at:at+50]})
         for case in cases or []:self.post('case',{'id':identity,**case})
         self.post('publish',{'id':identity});return identity
@@ -43,7 +44,7 @@ def main():
         if not token or os.environ.get('NV_UCDP_ENABLED')!='true':
             run['providers']['ucdp']={'state':'setup_required','reason':'UCDP_ACCESS_TOKEN and NV_UCDP_ENABLED=true required'}
         else:
-            monitor=UCDPMonitor(state,token,now=now)
+            monitor=UCDPMonitor(state,token,now=now,permit=lambda:publisher.post('ucdp-permit',{}))
             try:
                 annual=os.environ.get('UCDP_ANNUAL_VERSION','26.1');candidate=monitor.discover()
                 complete=monitor.sync(annual,max_pages=15)
@@ -55,7 +56,7 @@ def main():
                     cutoff=(now.date()-timedelta(days=90)).isoformat()
                     recent=[r for r in all_records if r['end_day']>=cutoff]
                     limited=len(recent)>20000;recent=recent[-20000:]
-                    metadata={'annual':annual,'candidate':candidate,'coverage_start':all_records[0]['day'] if all_records else None,'coverage_end':all_records[-1]['end_day'] if all_records else None,'records':len(recent),'limited':limited,'acquired_at':now.isoformat(),'source_updated_at':None,'lag_note':'UCDP published records, not live incident reporting','attribution':'Uppsala Conflict Data Program; https://ucdp.uu.se/downloads/'}
+                    metadata={'annual':annual,'candidate':candidate,'coverage_start':all_records[0]['day'] if all_records else None,'coverage_end':max((r['end_day'] for r in all_records),default=None),'records':len(recent),'limited':limited,'acquired_at':max((r['acquired_at'] for r in all_records),default=None),'source_updated_at':None,'lag_note':'UCDP published records, not live incident reporting','attribution':'Uppsala Conflict Data Program; https://ucdp.uu.se/downloads/'}
                     # Only completed source queries create zero buckets; never extrapolate to today.
                     cases=build_cases(aggregates,now) if aggregates else []
                     snapshot=publisher.snapshot('ucdp',recent,metadata,cases)
@@ -64,7 +65,8 @@ def main():
             finally:monitor.close()
         run['state']='complete' if any(v['state']=='complete' for v in run['providers'].values()) else 'skipped'
         run['completed']=datetime.now(timezone.utc).isoformat();publisher.post('run',run)
-        publisher.post('monitor-ai',{'run_id':run['id']})
+        try:publisher.post('monitor-ai',{'run_id':run['id']})
+        except ValueError:pass  # AI availability never invalidates a successful source publication.
         print(json.dumps({'run_id':run['id'],'state':run['state'],'providers':run['providers']}))
     except Exception:
         run.update(state='failed',completed=datetime.now(timezone.utc).isoformat(),error='monitor_cycle_failed')

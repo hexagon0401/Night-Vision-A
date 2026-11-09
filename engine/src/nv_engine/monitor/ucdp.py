@@ -51,11 +51,12 @@ class MonitorState:
 
 
 class UCDPMonitor:
-    def __init__(self,state,token,client=None,now=None,max_requests=500,sleep=time.sleep):
+    def __init__(self,state,token,client=None,now=None,max_requests=500,sleep=time.sleep,permit=None):
         self.state=state;self.token=token;self.client=client or httpx.Client(timeout=30,follow_redirects=False);self.owned=client is None
-        self.now=now or datetime.now(timezone.utc);self.max_requests=max_requests;self.sleep=sleep;self.used=0
+        self.now=now or datetime.now(timezone.utc);self.max_requests=max_requests;self.sleep=sleep;self.used=0;self.permit=permit
     def get(self,version,page=1,size=250,window=None):
         if not self.token:raise ValueError('missing_UCDP_ACCESS_TOKEN')
+        if self.permit:self.permit()
         self.state.charge(self.now.date().isoformat(),self.max_requests);self.used+=1
         params={'pagesize':size,'page':page}
         if window:params.update(StartDate=window,EndDate=self.now.date().isoformat())
