@@ -2,6 +2,7 @@ import type { CaseBundle, Observation, Source } from "../contracts/generated";
 import type { AnalysisReport, Anomaly } from "../contracts/analysis";
 
 export interface CasePayload {
+  map_context?: {id:string;lat:number;lon:number;precision:number}[];
   case: CaseBundle;
   analysis: AnalysisReport;
 }

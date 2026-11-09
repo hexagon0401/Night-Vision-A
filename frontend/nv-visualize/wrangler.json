@@ -5,6 +5,7 @@
   "workers_dev": true,
   "preview_urls": false,
   "main": "../../services/cloudflare/worker.js",
+  "rules": [{"type":"Text","globs":["**/*.sql"],"fallthrough":true}],
   "keep_vars": true,
   "d1_databases": [{"binding": "DB", "database_name": "nv-monitor", "migrations_dir": "../../services/cloudflare/migrations"}],
   "vars": {

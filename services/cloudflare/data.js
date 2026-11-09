@@ -22,7 +22,8 @@ export function validateCase(p) {
  requireValue(ident(p.case.case_id),'invalid_case_id');
  const names=['sources','claims','events','entities','observations','anomalies','narratives'];
  requireValue(names.every(k=>Array.isArray(p.case[k]))&&names.reduce((n,k)=>n+p.case[k].length,0)<=4096&&p.case.observations.length<=2048,'case_budget');
- requireValue(JSON.stringify(p).length<=3500000,'case_size');return p;
+ requireValue(new TextEncoder().encode(JSON.stringify(p)).length<=1800000,'case_size');
+ if(p.map_context)requireValue(Array.isArray(p.map_context)&&p.map_context.length<=250&&p.map_context.every(r=>{validateRecord(r);return true;}),'invalid_map_context');return p;
 }
 export async function ingest(request,env,path) {
  const d=await body(request);const db=env.DB;
@@ -46,7 +47,9 @@ export async function ingest(request,env,path) {
  if(path==='/api/internal/case') {
   requireValue(ident(d.id)&&typeof d.country==='string','invalid_case');const p=validateCase(d.payload);
   const s=await stmt(db,'SELECT state FROM snapshots WHERE id=?',d.id).first();requireValue(s?.state==='staging','snapshot_not_staging',409);
-  await stmt(db,'INSERT OR REPLACE INTO cases VALUES(?,?,?,?)',d.id,p.case.case_id,d.country,JSON.stringify(p)).run();return json({accepted:true});
+  requireValue(d.exports&&['observed','all'].every(k=>typeof d.exports[k]==='string'&&d.exports[k].length<=1500000&&/^UEs[A-Za-z0-9+/=]+$/.test(d.exports[k])),'invalid_exports');
+  const priority=Math.max(0,...p.analysis.anomalies.map(a=>Number.isFinite(a.score)?Math.abs(a.score):0));
+  await db.batch([stmt(db,'INSERT OR REPLACE INTO cases VALUES(?,?,?,?,?)',d.id,p.case.case_id,d.country,JSON.stringify(p),priority),...['observed','all'].map(scope=>stmt(db,'INSERT OR REPLACE INTO exports VALUES(?,?,?,?)',d.id,p.case.case_id,scope,d.exports[scope]))]);return json({accepted:true});
  }
  if(path==='/api/internal/publish') {
   requireValue(ident(d.id),'invalid_snapshot');const s=await stmt(db,'SELECT * FROM snapshots WHERE id=?',d.id).first();requireValue(s,'unknown_snapshot',404);
@@ -65,7 +68,7 @@ export async function ingest(request,env,path) {
  if(path==='/api/internal/aggregates') {
   requireValue(ident(d.provider)&&Array.isArray(d.rows)&&d.rows.length<=50,'invalid_aggregates');
   for(const r of d.rows)requireValue(typeof r.country==='string'&&date(r.day)&&Number.isInteger(r.events)&&r.events>=0,'invalid_aggregate');
-  if(d.rows.length)await db.batch(d.rows.map(r=>stmt(db,'INSERT OR REPLACE INTO aggregates VALUES(?,?,?,?)',d.provider,r.country,r.day,JSON.stringify(r))));
+  if(d.rows.length)await db.batch(d.rows.map(r=>stmt(db,'INSERT INTO aggregates VALUES(?,?,?,?) ON CONFLICT(provider,country,day) DO UPDATE SET body=excluded.body WHERE aggregates.body<>excluded.body',d.provider,r.country,r.day,JSON.stringify(r))));
   await stmt(db,"DELETE FROM aggregates WHERE day < date('now','-13 months')").run();return json({accepted:d.rows.length});
  }
  throw new ApiError(404,'not_found');
@@ -91,6 +94,11 @@ export async function publicData(url,env) {
  }
  if(path==='/api/v2/cases')return json({cases:await rows(db,'SELECT c.id,c.country FROM cases c JOIN heads h ON c.snapshot=h.snapshot ORDER BY c.country,c.id LIMIT 500')});
  if(path.startsWith('/api/v2/cases/')) {
+  if(path.endsWith('/export')) {
+   const id=decodeURIComponent(path.slice('/api/v2/cases/'.length,-'/export'.length)),scope=url.searchParams.get('scope')??'observed';requireValue(ident(id)&&['observed','all'].includes(scope),'invalid_export');
+   const r=await stmt(db,'SELECT e.body FROM exports e JOIN heads h ON e.snapshot=h.snapshot WHERE e.id=? AND e.scope=?',id,scope).first();requireValue(r,'unknown_export',404);
+   const bytes=Uint8Array.from(atob(r.body),c=>c.charCodeAt(0));return new Response(bytes,{headers:{'Content-Type':'application/zip','Content-Disposition':'attachment; filename="NV_foundry_'+scope+'.zip"','Cache-Control':'no-store'}});
+  }
   const id=decodeURIComponent(path.slice('/api/v2/cases/'.length));requireValue(ident(id),'invalid_case');const r=await stmt(db,'SELECT c.body FROM cases c JOIN heads h ON c.snapshot=h.snapshot WHERE c.id=?',id).first();requireValue(r,'unknown_case',404);return json(JSON.parse(r.body));
  }
  if(path==='/api/v2/monitor-summary') {const result=await stmt(db,"SELECT * FROM ai_results WHERE kind='monitor' ORDER BY created DESC LIMIT 1").first();return json({result:result?JSON.parse(result.body):null,analyzed_at:result?.created??null});}

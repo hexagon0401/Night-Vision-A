@@ -20,7 +20,7 @@ def aggregate(records):
     return result
 
 
-def build_cases(aggregates,acquired,coverage_start=None,coverage_end=None):
+def build_cases(aggregates,acquired,coverage_start=None,coverage_end=None,coverage_intervals=None):
     groups=defaultdict(list)
     for row in aggregates:groups[row['country']].append(row)
     result=[]
@@ -30,7 +30,11 @@ def build_cases(aggregates,acquired,coverage_start=None,coverage_end=None):
         # Bound each case; the most recent 90 days per country suffice for prior-only baselines.
         first=max(first,last-timedelta(days=89));rows=[];day=first
         while day<=last:
-            key=day.isoformat();rows.append(by_day.get(key,{'country':country,'day':key,'events':0,'low':0,'best':0,'high':0,'record_ids':[],'record_hashes':[],'interval_events':0,'assignment':'zero only inside completed dataset query coverage'}));day+=timedelta(days=1)
+            key=day.isoformat()
+            covered=coverage_intervals is None or any(a<=key<=b for a,b in coverage_intervals)
+            if covered:rows.append(by_day.get(key,{'country':country,'day':key,'events':0,'low':0,'best':0,'high':0,'record_ids':[],'record_hashes':[],'interval_events':0,'assignment':'zero only inside completed dataset query coverage'}))
+            day+=timedelta(days=1)
+        if not rows:continue
         name=digest(country)[:20];entity_id='entity:ucdp:'+name
         sources=[];observations=[];claims=[];provenance_ids=[]
         for row in rows:
@@ -43,6 +47,8 @@ def build_cases(aggregates,acquired,coverage_start=None,coverage_end=None):
                 claims.append(Claim(claim_id='claim:ucdp:'+digest([row,metric]),statement=f"{country}: {row[key]} {metric} assigned to start-date bucket {row['day']}",assessment='Daily aggregation boundary, not the time of the underlying events; low/high and interval uncertainty retained in aggregation evidence',evidence_status='reported',provenance=p,observation_ids=[oid]))
         entity=Entity(entity_id=entity_id,entity_type='country_conflict_series',name=country,location=None,evidence_status='reported',provenance=Provenance(source_ids=provenance_ids,extraction_method='nv:ucdp-aggregation:1'))
         case=CaseBundle(case_id='case:ucdp:'+digest(rows),title=f'UCDP reported conflict trends — {country}',data_origin='source_backed',sources=sources,entities=[entity],observations=observations,claims=claims,events=[],anomalies=[],relations=[],hypotheses=[],narratives=[])
-        report=analyze(case);case=attach_traces(case,report)
+        report=analyze(case)
+        if coverage_intervals is not None:report.warnings.append('coverage gaps excluded rather than zero-filled; scores uncalibrated')
+        case=attach_traces(case,report)
         result.append({'country':country,'payload':{'case':case.model_dump(mode='json'),'analysis':report.model_dump(mode='json'),'aggregation_evidence':rows,'time_semantics':'observed_at_utc is the derived day bucket boundary, never a provider-reported event instant'}})
     return result

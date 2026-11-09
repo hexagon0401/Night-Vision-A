@@ -33,9 +33,9 @@ export async function auth(request,env,url) {
   const state=url.searchParams.get('state'),code=url.searchParams.get('code');
   requireValue(/^[a-f0-9]{64}$/.test(state??'')&&state===cookies(request)['__Host-nv-state']&&code&&code.length<=512,'oauth_state_invalid',400);
   const saved=await stmt(db,'DELETE FROM oauth_states WHERE hash=? AND expires>? RETURNING verifier',await sha(state),Date.now()).first();requireValue(saved,'oauth_state_expired',400);
-  const exchange=await fetch('https://github.com/login/oauth/access_token',{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({client_id:env.GITHUB_CLIENT_ID,client_secret:env.GITHUB_CLIENT_SECRET,code,redirect_uri:callback,code_verifier:saved.verifier})});
+  const exchange=await fetch('https://github.com/login/oauth/access_token',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(15000),headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({client_id:env.GITHUB_CLIENT_ID,client_secret:env.GITHUB_CLIENT_SECRET,code,redirect_uri:callback,code_verifier:saved.verifier})});
   requireValue(exchange.ok,'github_exchange_failed',502);const token=await exchange.json();requireValue(typeof token.access_token==='string','github_exchange_rejected',401);
-  const response=await fetch('https://api.github.com/user',{redirect:'error',signal:AbortSignal.timeout(15000),headers:{Authorization:'Bearer '+token.access_token,Accept:'application/vnd.github+json','User-Agent':'Night-Vision'}});
+  const response=await fetch('https://api.github.com/user',{redirect:'manual',signal:AbortSignal.timeout(15000),headers:{Authorization:'Bearer '+token.access_token,Accept:'application/vnd.github+json','User-Agent':'Night-Vision'}});
   requireValue(response.ok,'github_profile_failed',502);const profile=await response.json();requireValue(allowed(env).has(String(profile.id)),'github_account_not_allowed',403);
   const session=random();await stmt(db,'DELETE FROM sessions WHERE expires<? OR user_id=?',Date.now(),String(profile.id)).run();
   await stmt(db,'INSERT INTO sessions VALUES(?,?,?,?)',await sha(session),String(profile.id),String(profile.login),Date.now()+7*86400000).run();

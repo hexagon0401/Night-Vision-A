@@ -17,6 +17,9 @@ coverage/
 *.local.sqlite3-*
 
 .local/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
 
 test-results/
 playwright-report/

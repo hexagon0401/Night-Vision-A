@@ -12,6 +12,7 @@ import {
 import type { Candidate, CandidateLink, Point } from "../cases/model";
 
 export interface MapData {
+  events?: {id:string;lat:number;lon:number;precision:number}[];
   candidates: Candidate[];
   links: CandidateLink[];
   selected: string | null;
@@ -33,6 +34,7 @@ export interface MapCallbacks {
   error(): void;
   dismiss(): void;
   basemap?(detailed: boolean): void;
+  event?(id:string): void;
 }
 interface Marker {
   point: Point;
@@ -183,6 +185,12 @@ export function createMap(
       data.trace ? arc(d.points, reduced ? 1 : data.trace.progress) : d.points;
     overlay.setProps({
       layers: [
+        new ScatterplotLayer<{id:string;lat:number;lon:number;precision:number}>({
+          id:'reported-events',data:data.events??[],pickable:true,stroked:true,
+          getPosition:d=>[d.lon,d.lat],getRadius:d=>d.precision===1?4:11,radiusUnits:'pixels',
+          getFillColor:d=>d.precision===1?[225,225,220,200]:[180,180,180,35],getLineColor:[220,220,220,180],getLineWidth:1,lineWidthUnits:'pixels',
+          onClick:info=>{if(info.object)callbacks.event?.(info.object.id);}
+        }),
         new PathLayer<CandidateLink>({
           id: "direct-relations",
           data: paths.filter((d) =>

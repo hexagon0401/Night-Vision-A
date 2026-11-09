@@ -98,6 +98,10 @@ class UCDPMonitor:
             response,raw=result;records=[normalize(r,version,now) for r in raw]
             with db:
                 for record in records:
+                    previous=db.execute('SELECT body FROM upstream WHERE version=? AND id=?',(version,record['id'])).fetchone()
+                    if previous:
+                        old=json.loads(previous[0])
+                        if old['hash']==record['hash']:record['acquired_at']=old['acquired_at']
                     db.execute('INSERT OR REPLACE INTO staging VALUES(?,?,?)',(version,record['id'],canonical(record)))
                     db.execute('INSERT OR IGNORE INTO revisions VALUES(?,?,?,?)',(version,record['id'],record['hash'],now))
                 next_page=response.get('NextPageUrl') or response.get('nextPageUrl')

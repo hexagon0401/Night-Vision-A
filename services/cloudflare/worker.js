@@ -2,6 +2,7 @@ import {ApiError,json,internal,stmt,sameOrigin,body,requireValue} from './core.j
 import {ingest,publicData} from './data.js';
 import {auth,requireUser} from './auth.js';
 import {analyzeCase,monitorSummary,reason} from './ai.js';
+import {initialize} from './database.js';
 
 export default {
  async fetch(request,env,ctx) {
@@ -14,6 +15,7 @@ export default {
     return new Response(response.body,{status:response.status,headers});
    }
    if(!env.DB)return json({configured:false,error:'database_not_configured',setup_url:'/setup.html'},503);
+   await initialize(env.DB);
    if(url.pathname.startsWith('/api/auth/'))return await auth(request,env,url);
    if(url.pathname.startsWith('/api/internal/')) {
     await internal(request,env);if(request.method!=='POST')throw new ApiError(405,'method_not_allowed');

@@ -15,12 +15,17 @@ CREATE INDEX IF NOT EXISTS record_country_day ON records(snapshot,country,day);
 CREATE INDEX IF NOT EXISTS record_day ON records(snapshot,day);
 CREATE TABLE IF NOT EXISTS cases (
  snapshot TEXT NOT NULL REFERENCES snapshots(id) ON DELETE CASCADE,
- id TEXT NOT NULL, country TEXT NOT NULL, body TEXT NOT NULL,
+ id TEXT NOT NULL, country TEXT NOT NULL, body TEXT NOT NULL, priority REAL NOT NULL DEFAULT 0,
  PRIMARY KEY(snapshot,id)
 );
 CREATE TABLE IF NOT EXISTS aggregates (
  provider TEXT NOT NULL, country TEXT NOT NULL, day TEXT NOT NULL,
  body TEXT NOT NULL, PRIMARY KEY(provider,country,day)
+);
+CREATE TABLE IF NOT EXISTS exports (
+ snapshot TEXT NOT NULL REFERENCES snapshots(id) ON DELETE CASCADE,
+ id TEXT NOT NULL, scope TEXT NOT NULL, body TEXT NOT NULL,
+ PRIMARY KEY(snapshot,id,scope)
 );
 CREATE TABLE IF NOT EXISTS runs (
  id TEXT PRIMARY KEY, started TEXT NOT NULL, completed TEXT,

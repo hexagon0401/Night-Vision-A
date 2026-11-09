@@ -89,6 +89,7 @@ export function mount(
   );
   function updateMap() {
     map.update({
+      events: payload.map_context,
       candidates: currentFrame
         ? filtered().filter(
             (item) =>
@@ -174,6 +175,7 @@ export function mount(
     ready: () => {
       message.hidden = true;
       root.dataset.ready = "true";
+      if(payload.map_context?.length)map.focus(payload.map_context.map(r=>[r.lon,r.lat]),false);
     },
     error: () => {
       message.hidden = false;
@@ -223,11 +225,11 @@ export function mount(
     root.querySelector(".demo-label")!.textContent =
       payload.case.data_origin === "synthetic"
         ? "SYNTHETIC DATA · 합성 탐지 실험"
-        : "SOURCE-BACKED ALPHA · USGS Taiwan · uncalibrated";
+        : payload.case.case_id.startsWith('case:ucdp:') ? 'UCDP · 보고 자료 · 날짜별 집계 · UNCALIBRATED' : "SOURCE-BACKED ALPHA · USGS Taiwan · uncalibrated";
     root.querySelector("[data-mode]")!.textContent =
       payload.case.data_origin === "synthetic"
         ? "OFFLINE DEMO"
-        : "ARCHIVED ALPHA";
+        : payload.case.case_id.startsWith('case:ucdp:') ? 'SOURCE-BACKED UCDP' : "ARCHIVED ALPHA";
     root.querySelector("[data-count]")!.textContent =
       `${filtered().length} CANDIDATES · ${payload.case.sources.length} SOURCES`;
     root
@@ -285,7 +287,7 @@ export function mount(
             "p",
             payload.case.data_origin === "synthetic"
               ? "SYNTHETIC DATA · 출처·위치는 합성 입력입니다."
-              : "USGS 공식 자료 · 통계 후보는 미보정입니다.",
+              : payload.case.case_id.startsWith('case:ucdp:') ? 'UCDP 보고 자료 · 집계 경계는 사건 시각이 아닙니다. 통계 후보는 미보정입니다.' : "USGS 공식 자료 · 통계 후보는 미보정입니다.",
             "muted",
           ),
         );
@@ -347,8 +349,9 @@ export function mount(
       link.download = "";
       const kind =
         payload.case.data_origin === "synthetic" ? "synthetic" : "alpha";
+      const live=payload.case.case_id.startsWith('case:ucdp:');
       const update = () =>
-        (link.href = `${base}exports/${kind}-${include.checked ? "all" : "observed"}.zip`);
+        (link.href = live?`/api/v2/cases/${encodeURIComponent(payload.case.case_id)}/export?scope=${include.checked?'all':'observed'}`:`${base}exports/${kind}-${include.checked ? "all" : "observed"}.zip`);
       include.onchange = update;
       update();
       panel.append(
