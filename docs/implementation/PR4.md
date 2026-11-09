@@ -1,0 +1,9 @@
+# PR 4 — Flat Black map and contextual evidence
+
+Stacked on PR 3. Replace the foundation shell with an actual MapLibre/deck.gl Explore interface. Bundle pinned, real Natural Earth geography and the deterministic synthetic analysis case. Default Explore is map-first with small pill tools, supplied four-lens branding, explicit SYNTHETIC DATA, clustered candidate markers and a single-line status bar.
+
+Add searchable/keyboard-accessible candidate choices, contextual evidence, source hashes/metadata, user-pinned drawer, mutually exclusive sources/layers, opt-in dashed inferred links, Escape dismissal, responsive layout and reduced-motion camera transitions. Unknown latest coordinates remain unknown; symbolic/old/centroid coordinates are not invented. Synthetic sources are clearly labelled and never fetched as real evidence.
+
+Validation: 111 Python tests, 8 frontend unit tests and 3 real browser tests passed. Unit tests exercise model safety and UI state; Playwright renders actual WebGL at 1440x900 and 390x844 while blocking all non-local network requests, checks default panel absence, candidate selection, pin/unpin, Escape, source/layer controls, search and page errors. Production typecheck/build, Python regression suite, generated contract/demo checks and pinned geography/legacy archive integrity are required. Hosted CI runs browser tests too. Desktop browser screenshots were visually inspected.
+
+No real case, historical accuracy/calibration, live feed, Trace playback, user auth/deployment or Foundry export is added. The map libraries increase frontend bundle size; performance budgets and production rollout remain PR 7. Natural Earth is generalized public-domain cartography; exact source/hash/license details are under public/geography. See ADR 0005 for the deliberate offline-basemap choice.

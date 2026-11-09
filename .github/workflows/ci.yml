@@ -19,6 +19,8 @@ jobs:
       - run: npm ci
         working-directory: frontend/nv-visualize
       - run: python tools/generate_contracts.py --check
+      - run: python tools/generate_map_demo.py --check
+      - run: python tools/verify_geography.py
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -34,3 +36,5 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

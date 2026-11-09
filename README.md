@@ -6,7 +6,11 @@ A source-traceable geopolitical anomaly intelligence project: **Detect → Conne
 
 ## Current status / 현재 단계
 
-PR 1 contracts implemented: ten canonical Python models, provenance/geotime/reference validation, stateless validation API, generated JSON Schema/OpenAPI/TypeScript contracts and explicit snapshot database migrations. The frontend remains a Phase 0 shell. PR 2 adds bounded GDELT/UCDP/FIRMS/RSS collectors, explicit synthetic replay, retry/cache/pacing and persistent deduplication. Live sources remain disabled by default. PR 3 adds uncalibrated median/MAD, CUSUM and sourced-point candidate analysis with an evidence graph. Real maps, Trace playback and Foundry export are **not implemented**. The shell shows no live intelligence. Historical data is unverified, not a production feed.
+The engine provides ten canonical models, provenance/geotime/reference validation, versioned API/TypeScript contracts and optional snapshot migrations. Bounded GDELT/UCDP/FIRMS/RSS collectors support synthetic replay, retries, cache and dedup. Median/MAD, CUSUM and sourced-point candidate analysis produce an explicit evidence graph with uncalibrated scores.
+
+NV Visualize provides a Flat Black MapLibre/deck.gl Explore map over real offline cartography and a clearly synthetic case. Sources, Layers, search and user-controlled evidence pinning open on demand.
+
+Live sources remain disabled by default. Trace playback and Foundry export are **not implemented**. Historical data remains unverified; no live global intelligence feed or real historical detection accuracy is claimed.
 
 ## Workspace
 
@@ -21,7 +25,7 @@ PR 1 contracts implemented: ten canonical Python models, provenance/geotime/refe
 
 ## Develop
 
-Python 3.12+ and Node 22+ are supported. No credentials or database are required for Phase 0.
+Python 3.12+ and Node 22+ are supported. Offline development requires no service credentials or running database.
 
 ```sh
 python3 -m venv .venv
@@ -43,7 +47,7 @@ npm run dev -- --host 0.0.0.0
 
 Contracts: run `.venv/bin/python tools/generate_contracts.py --check` after `npm ci`. Local optional DB: `.venv/bin/alembic -c engine/alembic.ini upgrade head`, then `current`. No data is imported automatically. See [contract/storage decisions](docs/decisions/0002-canonical-contracts-and-storage.md) for limits.
 
-API readiness: `GET /healthz` must return `status: ok`, `phase: foundation`. This is process/package readiness, not ingestion readiness. Frontend: a flat-black foundation screen with provided NV branding, an explicit no-feed state and no fabricated case/map. Run `python3 tools/verify_migration.py` to verify every legacy file and archive.
+API readiness: `GET /healthz` must return `status: ok`, `phase: foundation`. This is process/package readiness, not ingestion readiness. Frontend: a Flat Black Explore map using pinned real cartography and an explicitly synthetic case; Sources, Layers, search and evidence pinning open on demand. Run `python3 tools/verify_migration.py` to verify every legacy file and archive.
 
 ## Offline collector demo
 

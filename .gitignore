@@ -17,3 +17,6 @@ coverage/
 *.local.sqlite3-*
 
 .local/
+
+test-results/
+playwright-report/
