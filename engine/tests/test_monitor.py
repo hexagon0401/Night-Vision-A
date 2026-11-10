@@ -99,7 +99,7 @@ def test_publisher_uses_fresh_scoped_oidc_without_shared_key(monkeypatch):
    return httpx.Response(200,json={'value':'synthetic-workload-token'})
   assert req.headers['Authorization']=='Bearer synthetic-workload-token'
   return httpx.Response(200,json={'recorded':True})
- publisher=module.Publisher('https://example.test',None);publisher.client.close();publisher.client=httpx.Client(transport=httpx.MockTransport(handle))
+ publisher=module.Publisher('https://example.test','stale-legacy-key');publisher.client.close();publisher.client=httpx.Client(transport=httpx.MockTransport(handle))
  publisher.post('run',{});publisher.post('run',{})
  assert len(calls)==4
  publisher.client.close()

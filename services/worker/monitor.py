@@ -20,10 +20,11 @@ class Publisher:
         if u.scheme!='https' or not u.hostname or u.username or u.password or u.query or u.fragment or u.path not in ('','/'):raise ValueError('invalid_worker_origin')
         self.url=url.rstrip('/');self.token=token;self.client=httpx.Client(timeout=120,follow_redirects=False)
     def authorization(self):
-        if self.token:return self.token
         from urllib.parse import quote
         url=os.environ.get('ACTIONS_ID_TOKEN_REQUEST_URL');guard=os.environ.get('ACTIONS_ID_TOKEN_REQUEST_TOKEN')
-        if not url or not guard:raise ValueError('workload_identity_unavailable')
+        if not url or not guard:
+            if self.token:return self.token
+            raise ValueError('workload_identity_unavailable')
         try:
             r=self.client.get(url+('&' if '?' in url else '?')+'audience='+quote(self.url+'/monitor',safe=''),headers={'Authorization':'Bearer '+guard})
             r.raise_for_status();return r.json()['value']
