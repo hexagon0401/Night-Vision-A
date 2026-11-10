@@ -124,3 +124,14 @@ test('schema interoperability never supplies missing factual citations',()=>{
 });
 
 test('inline invented citations cannot enter an adapted answer',()=>{expect(()=>validateAnswer({summary:[{text:'claim [S:invented]',source_ids:['source:1']}],alternatives:[],counterevidence:[],unknowns:[]},new Set(['source:1']))).toThrow('ai_unknown_source');});
+
+import {evidenceAliases,restoreCitations} from '../../../services/cloudflare/ai.js';
+test('short model citations round-trip to exactly the supplied source records',()=>{
+ const evidence={sources:[{source_id:'source:canonical-1'}],claims:[{source_ids:['source:canonical-1'],statement:'Original claim'}]};
+ const {packet,aliases}=evidenceAliases(evidence);
+ expect(packet.sources[0].source_id).toBe('S1');expect(packet.claims[0].source_ids).toEqual(['S1']);
+ expect(evidence.claims[0].source_ids).toEqual(['source:canonical-1']);
+ const restored=restoreCitations({summary:[{text:'Claim [S:S1]',source_ids:['S1']}],alternatives:[],counterevidence:[],unknowns:[]},aliases);
+ expect(restored.summary[0]).toEqual({text:'Claim [S:source:canonical-1]',source_ids:['source:canonical-1']});
+ expect(()=>restoreCitations({summary:[{text:'invented',source_ids:['S99']}]},aliases)).toThrow('ai_unknown_source');
+});
