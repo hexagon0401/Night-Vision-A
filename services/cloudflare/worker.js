@@ -17,6 +17,9 @@ import {betaRoute} from './beta.js';
 
 import {contextRoute,resolveEvent} from './event-context.js';
 
+import {nearbyRoute} from './nearby.js';
+import {preview} from './nearby-preview.js';
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -45,6 +48,8 @@ export default {
           503,
         );
       await initialize(env.DB);
+      if(url.pathname==='/api/v2/nearby')return await nearbyRoute(request,env,url);
+      if(url.pathname==='/api/v2/nearby/preview')return await preview(request,env,url);
       if(/^\/api\/v2\/events\/[^/]+$/.test(url.pathname)&&request.method==='GET')return json((await resolveEvent(env,decodeURIComponent(url.pathname.split('/').pop()))).r);
       if(/^\/api\/v2\/events\/[^/]+\/context(?:\/|$)/.test(url.pathname))return await contextRoute(request,env,url);
       if(url.pathname.startsWith('/api/internal/beta/')){
