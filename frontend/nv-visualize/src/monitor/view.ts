@@ -244,6 +244,7 @@ export function mountMonitor(
         }
       }
     }
+    if(data.fallback_reason) parent.append(el('p',`분석 모델 대체: ${data.requested_model} → ${data.model}. 분석과 검토에 같은 모델을 사용하며, 두 결과의 일치는 독립 검증이 아닙니다.`));
     parent.append(
       el(
         "p",

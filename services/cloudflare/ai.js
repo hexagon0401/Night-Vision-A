@@ -1,4 +1,4 @@
-import {completion,nimHealth} from './nim.js';
+import {completion,nimHealth,selectModel} from './nim.js';
 import { nimKeys } from "./credentials.js";
 import {
   ApiError,
@@ -107,7 +107,8 @@ export async function reason(
     "nim_not_enabled",
     503,
   );
-  const model = review ? env.NIM_REVIEW_MODEL : env.NIM_MODEL;
+  const selection=await selectModel(env,review?env.NIM_REVIEW_MODEL:env.NIM_MODEL,review?'critic':'analyst');
+  const model=selection.model;
   requireValue(
     typeof model === "string" && model.length <= 160,
     "nim_model_not_configured",
@@ -152,6 +153,7 @@ export async function reason(
     result,
     model,
     generation: diagnostic,
+    ...selection,
     analyzed_at: new Date().toISOString(),
     evidence_status: "inferred",
     independent_verification: false,

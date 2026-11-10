@@ -88,7 +88,7 @@ def main():
                     else:run['providers']['ucdp']={'state':'backfill_pending','reason':'next run resumes saved page; last published data retained'}
                 finally:run['requests']=monitor.used;monitor.close()
         except Exception as error:
-            safe=str(error) if isinstance(error,ValueError) and str(error).startswith(('ucdp_','publication_','daily_request_')) else 'source_acquisition_or_publication_failed'
+            safe=str(error) if isinstance(error,ValueError) and str(error).startswith(('ucdp_','publication_','daily_request_')) else 'ucdp_processing_'+type(error).__name__
             run['providers']['ucdp']={'state':'failed','reason':safe}
         if os.environ.get('NV_RSS_ENABLED')=='true':
             try:

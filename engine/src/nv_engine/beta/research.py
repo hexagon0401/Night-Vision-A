@@ -141,6 +141,8 @@ def markdown(run):
   if step.get('output',{} ) and step['output'].get('diagnostic'):lines.append('진단: '+json.dumps(step['output']['diagnostic'],ensure_ascii=False))
   if step.get('output') and step['output'].get('report'):
    o=step['output'];lines.append(f"모델 {o['model']} · {o['duration_ms']}ms · 사용량 {o.get('usage')}")
+   if o.get('fallback_reason'):lines.append(f"설정 모델 {o['requested_model']}의 응답 형식 오류로 {o['model']} 사용. 분석과 검토에 같은 모델을 사용하며 독립 증거가 아닙니다.")
+   lines.append('추론 설정: '+o.get('reasoning_effort','provider_default'))
    r=o['report']
    for key,value in r.get('sections',{}).items():lines.extend([f'### {key}',value])
    if 'critique'in r:lines.extend(['### 반증 평가',r['critique'],json.dumps(r.get('rubric'),ensure_ascii=False)])
