@@ -1,6 +1,5 @@
 import maplibregl, {
   type StyleSpecification,
-  type IControl,
 } from "maplibre-gl";
 import detailStyle from "./detail-style.json";
 import type { Candidate, CandidateLink, Point } from "../cases/model";
@@ -55,7 +54,7 @@ export const style: StyleSpecification = {
       id: "land",
       type: "fill",
       source: "countries",
-      paint: { "fill-color": "#080808" },
+      paint: { "fill-color": "#202020" },
     },
     {
       id: "borders",
@@ -103,6 +102,8 @@ export function createMap(
     attributionControl: false,
     pitchWithRotate: false,
     dragRotate: false,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    fadeDuration: 0,
   });
   map.addControl(
     new maplibregl.AttributionControl({
@@ -200,14 +201,26 @@ export function createMap(
   map.on("click", (event) => {
     if (!overlay?.pick(event.point.x, event.point.y)) callbacks.dismiss();
   });
-  map.on("error", () => {
+  const fallback = () => {
     if (detailed && !failedDetail) {
       failedDetail = true;
       detailed = false;
       map.setStyle(style);
       container.dataset.basemap = "fallback";
       callbacks.basemap?.(false);
-    } else if (!failedDetail) callbacks.error();
+    }
+  };
+  // A missing glyph or a single transient tile must not discard the whole basemap.
+  let detailErrors = false;
+  const deadline = window.setTimeout(() => {
+    if (!destroyed && (!basemapLoaded || detailErrors)) fallback();
+  }, 12000);
+  map.on("error", (event) => {
+    const failure = event as typeof event & { sourceId?: string; tile?: unknown };
+    if (detailed && failure.sourceId === "openmaptiles") {
+      detailErrors = true;
+      if (!failure.tile) fallback(); // TileJSON/source failure; tile errors get a grace period.
+    } else if (!detailed && failure.sourceId === "countries") callbacks.error();
   });
   return {
     update(value) {
@@ -220,25 +233,14 @@ export function createMap(
     resize() {
       map.resize();
     },
-    focus(points, animate = true) {
+    focus(points) {
       if (!points.length) return;
-      const reduce = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      if (points.length === 1)
-        map.flyTo({
-          center: points[0],
-          zoom: 7,
-          duration: reduce || !animate ? 0 : 700,
-        });
+      // Instant selection avoids queuing intermediate zoom tiles on slower GPUs.
+      if (points.length === 1) map.jumpTo({center:points[0],zoom:7});
       else {
-        const bounds = new maplibregl.LngLatBounds(points[0], points[0]);
-        for (const point of points) bounds.extend(point);
-        map.fitBounds(bounds, {
-          padding: 100,
-          maxZoom: 8,
-          duration: reduce || !animate ? 0 : 700,
-        });
+        const bounds=new maplibregl.LngLatBounds(points[0],points[0]);
+        for(const point of points) bounds.extend(point);
+        map.fitBounds(bounds,{padding:100,maxZoom:8,duration:0});
       }
     },
     project(point) {
@@ -246,6 +248,7 @@ export function createMap(
     },
     destroy() {
       destroyed = true;
+      clearTimeout(deadline);
       overlay?.destroy();
       map.remove();
     },
