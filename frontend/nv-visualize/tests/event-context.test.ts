@@ -50,8 +50,14 @@ test('Mapillary uses a bounded bbox and header token, ignores pagination tokens 
 });
 test('Mapillary skips outside-box points rather than relocating them',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json({data:[{id:'1',geometry:{type:'Point',coordinates:[0,0]}}]})));expect(await discoverMapillary(event,fixture.generated_at_utc,{MAPILLARY_ACCESS_TOKEN:'test'})).toEqual([]);});
 test('Windy leaves frame time unknown, strips signed query strings and never returns images',async()=>{
- vi.stubGlobal('fetch',vi.fn(async(_u:any,o:any)=>{expect(o.headers['x-windy-api-key']).toBe('test');return Response.json({total:1,webcams:[{webcamId:123,title:'SYNTHETIC CAMERA',status:'active',location:{latitude:35,longitude:71},lastUpdatedOn:'2026-11-01T12:00:00Z',urls:{detail:'https://webcams.windy.com/webcams/123?token=secret-test'},images:{current:{preview:'https://signed.invalid/?key=secret-test'}}}]});}));
+ vi.stubGlobal('fetch',vi.fn(async(_u:any,o:any)=>{expect(o.headers['x-windy-api-key']).toBe('test');return Response.json({total:1,webcams:[{webcamId:123,title:'SYNTHETIC CAMERA',categories:[{id:'traffic'}],status:'active',location:{latitude:35,longitude:71},lastUpdatedOn:'2026-11-01T12:00:00Z',urls:{detail:'https://webcams.windy.com/webcams/123?token=secret-test'},images:{current:{preview:'https://signed.invalid/?key=secret-test'}}}]});}));
  const [i]=await discoverWindy(event,fixture.generated_at_utc,{WINDY_API_KEY:'test'});expect(i.temporal_role).toBe('present_context');expect(i.evidence_role).toBe('context_only');expect(i.camera.frame_captured_at_utc).toBeNull();expect(i.observed_from_utc).toBeNull();expect(JSON.stringify(i)).not.toContain('secret-test');expect(i.attribution).toContain('Windy.com');
 });
 test('Mapillary JSON auth errors on HTTP 500 are safely classified without exposing bodies',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json({error:{code:190,message:'secret-test'}},{status:500})));await expect(boundedJSON('https://graph.mapillary.com/images')).rejects.toThrow('upstream_authentication_failed');});
 test('provider timeout has an actionable constant error',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>{throw new DOMException('private URL','TimeoutError');}));await expect(boundedJSON('https://example.invalid')).rejects.toThrow('upstream_timeout');});
+
+
+test('Windy excludes residential or indoor catalog entries even if publicly listed',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json({total:1,webcams:[{webcamId:321,title:'SYNTHETIC GARAGE 01',status:'active',categories:[{id:'traffic'}],location:{latitude:35,longitude:71}}]})));
+ expect(await discoverWindy(event,fixture.generated_at_utc,{WINDY_API_KEY:'test'})).toEqual([]);
+});

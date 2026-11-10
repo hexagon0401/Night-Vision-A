@@ -22,13 +22,15 @@ export async function discoverMapillary(r,now,env){
 }
 export async function discoverWindy(r,now,env){
  const radius=r.precision===1?15:25;
- const url=new URL('https://api.windy.com/webcams/api/v3/webcams');url.search=new URLSearchParams({nearby:[r.lat,r.lon,radius].join(','),include:'location,urls',limit:'4',lang:'ko'}).toString();
+ const url=new URL('https://api.windy.com/webcams/api/v3/webcams');url.search=new URLSearchParams({nearby:[r.lat,r.lon,radius].join(','),include:'categories,location,urls',categories:'traffic,city,square,landscape,coast,port,beach,mountain',limit:'4',lang:'ko'}).toString();
  const data=await boundedJSON(url.href,{headers:{'x-windy-api-key':env.WINDY_API_KEY}});
  if(!Array.isArray(data.webcams)||!Number.isFinite(data.total))throw new Error('upstream_invalid_response');
  const seen=new Set();
  return data.webcams.slice(0,4).flatMap(camera=>{
   const id=String(camera.webcamId??''),l=camera.location;
   if(seen.has(id)||!/^\d{1,30}$/.test(id)||camera.status!=='active'||!Number.isFinite(l?.latitude)||!Number.isFinite(l?.longitude)||Math.abs(l.latitude)>90||Math.abs(l.longitude)>180)return [];
+  const categories=(camera.categories??[]).map(c=>typeof c==='string'?c:c.id);
+  if(!categories.some(c=>['traffic','city','square','landscape','coast','port','beach','mountain'].includes(c))||/garage\d*|indoor|bedroom|living room|private camera|home camera/i.test(String(camera.title??'')))return [];
   // Enforce the requested neighborhood even if the provider returns wider data.
   const rad=x=>x*Math.PI/180,a=rad(l.latitude-r.lat),b=rad(l.longitude-r.lon),h=Math.sin(a/2)**2+Math.cos(rad(r.lat))*Math.cos(rad(l.latitude))*Math.sin(b/2)**2;
   if(6371*2*Math.asin(Math.sqrt(Math.min(1,h)))>radius)return [];
