@@ -10,13 +10,14 @@ export function item(provider,kind,id,title,url,now) {
  return {id:provider+':'+id,kind,provider_id:provider,source_id:provider+':'+id,title:String(title).slice(0,500),url:safeURL(url),thumbnail_url:null,description:null,publisher:null,author:null,acquired_at_utc:now,published_at_utc:null,observed_from_utc:null,observed_to_utc:null,location:{lat:null,lon:null,accuracy_m:null,geometry_geojson:null,location_claim:null},satellite:null,camera:null,temporal_role:'unknown',evidence_role:'context_only',relation_reasons:[],disconfirming_checks:['Same place or date is not proof of incident identity.'],relevance:{tier:'unscored',feature_scores:{}},media_license_status:'link_only',attribution:null,source_independence_group:null,warnings:[],raw_source_ref:null};
 }
 export async function boundedJSON(url,options={},max=1000000,timeoutMs=10000) {
- const response=await fetch(url,{...options,redirect:'manual',signal:AbortSignal.timeout(timeoutMs)});
+ let response;try{response=await fetch(url,{...options,redirect:'manual',signal:AbortSignal.timeout(timeoutMs)});}catch(e){throw new Error(['TimeoutError','AbortError'].includes(e.name)?'upstream_timeout':'upstream_transport_failure');}
  if(response.status===429){const seconds=Number(response.headers.get('retry-after'));const e=new Error('rate_limited');e.retry=new Date(Date.now()+(Number.isFinite(seconds)&&seconds>0?Math.min(seconds,86400):3600)*1000).toISOString();throw e;}
- if(!response.ok)throw new Error('upstream_http_'+response.status);
+ const graphError=!response.ok&&new URL(url).hostname==='graph.mapillary.com'&&response.headers.get('content-type')?.includes('json');
+ if(!response.ok&&!graphError)throw new Error('upstream_http_'+response.status);
  if(!response.headers.get('content-type')?.includes('json'))throw new Error('upstream_not_json');
  const reader=response.body.getReader();let size=0;const chunks=[];
  try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>max)throw new Error('upstream_size_limit');chunks.push(value);}}finally{await reader.cancel();}
- const buffer=new Uint8Array(size);let at=0;for(const c of chunks){buffer.set(c,at);at+=c.length;}return JSON.parse(new TextDecoder().decode(buffer));
+ const buffer=new Uint8Array(size);let at=0;for(const c of chunks){buffer.set(c,at);at+=c.length;}const parsed=JSON.parse(new TextDecoder().decode(buffer));if(graphError){throw new Error(parsed.error?.code===190?'upstream_authentication_failed':[10,200].includes(parsed.error?.code)?'upstream_permission_denied':'upstream_http_'+response.status);}return parsed;
 }
 export function bbox(record) {
  if(![1,2].includes(record.precision)||!Number.isFinite(record.lat)||!Number.isFinite(record.lon)||Math.abs(record.lat)>85||Math.abs(record.lon)>179.5)return null;

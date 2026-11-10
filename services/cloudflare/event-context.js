@@ -4,7 +4,7 @@ import {validateRecord} from './data.js';
 import {providers,eligibility,policy} from './provider-policy.js';
 import {discover} from './event-context-providers/discover.js';
 import {shift,validateBundle,roles} from './event-context-providers/common.js';
-const VERSION='context:3';
+const VERSION='context:4';
 export async function resolveEvent(env,id){
  requireValue(/^ucdp:[\w.:-]{1,175}$/.test(id),'invalid_event_id');
  const found=await stmt(env.DB,"SELECT r.body,r.snapshot FROM records r JOIN heads h ON r.snapshot=h.snapshot WHERE r.id=? AND r.kind='ucdp' AND h.provider='ucdp' LIMIT 1",id).first();requireValue(found,'unknown_event',404);
@@ -12,12 +12,15 @@ export async function resolveEvent(env,id){
 }
 async function runProvider(env,p,r,snapshot,force=false,statusOnly=false){
  const now=new Date().toISOString(),version=VERSION+':'+snapshot,gate=eligibility(p,r),pol=policy(p,env);
- const base={provider_id:p.id,status:'empty',started_at_utc:now,completed_at_utc:now,cached:false,retry_after_utc:null,diagnostics_code:null,fetched_count:0,policy_url:p.terms,provider_url:p.url,mode:'metadata_link_only'};
+ const base={provider_id:p.id,status:'empty',started_at_utc:now,completed_at_utc:now,cached:false,retry_after_utc:null,diagnostics_code:null,fetched_count:0,key_configured:p.key?!!env[p.key]:null,policy_url:p.terms,provider_url:p.url,mode:'metadata_link_only'};
  const blocked=(status,reason)=>({run:{...base,status,diagnostics_code:reason},items:[]});
  if(gate)return blocked('irrelevant',gate);if(pol)return blocked(pol.status,pol.reason);
+ if(p.id==='gdelt_doc'&&shift(r.end_day,14)<shift(now.slice(0,10),-90))return blocked('historical_unavailable','outside_recent_news_window');
  const old=await stmt(env.DB,'SELECT body,expires_at FROM event_context_cache WHERE event_id=? AND provider_id=? AND event_hash=? AND provider_version=?',r.id,p.id,r.hash,version).first();
  if(old&&!force&&old.expires_at>now){const cached=JSON.parse(old.body);cached.run.cached=true;return cached;}
  if(statusOnly){if(old){const cached=JSON.parse(old.body);cached.run.cached=true;cached.run.diagnostics_code='stale_cache';return cached;}return blocked('disabled','not_requested');}
+ const health=await stmt(env.DB,'SELECT value FROM settings WHERE key=?','context-health:'+p.id).first();
+ if(!force&&health){const h=JSON.parse(health.value);if(h.retry_after_utc&&h.retry_after_utc>now){const held=blocked(h.status,h.diagnostics_code);held.run.retry_after_utc=h.retry_after_utc;if(old){held.items=JSON.parse(old.body).items;held.run.cached=true;held.run.diagnostics_code+=':stale_cache';}return held;}}
  const job=r.id+':'+p.id,epoch=Date.now();let slot=null;
  for(let i=0;i<3;i++){try{const lease=await stmt(env.DB,'INSERT INTO context_locks VALUES(?,?,?) ON CONFLICT(slot) DO UPDATE SET job=excluded.job,expires=excluded.expires WHERE expires<? RETURNING slot',i,job,epoch+15000,epoch).first();if(lease){slot=i;break;}}catch{}}
  if(slot===null)return blocked('rate_limited','concurrency_limit');
@@ -27,7 +30,8 @@ async function runProvider(env,p,r,snapshot,force=false,statusOnly=false){
   if(!charged)return blocked('rate_limited','daily_provider_budget');
   let result;
   try{const items=(await discover(p,r,now,env)).filter(i=>i.url).slice(0,20);result={run:{...base,status:items.length?'ok':'empty',fetched_count:items.length,completed_at_utc:new Date().toISOString()},items};}
-  catch(e){result=blocked(e.message==='rate_limited'?'rate_limited':'temporarily_failed',/^upstream_|invalid_|geometry_|adapter_/.test(e.message)?e.message:'provider_fetch_failed');result.run.retry_after_utc=e.retry??null;if(old){const previous=JSON.parse(old.body);result.items=previous.items;result.run.cached=true;result.run.diagnostics_code+=':stale_cache';}}
+  catch(e){result=blocked(e.message==='rate_limited'?'rate_limited':'temporarily_failed',/^upstream_|invalid_|geometry_|adapter_/.test(e.message)?e.message:'provider_fetch_failed');result.run.retry_after_utc=e.retry??new Date(Date.now()+300000).toISOString();if(old){const previous=JSON.parse(old.body);result.items=previous.items;result.run.cached=true;result.run.diagnostics_code+=':stale_cache';}}
+  await stmt(env.DB,'INSERT OR REPLACE INTO settings VALUES(?,?)','context-health:'+p.id,JSON.stringify({provider_id:p.id,status:result.run.status,diagnostics_code:result.run.diagnostics_code,checked_at:result.run.completed_at_utc,retry_after_utc:result.run.retry_after_utc,fetched_count:result.run.fetched_count})).run();
   const ttl=result.run.status==='ok'||result.run.status==='empty'?3600000:300000;
   await stmt(env.DB,'INSERT OR REPLACE INTO event_context_cache VALUES(?,?,?,?,?,?,?,?)',r.id,p.id,r.hash,version,now,new Date(Date.now()+ttl).toISOString(),result.run.status,JSON.stringify(result)).run();
   // Bounded retention; retain revision history for 30 days, never delete canonical data.
