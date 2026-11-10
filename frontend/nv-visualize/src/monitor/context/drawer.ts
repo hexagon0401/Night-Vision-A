@@ -3,8 +3,8 @@ const groups=[['기사·원출처',['gdelt_doc','ucdp_existing']],['사진·거�
 const states:Record<string,string>={ok:'자료 조회됨',empty:'검색 결과 없음',irrelevant:'관련성 낮음',key_required:'접근 키 필요',terms_pending:'이용 조건 확인 대기',rate_limited:'조회 한도·동시 요청 제한',historical_unavailable:'과거 자료 없음',temporarily_failed:'공급원 연결 실패',disabled:'연결 비활성'};
 const timeLabels:Record<string,string>={event_time:'사건 당시 기간',post_event:'사건 이후',present_context:'현재 주변 상황',unknown:'사건 이전 또는 시점 정합 미확인'};
 const node=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
-export function contextDrawer(host:HTMLElement,eventId:string){
- const controller=new AbortController();let disposed=false,bundle:Bundle|null=null,current=0,pending=false;
+export function contextDrawer(host:HTMLElement,eventId:string,expectedHash?:string){
+ const controller=new AbortController();let disposed=false,bundle:Bundle|null=null,current=0,pending=false,queued:string|undefined;
  const root=node('section','','context-drawer');root.setAttribute('aria-label','사건 자료 탐색');const title=node('h3','사건 자료 탐색'),summary=node('p','기사·과거 위성자료를 확인하고 있습니다.','context-state'),tabs=node('div','','context-tabs'),content=node('div','','context-content'),controls=node('div','','event-actions');
  summary.setAttribute('role','status');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','사건 자료 종류');
  const filter=document.createElement('select');filter.setAttribute('aria-label','자료 시간 구분');for(const [v,t] of [['','모든 시점'],['event_time','사건 당시'],['post_event','사건 이후'],['present_context','현재 주변 상황'],['unknown','이전·미확인']]){const o=document.createElement('option');o.value=v;o.textContent=t;filter.append(o);}filter.onchange=()=>render();
@@ -32,9 +32,9 @@ export function contextDrawer(host:HTMLElement,eventId:string){
   if(!items.length)content.append(node('p','현재 조건에 표시할 자료가 없습니다. 자료 부재는 사건 부재를 의미하지 않습니다.','muted'));
  }
  async function request(include?:string){
-  if(pending||disposed)return;pending=true;root.setAttribute('aria-busy','true');
-  try{const next=await loadContext(eventId,controller.signal,include);if(disposed)return;bundle=next;summary.textContent=`발견 ${next.counts.total}건 · 연결 후보 ${next.counts.candidate} · 맥락 ${next.counts.context_only} · 접근 제한 ${next.counts.inaccessible}개 공급원`;render();}
-  catch(e){if(!disposed)summary.textContent=(e as Error).message;}finally{pending=false;root.setAttribute('aria-busy','false');}
+  if(disposed)return;if(pending){queued=include;return;}pending=true;root.setAttribute('aria-busy','true');
+  try{const next=await loadContext(eventId,controller.signal,include,'',expectedHash);if(disposed)return;bundle=next;summary.textContent=`발견 ${next.counts.total}건 · 연결 후보 ${next.counts.candidate} · 맥락 ${next.counts.context_only} · 접근 제한 ${next.counts.inaccessible}개 공급원`;render();}
+  catch(e){if(!disposed)summary.textContent=(e as Error).message;}finally{pending=false;root.setAttribute('aria-busy','false');if(queued&&!disposed){const next=queued;queued=undefined;void request(next);}}
  }
  void request();return ()=>{disposed=true;controller.abort();root.remove();};
 }

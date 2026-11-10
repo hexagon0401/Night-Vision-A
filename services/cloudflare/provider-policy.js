@@ -3,7 +3,7 @@ export const providers=[
  {id:'ucdp_existing',category:'official_notice',enabled:true,url:'https://ucdp.uu.se/',terms:'https://ucdp.uu.se/downloads/'},
  {id:'gdelt_doc',category:'article',enabled:false,url:'https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/',terms:'https://www.gdeltproject.org/about.html',reason:'live_probe_failed_http_503'},
  {id:'earth_search_stac',category:'satellite',enabled:true,url:'https://earth-search.aws.element84.com/v1',terms:'https://element84.com/earth-search/'},
- {id:'us_road_cameras_official',category:'cctv',enabled:false,url:'https://quickmap.dot.ca.gov/',terms:'https://dot.ca.gov/privacy-policy',reason:'terms_pending'},
+ {id:'us_road_cameras_official',category:'cctv',enabled:true,url:'https://cwwp2.dot.ca.gov/tools/cctv.html',terms:'https://dot.ca.gov/conditions-of-use'},
  {id:'panoramax',category:'street_view',enabled:false,url:'https://panoramax.fr/',terms:'https://docs.panoramax.fr/',reason:'terms_pending'},
  {id:'mapillary_street_photo',category:'photo',key:'MAPILLARY_ACCESS_TOKEN',url:'https://www.mapillary.com/',terms:'https://www.mapillary.com/developer'},
  {id:'windy_webcams_v3',category:'cctv',key:'WINDY_API_KEY',url:'https://api.windy.com/webcams/docs',terms:'https://api.windy.com/webcams/terms'},

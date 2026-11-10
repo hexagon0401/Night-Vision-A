@@ -4,7 +4,7 @@ import {validateRecord} from './data.js';
 import {providers,eligibility,policy} from './provider-policy.js';
 import {discover} from './event-context-providers/discover.js';
 import {shift,validateBundle,roles} from './event-context-providers/common.js';
-const VERSION='context:1';
+const VERSION='context:2';
 export async function resolveEvent(env,id){
  requireValue(/^ucdp:[\w.:-]{1,175}$/.test(id),'invalid_event_id');
  const found=await stmt(env.DB,"SELECT r.body,r.snapshot FROM records r JOIN heads h ON r.snapshot=h.snapshot WHERE r.id=? AND r.kind='ucdp' LIMIT 1",id).first();requireValue(found,'unknown_event',404);
@@ -26,7 +26,7 @@ async function runProvider(env,p,r,snapshot,force=false,statusOnly=false){
   const charged=await stmt(env.DB,'INSERT INTO quotas VALUES(?,?,1) ON CONFLICT(day,bucket) DO UPDATE SET count=count+1 WHERE count<50 RETURNING count',day,bucket).first();
   if(!charged)return blocked('rate_limited','daily_provider_budget');
   let result;
-  try{const items=(await discover(p,r,now)).filter(i=>i.url).slice(0,20);result={run:{...base,status:items.length?'ok':'empty',fetched_count:items.length,completed_at_utc:new Date().toISOString()},items};}
+  try{const items=(await discover(p,r,now,env)).filter(i=>i.url).slice(0,20);result={run:{...base,status:items.length?'ok':'empty',fetched_count:items.length,completed_at_utc:new Date().toISOString()},items};}
   catch(e){result=blocked(e.message==='rate_limited'?'rate_limited':'temporarily_failed',/^upstream_|invalid_|geometry_|adapter_/.test(e.message)?e.message:'provider_fetch_failed');result.run.retry_after_utc=e.retry??null;if(old){const previous=JSON.parse(old.body);result.items=previous.items;result.run.cached=true;result.run.diagnostics_code+=':stale_cache';}}
   const ttl=result.run.status==='ok'||result.run.status==='empty'?3600000:300000;
   await stmt(env.DB,'INSERT OR REPLACE INTO event_context_cache VALUES(?,?,?,?,?,?,?,?)',r.id,p.id,r.hash,version,now,new Date(Date.now()+ttl).toISOString(),result.run.status,JSON.stringify(result)).run();

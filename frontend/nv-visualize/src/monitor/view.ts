@@ -317,7 +317,7 @@ export function mountMonitor(
     const c=cases.find(c=>c.country===r.country);
     if(c) {const trace=link('관련 추이·Trace','/?case=live&id='+encodeURIComponent(c.id));trace.append(icon(ChevronRight));actions.append(trace);}
     detail.append(actions);
-    const contextHost=el('div'),investigate=button('사건 자료 탐색',()=>{investigate.disabled=true;disposeContext=contextDrawer(contextHost,r.id);contextHost.scrollIntoView({block:'nearest',behavior:'instant'});});
+    const contextHost=el('div'),investigate=button('사건 자료 탐색',()=>{investigate.disabled=true;disposeContext=contextDrawer(contextHost,r.id,r.hash);contextHost.scrollIntoView({block:'nearest',behavior:'instant'});});
     investigate.className='investigate-button';const copy=button('링크 복사',()=>{const url=new URL(window.location.href);url.searchParams.set('view','monitor');url.searchParams.set('event',r.id);void navigator.clipboard.writeText(url.href).then(()=>copy.textContent='복사됨').catch(()=>copy.textContent='링크 복사 실패');});
     const contextActions=el('div','','event-actions');contextActions.append(investigate,copy);detail.append(contextActions,contextHost);
     const provenance=el('details','','event-disclosure verification');const provenanceTitle=el('summary','출처·검증 정보');provenanceTitle.prepend(icon(ShieldCheck));provenance.append(provenanceTitle);
