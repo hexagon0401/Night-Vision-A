@@ -21,6 +21,17 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
       return [p.lng,p.lat];
     });
   };
+  const groupMarkers = (data:MapData) => {
+    const markers: {point:Point;ids:string[]}[] = [];
+    if (data.showMarkers) for (const c of data.candidates) {
+      if (!c.point) continue;
+      const p=map.project(c.point), existing=markers.find(m=>{const q=map.project(m.point);return Math.hypot(q.x-p.x,q.y-p.y)<19;});
+      if (existing) existing.ids.push(c.anomaly.anomaly_id);
+      else markers.push({point:c.point,ids:[c.anomaly.anomaly_id]});
+    }
+    if (data.trace?.point) markers.splice(0,markers.length,{point:data.trace.point,ids:data.selected?[data.selected]:[]});
+    return markers;
+  };
   const render = (data: MapData) => {
     latest = data;
     if (destroyed) return;
@@ -35,14 +46,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
     }
     const features: Feature<Geometry>[] = [];
     const point = (p:Point,properties:Record<string,unknown>) => features.push({type:"Feature",geometry:{type:"Point",coordinates:p},properties});
-    const markers: {point:Point;ids:string[]}[] = [];
-    if (data.showMarkers) for (const c of data.candidates) {
-      if (!c.point) continue;
-      const p=map.project(c.point), existing=markers.find(m=>{const q=map.project(m.point);return Math.hypot(q.x-p.x,q.y-p.y)<19;});
-      if (existing) existing.ids.push(c.anomaly.anomaly_id);
-      else markers.push({point:c.point,ids:[c.anomaly.anomaly_id]});
-    }
-    if (data.trace?.point) markers.splice(0,markers.length,{point:data.trace.point,ids:data.selected?[data.selected]:[]});
+    const markers=groupMarkers(data);
     for (const m of markers) point(m.point,{kind:"marker",ids:JSON.stringify(m.ids),count:m.ids.length,selected:m.ids.includes(data.selected??"")});
     for (const e of data.events??[]) point([e.lon,e.lat],{kind:"event",id:e.id,precision:e.precision});
     const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -59,13 +63,18 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
   return {
     render,
     pick(x:number,y:number) {
-      const layers=["nv-markers","nv-events"].filter(id=>map.getLayer(id));
-      if (!layers.length) return null;
-      const hit=map.queryRenderedFeatures([[x-10,y-10],[x+10,y+10]],{layers})[0];
-      if (!hit) return null;
-      if (hit.properties.kind==="event") callbacks.event?.(hit.properties.id);
-      else callbacks.pick(JSON.parse(hit.properties.ids));
-      return hit;
+      if(!latest) return null;
+      // Project canonical points at the current camera; worker tile updates may
+      // still contain clusters from the previous zoom for a frame.
+      for(const m of groupMarkers(latest)) {
+        const p=map.project(m.point);
+        if(Math.hypot(p.x-x,p.y-y)<=22) {callbacks.pick(m.ids);return m;}
+      }
+      for(const e of latest.events??[]) {
+        const p=map.project([e.lon,e.lat]);
+        if(Math.hypot(p.x-x,p.y-y)<=14) {callbacks.event?.(e.id);return e;}
+      }
+      return null;
     },
     destroy() {
       destroyed=true;map.off("style.load",reload);

@@ -19,6 +19,7 @@ for (const viewport of [
     await expect(page.locator(".demo-label")).toContainText("SYNTHETIC DATA");
     await expect(page.getByRole("region", { name: "후보 증거" })).toBeHidden();
     await expect(page.getByRole("region", { name: "탐색 도구" })).toBeHidden();
+    await expect(page.locator('[data-basemap="fallback"]')).toBeVisible();
     await expect(page.locator("canvas")).toHaveCount(1);
     const bounds = await page
       .getByRole("region", { name: "지정학 지도" })

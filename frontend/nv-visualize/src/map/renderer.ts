@@ -233,25 +233,14 @@ export function createMap(
     resize() {
       map.resize();
     },
-    focus(points, animate = true) {
+    focus(points) {
       if (!points.length) return;
-      const reduce = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      if (points.length === 1)
-        map.flyTo({
-          center: points[0],
-          zoom: 7,
-          duration: reduce || !animate ? 0 : 700,
-        });
+      // Instant selection avoids queuing intermediate zoom tiles on slower GPUs.
+      if (points.length === 1) map.jumpTo({center:points[0],zoom:7});
       else {
-        const bounds = new maplibregl.LngLatBounds(points[0], points[0]);
-        for (const point of points) bounds.extend(point);
-        map.fitBounds(bounds, {
-          padding: 100,
-          maxZoom: 8,
-          duration: reduce || !animate ? 0 : 700,
-        });
+        const bounds=new maplibregl.LngLatBounds(points[0],points[0]);
+        for(const point of points) bounds.extend(point);
+        map.fitBounds(bounds,{padding:100,maxZoom:8,duration:0});
       }
     },
     project(point) {
