@@ -16,6 +16,14 @@ export function parseCompletion(text) {
 }
 export const reasoningMode=model=>generationOptions(model).chat_template_kwargs
  ? 'thinking_disabled_for_structured_output' : 'provider_default';
+export async function selectModel(env,requested,role='analyst') {
+ if(role!=='analyst'||requested!=='nvidia/nemotron-3.5-lightning-30b-a3b'||env.NIM_REVIEW_MODEL!=='meta/llama-3.3-70b-instruct') return {model:requested,requested_model:requested,fallback_reason:null};
+ const health=await stmt(env.DB,'SELECT value FROM settings WHERE key=?','nim-health:'+requested).first();
+ const failure=health?JSON.parse(health.value):null;
+ // Response-format fallback only: same A key, same budgets, never an access/quota bypass.
+ if(['invalid_ai_response','nim_truncated_response'].includes(failure?.error)) return {model:env.NIM_REVIEW_MODEL,requested_model:requested,fallback_reason:'primary_structured_output_failure',shared_model_with_critic:true};
+ return {model:requested,requested_model:requested,fallback_reason:null};
+}
 export async function nimHealth(env,model,health) {
  await stmt(env.DB,'INSERT OR REPLACE INTO settings VALUES(?,?)','nim-health:'+model,JSON.stringify({model,checked_at:new Date().toISOString(),...health})).run();
 }

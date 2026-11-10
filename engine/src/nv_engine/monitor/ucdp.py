@@ -123,7 +123,15 @@ class UCDPMonitor:
         for _ in range(max_pages):
             self.sleep(.25);result=self.get(version,page,window=window)
             if result is None:raise ValueError('ucdp_version_unavailable')
-            response,raw=result;records=[normalize(r,version,now) for r in raw]
+            response,raw=result;records=[]
+            for r in raw:
+                try:records.append(normalize(r,version,now))
+                except KeyError as error:
+                    field=str(error.args[0]);field=field if field in ('id','date_start','date_end','country') else 'unknown'
+                    raise ValueError('ucdp_missing_record_field_'+field) from None
+                except (ValueError,TypeError) as error:
+                    code=str(error) if str(error) in ('invalid_event_interval','invalid_coordinates','invalid_fatalities') else type(error).__name__
+                    raise ValueError('ucdp_invalid_record_'+code) from None
             with db:
                 for record in records:
                     previous=db.execute('SELECT body FROM upstream WHERE version=? AND id=?',(version,record['id'])).fetchone()
