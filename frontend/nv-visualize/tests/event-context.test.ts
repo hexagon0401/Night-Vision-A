@@ -24,3 +24,16 @@ test('no unapproved images are accepted',()=>{const i=item('ucdp_existing','phot
 test('429 preserves bounded retry time',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>new Response('',{status:429,headers:{'retry-after':'60'}})));await expect(boundedJSON('https://example.invalid')).rejects.toMatchObject({message:'rate_limited'});});
 test('oversized upstream JSON is rejected',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>new Response('{"large":"'+ 'x'.repeat(100)+'"}',{headers:{'content-type':'application/json'}})));await expect(boundedJSON('https://example.invalid',{},50)).rejects.toThrow('upstream_size_limit');});
 test('STAC does not accept out-of-window or malformed scene metadata',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json({features:[{id:'bad',collection:'sentinel-2-l2a',properties:{datetime:'2030-01-01T00:00:00Z'}}]})));expect(await discover({id:'earth_search_stac'},event,fixture.generated_at_utc)).toEqual([]);});
+
+test('copied article titles never create multiple independent confirmations',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json({articles:[{url:'https://example.invalid/a',title:'SYNTHETIC WIRE',seendate:'20260101T120000Z'},{url:'https://example.invalid/b',title:'SYNTHETIC WIRE',seendate:'20260101T130000Z'}]})));
+ const items=await discover({id:'gdelt_doc'},event,fixture.generated_at_utc);expect(items).toHaveLength(1);expect(items[0].evidence_role).toBe('candidate');expect(items[0].published_at_utc).toBeNull();expect(items[0].temporal_role).toBe('unknown');
+});
+test('camera provider returns only current-context metadata and an official link',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json({data:[{cctv:{index:'test',location:{latitude:'37.8',longitude:'-122.3',locationName:'SYNTHETIC CAMERA',direction:'West'}}}]})));
+ const db:any={prepare:()=>({bind:()=>({first:async()=>null,run:async()=>({})})})};
+ const [i]=await discover({id:'us_road_cameras_official'},{...event,lat:37.8,lon:-122.3,country:'United States'},fixture.generated_at_utc,{DB:db});
+ expect(i.temporal_role).toBe('present_context');expect(i.evidence_role).toBe('context_only');expect(i.camera.frame_captured_at_utc).toBeNull();expect(i.thumbnail_url).toBeNull();expect(i.url).toBe('https://cwwp2.dot.ca.gov/tools/cctv.html');
+});
+
+test('changed canonical event hashes invalidate the selected-record client view',()=>expect(()=>readContext(fixture,fixture.event_ref.id,'b'.repeat(64))).toThrow('갱신'));

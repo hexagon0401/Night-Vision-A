@@ -31,6 +31,8 @@ def normalize(row,version,acquired,allow_invalid_estimates=False):
         'actors':[str(row.get(k) or '') for k in ('side_a','side_b')],
         'title':str(row.get('country') or 'Unknown')+' · '+str(row.get('side_a') or 'UCDP reported conflict')+' / '+str(row.get('side_b') or ''),
         'source_url':'https://ucdp.uu.se/','endpoint':'https://ucdpapi.pcr.uu.se/api/gedevents/'+version,
+        **({'date_prec':int(row['date_prec'])} if str(row.get('date_prec','')).isdigit() and 1<=int(row['date_prec'])<=5 else {}),
+        **{target:str(row[source])[:2000] for source,target in [('where_description','location_name'),('adm_1','admin1'),('adm_2','admin2'),('conflict_name','conflict_name'),('dyad_name','dyad_name'),('source_headline','source_headline')] if isinstance(row.get(source),str) and row[source].strip()},
         'version':version,'dataset':'candidate' if '.0.' in version else 'annual',
         'hash':digest(row),'acquired_at':acquired,**values,**quality}
 

@@ -1,5 +1,5 @@
-import {boundedJSON,bbox,item,shift,iso,temporal,safeURL} from './common.js';
-export async function discover(p,r,now){
+import {boundedJSON,bbox,item,shift,iso,temporal,safeURL,validGeometry} from './common.js';
+export async function discover(p,r,now,env){
  if(p.id==='ucdp_existing') {const i=item(p.id,'official_notice',r.id,r.title,r.source_url,now);i.attribution='UCDP';i.raw_source_ref=r.id;i.description='이미 게시된 UCDP 보고 기록. 개별 기사 인용은 원자료에 없으면 미확인.';i.warnings=['missing_primary_event_citation'];return [i];}
  if(p.id==='earth_search_stac') {
   const bounds=bbox(r);if(!bounds)throw new Error('geometry_required');
@@ -12,8 +12,23 @@ export async function discover(p,r,now){
    const n=k=>Number.isFinite(f.properties[k])?f.properties[k]:null;
    i.satellite={platform:String(f.properties.platform??'Sentinel-2'),scene_id:f.id,collection:f.collection,gsd_m:n('gsd'),cloud_pct:n('eo:cloud_cover'),asset_url:null};
    // Footprints are metadata, not a newly inferred incident location.
-   if(f.geometry?.type==='Polygon'&&JSON.stringify(f.geometry).length<10000&&Array.isArray(f.geometry.coordinates)&&f.geometry.coordinates.flat(2).every(x=>Number.isFinite(x)&&Math.abs(x)<=180))i.location.geometry_geojson=f.geometry;
+   if(f.geometry&&validGeometry(f.geometry)&&JSON.stringify(f.geometry).length<10000)i.location.geometry_geojson=f.geometry;
    i.location.location_claim='scene_footprint';i.relation_reasons=['historical_search_window','bbox_candidate_not_event_proof'];i.warnings=['10m imagery cannot identify people or establish incident cause.','Before-event scenes have temporal_role unknown; acquisition time is shown.'];return [i];
+  });
+ }
+ if(p.id==='us_road_cameras_official') {
+  const key='context-caltrans-d4-catalog';const cached=await env.DB.prepare('SELECT value FROM settings WHERE key=?').bind(key).first();let catalog;
+  if(cached&&JSON.parse(cached.value).expires>Date.now())catalog=JSON.parse(cached.value).rows;
+  else {
+   const raw=await boundedJSON('https://cwwp2.dot.ca.gov/data/d4/cctv/cctvStatusD04.json',{},3000000);
+   if(!Array.isArray(raw.data))throw new Error('invalid_camera_catalog');
+   catalog=raw.data.slice(0,3000).flatMap(row=>{const c=row.cctv,l=c?.location,lat=Number(l?.latitude),lon=Number(l?.longitude);return l&&Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=32&&lat<=42&&lon>=-125&&lon<=-114?[{id:String(c.index),name:String(l.locationName??'Caltrans camera').slice(0,300),lat,lon,direction:String(l.direction??'unknown').slice(0,50)}]:[];});
+   await env.DB.prepare('INSERT OR REPLACE INTO settings VALUES(?,?)').bind(key,JSON.stringify({expires:Date.now()+86400000,rows:catalog})).run();
+  }
+  const bounds=bbox(r);if(!bounds)throw new Error('geometry_required');
+  return catalog.filter(c=>c.lon>=bounds[0]&&c.lon<=bounds[2]&&c.lat>=bounds[1]&&c.lat<=bounds[3]).slice(0,4).map(c=>{
+   const i=item(p.id,'cctv',c.id,c.name,'https://cwwp2.dot.ca.gov/tools/cctv.html',now);i.attribution='Caltrans — CWWP2 (catalog metadata only)';i.publisher='California Department of Transportation';i.temporal_role='present_context';i.location={lat:c.lat,lon:c.lon,accuracy_m:null,geometry_geojson:null,location_claim:'provider_camera_catalog_location'};
+   i.camera={camera_id:c.id,camera_type:'public_traffic',heading_deg:null,heading_confidence:'unknown',feed_mode:'link_only',frame_captured_at_utc:null};i.relation_reasons=['nearby_catalog_context_only'];i.warnings=['현재 공개 카탈로그 위치이며 과거 사건의 녹화 영상이 아닙니다.','촬영 시각·시야 방향은 검증되지 않았습니다. 공식 뷰어에서 카메라 이름을 확인하세요.'];return i;
   });
  }
  if(p.id==='gdelt_doc') {
