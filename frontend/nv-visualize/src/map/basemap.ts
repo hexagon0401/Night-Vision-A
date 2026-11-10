@@ -7,7 +7,7 @@ export function flatBlack(input: StyleSpecification): StyleSpecification {
   delete style.terrain;
   for (const layer of style.layers) {
     if (layer.type === "background")
-      layer.paint = { "background-color": "#050505" };
+      layer.paint = { "background-color": "#202020" };
     if (layer.type === "fill")
       layer.paint = {
         ...layer.paint,

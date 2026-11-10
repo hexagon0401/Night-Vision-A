@@ -30,6 +30,6 @@ test("switching map views retains one map canvas and accessible account controls
         .locator("canvas.maplibregl-canvas")
         .evaluate((canvas) => canvas === (window as any).__firstNvCanvas),
     ).toBe(true);
-    expect(await page.locator("canvas").count()).toBeLessThanOrEqual(2);
+    await expect(page.locator("canvas")).toHaveCount(1);
   }
 });
