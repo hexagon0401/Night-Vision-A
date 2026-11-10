@@ -7,7 +7,7 @@ import {shift,validateBundle,roles} from './event-context-providers/common.js';
 const VERSION='context:2';
 export async function resolveEvent(env,id){
  requireValue(/^ucdp:[\w.:-]{1,175}$/.test(id),'invalid_event_id');
- const found=await stmt(env.DB,"SELECT r.body,r.snapshot FROM records r JOIN heads h ON r.snapshot=h.snapshot WHERE r.id=? AND r.kind='ucdp' LIMIT 1",id).first();requireValue(found,'unknown_event',404);
+ const found=await stmt(env.DB,"SELECT r.body,r.snapshot FROM records r JOIN heads h ON r.snapshot=h.snapshot WHERE r.id=? AND r.kind='ucdp' AND h.provider='ucdp' LIMIT 1",id).first();requireValue(found,'unknown_event',404);
  const r=validateRecord(JSON.parse(found.body));requireValue(!r.actors||(Array.isArray(r.actors)&&r.actors.length<=12&&r.actors.every(a=>typeof a==='string'&&a.length<=1000)),'invalid_event_actors',409);requireValue(r.id===id&&r.kind==='ucdp','event_identity_mismatch',409);return {r,snapshot:found.snapshot};
 }
 async function runProvider(env,p,r,snapshot,force=false,statusOnly=false){
@@ -42,9 +42,10 @@ export async function contextRoute(request,env,url){
  const {r,snapshot}=await resolveEvent(env,id);const action=match[2]??'';
  let actor=null;if(['refresh','review'].includes(action)){requireValue(request.method==='POST','method_not_allowed',405);sameOrigin(request);actor=await requireUser(request,env);}else requireValue(request.method==='GET','method_not_allowed',405);
  if(action==='review'){
+  const day=new Date().toISOString().slice(0,10),permit=await stmt(env.DB,'INSERT INTO quotas VALUES(?,?,1) ON CONFLICT(day,bucket) DO UPDATE SET count=count+1 WHERE count<10 RETURNING count',day,'context-review:'+actor.user_id).first();requireValue(permit,'context_review_daily_limit',429);
   const evidence=await rows(env.DB,'SELECT body FROM event_context_cache WHERE event_id=? AND event_hash=? AND provider_version=?',id,r.hash,VERSION+':'+snapshot);
   const review={event_ref:eventRef(r),state:'manual_review_requested',created:new Date().toISOString(),user_id:actor.user_id,items:evidence.flatMap(e=>JSON.parse(e.body).items),automatic_promotion:false,modules:['source_finder','source_tracker','chrono_search','visual_forensics','hypothesis_lab']};
-  const key=await sha(JSON.stringify(review));await stmt(env.DB,'INSERT INTO context_reviews VALUES(?,?,?,?,?,?)',key,id,r.hash,review.created,actor.user_id,JSON.stringify(review)).run();return json({...review,id:key});
+  const key=await sha(JSON.stringify(review));await stmt(env.DB,'INSERT INTO context_reviews VALUES(?,?,?,?,?,?)',key,id,r.hash,review.created,actor.user_id,JSON.stringify(review)).run();await stmt(env.DB,"DELETE FROM context_reviews WHERE created<datetime('now','-30 days')").run();return json({...review,id:key});
  }
  const include=url.searchParams.get('include');requireValue(!include||include.length<350,'invalid_include');const requested=match[3]?[match[3]]:include?include.split(','):['ucdp_existing','gdelt_doc','earth_search_stac'];
  requireValue(requested.length<=providers.length&&requested.every(id=>providers.some(p=>p.id===id)),'unknown_provider');
