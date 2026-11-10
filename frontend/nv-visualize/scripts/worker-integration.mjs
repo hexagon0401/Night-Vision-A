@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import {fileURLToPath} from 'node:url';
 process.chdir(fileURLToPath(new URL('..',import.meta.url)));
 const built = await build({
+  absWorkingDir:fileURLToPath(new URL('..',import.meta.url)),
   entryPoints: ["../../services/cloudflare/worker.js"],
   bundle: true,
   format: "esm",
