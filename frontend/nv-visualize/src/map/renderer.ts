@@ -5,7 +5,7 @@ import detailStyle from "./detail-style.json";
 import type { Candidate, CandidateLink, Point } from "../cases/model";
 
 export interface MapData {
-  events?: { id: string; lat: number; lon: number; precision: number }[];
+  events?: { id: string; lat: number; lon: number; precision: number; color?: string; radius?: number }[];
   candidates: Candidate[];
   links: CandidateLink[];
   selected: string | null;
