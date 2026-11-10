@@ -23,8 +23,9 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
   };
   const render = (data: MapData) => {
     latest = data;
-    if (destroyed || !map.isStyleLoaded()) return;
+    if (destroyed) return;
     if (!map.getSource(source)) {
+      if (!map.isStyleLoaded()) return;
       map.addSource(source,{type:"geojson",data:{type:"FeatureCollection",features:[]}});
       for (const [id,kind,dash] of [["nv-direct","direct",null],["nv-inferred","inferred",[5,4]],["nv-scenario","scenario",[1,5]]] as const)
         map.addLayer({id,type:"line",source,filter:["==",["get","kind"],kind],paint:{"line-color":kind==="direct"?"#ecece8":"#a7a7a7","line-width":1.5,...(dash?{"line-dasharray":[...dash]}:{})}});
