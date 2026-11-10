@@ -27,7 +27,7 @@ export function parseCompletion(text) {
 }
 export function responseShape(value) {
  if(!value||typeof value!=='object'||Array.isArray(value))return {type:Array.isArray(value)?'array':typeof value};
- return Object.fromEntries(Object.entries(value).slice(0,12).map(([k,v])=>[k.slice(0,40),Array.isArray(v)?{type:'array',length:v.length,item_types:v.slice(0,2).map(x=>typeof x),item_fields:v.slice(0,2).map(x=>x&&typeof x==='object'?Object.keys(x).slice(0,8):[])}:{type:typeof v}]));
+ return Object.fromEntries(Object.entries(value).slice(0,12).map(([k,v])=>[k.slice(0,40),Array.isArray(v)?{type:'array',length:v.length,item_types:v.slice(0,2).map(x=>typeof x),item_shapes:v.slice(0,2).map(x=>x&&typeof x==='object'?{text_type:typeof x.text,citations_type:Array.isArray(x.source_ids)?'array':typeof x.source_ids,citations_count:Array.isArray(x.source_ids)?x.source_ids.length:null}:{}),item_fields:v.slice(0,2).map(x=>x&&typeof x==='object'?Object.keys(x).slice(0,8):[])}:{type:typeof v}]));
 }
 export const reasoningMode=model=>generationOptions(model).chat_template_kwargs
  ? 'thinking_disabled_for_structured_output' : 'provider_default';
