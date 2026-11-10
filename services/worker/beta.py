@@ -33,7 +33,8 @@ def main():
  research=Research(cutoff);started=time.monotonic();run=None
  try:
   if args.resume_id:
-   r=client.get(origin+'/api/v2/beta/'+args.resume_id);r.raise_for_status();run=r.json();cutoff=timestamp(run['cutoff']);research.cutoff=cutoff;research.start=cutoff-__import__('datetime').timedelta(days=90);research.sources={s['id']:s for s in run['input']['sources']}
+   r=client.get(origin+'/api/v2/beta/'+args.resume_id);r.raise_for_status();run=r.json();cutoff=timestamp(run['cutoff']);research.cutoff=cutoff;research.start=cutoff-__import__('datetime').timedelta(days=90);research.sources={s['id']:s for s in run['input']['sources']};research.fetched={s['url'] for s in run['input']['sources']}
+   if run['steps'][0]['state']!='complete':research.discover(['official shipping safety update'])
    (out/'comparison-prompt.md').write_text(common_prompt(cutoff))
   else:
    sources=research.discover(['shipping attacks disruption','vessel transit rerouting'])
