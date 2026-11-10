@@ -1,174 +1,75 @@
-import type { Map as LibreMap, IControl } from "maplibre-gl";
-import { MapboxOverlay } from "@deck.gl/mapbox";
-import { ScatterplotLayer, PathLayer, TextLayer } from "@deck.gl/layers";
-import {
-  PathStyleExtension,
-  type PathStyleExtensionProps,
-} from "@deck.gl/extensions";
+import type { Map as LibreMap, GeoJSONSource } from "maplibre-gl";
+import type { Feature, FeatureCollection, Geometry } from "geojson";
 import type { MapData, MapCallbacks } from "./renderer";
-import type { Point, CandidateLink } from "../cases/model";
-interface Marker {
-  point: Point;
-  ids: string[];
-}
-export function attachOverlay(
-  map: LibreMap,
-  callbacks: MapCallbacks,
-  onReady: () => void,
-) {
-  let destroyed = false;
-  const overlay = new MapboxOverlay({
-    interleaved: false,
-    layers: [],
-    onAfterRender: onReady,
-  });
-  map.addControl(overlay as unknown as IControl);
+import type { Point } from "../cases/model";
+
+// One MapLibre context for basemap, events and Trace. No second WebGL canvas.
+export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: () => void) {
+  const source = "nv-overlay";
+  const ids = ["nv-direct", "nv-inferred", "nv-scenario", "nv-events", "nv-markers", "nv-counts"];
+  let latest: MapData | undefined, destroyed = false, notified = false;
   const arc = (points: Point[], progress: number): Point[] => {
     if (points.length < 2) return points;
-    const start = points[0],
-      end: [number, number] = [points[1][0], points[1][1]];
+    const start = points[0], end: Point = [...points[1]];
     while (end[0] - start[0] > 180) end[0] -= 360;
     while (end[0] - start[0] < -180) end[0] += 360;
-    const a = map.project(start),
-      b = map.project(end),
-      dx = b.x - a.x,
-      dy = b.y - a.y,
-      length = Math.hypot(dx, dy) || 1;
-    const bend = Math.min(90, length * 0.2),
-      c = {
-        x: (a.x + b.x) / 2 - (dy / length) * bend,
-        y: (a.y + b.y) / 2 + (dx / length) * bend,
-      };
-    return Array.from({ length: 33 }, (_, i) => {
-      const t = (progress * i) / 32;
-      const p = map.unproject([
-        (1 - t) ** 2 * a.x + 2 * (1 - t) * t * c.x + t * t * b.x,
-        (1 - t) ** 2 * a.y + 2 * (1 - t) * t * c.y + t * t * b.y,
-      ]);
-      return [p.lng, p.lat] as Point;
+    const a = map.project(start), b = map.project(end), dx = b.x-a.x, dy = b.y-a.y;
+    const length = Math.hypot(dx,dy)||1, bend = Math.min(90,length*.2);
+    const c = {x:(a.x+b.x)/2-dy/length*bend,y:(a.y+b.y)/2+dx/length*bend};
+    return Array.from({length:33},(_,i) => {
+      const t=progress*i/32, p=map.unproject([(1-t)**2*a.x+2*(1-t)*t*c.x+t*t*b.x,(1-t)**2*a.y+2*(1-t)*t*c.y+t*t*b.y]);
+      return [p.lng,p.lat];
     });
   };
   const render = (data: MapData) => {
-    if (destroyed) return;
-    const markers: Marker[] = [];
-    if (data.showMarkers)
-      for (const candidate of data.candidates) {
-        if (!candidate.point) continue;
-        const projected = map.project(candidate.point);
-        const existing = markers.find((marker) => {
-          const p = map.project(marker.point);
-          return Math.hypot(p.x - projected.x, p.y - projected.y) < 19;
-        });
-        if (existing) existing.ids.push(candidate.anomaly.anomaly_id);
-        else
-          markers.push({
-            point: candidate.point,
-            ids: [candidate.anomaly.anomaly_id],
-          });
-      }
-    if (data.trace?.point) {
-      markers.splice(0, markers.length, {
-        point: data.trace.point,
-        ids: data.selected ? [data.selected] : [],
-      });
+    latest = data;
+    if (destroyed || !map.isStyleLoaded()) return;
+    if (!map.getSource(source)) {
+      map.addSource(source,{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+      for (const [id,kind,dash] of [["nv-direct","direct",null],["nv-inferred","inferred",[5,4]],["nv-scenario","scenario",[1,5]]] as const)
+        map.addLayer({id,type:"line",source,filter:["==",["get","kind"],kind],paint:{"line-color":kind==="direct"?"#ecece8":"#a7a7a7","line-width":1.5,...(dash?{"line-dasharray":[...dash]}:{})}});
+      map.addLayer({id:"nv-events",type:"circle",source,filter:["==",["get","kind"],"event"],paint:{"circle-radius":["case",["==",["get","precision"],1],4,11],"circle-color":"#e1e1dc","circle-opacity":["case",["==",["get","precision"],1],.8,.14],"circle-stroke-color":"#dcdcdc","circle-stroke-width":1}});
+      map.addLayer({id:"nv-markers",type:"circle",source,filter:["==",["get","kind"],"marker"],paint:{"circle-radius":["case",[">",["get","count"],1],12,7],"circle-color":["case",["get","selected"],"#ebebe6","#181818"],"circle-stroke-color":"#ebebe6","circle-stroke-width":1.2}});
+      map.addLayer({id:"nv-counts",type:"symbol",source,filter:["all",["==",["get","kind"],"marker"],[">",["get","count"],1]],layout:{"text-field":["to-string",["get","count"]],"text-font":["Noto Sans Regular"],"text-size":11,"text-allow-overlap":true},paint:{"text-color":"#f2f2f0"}});
     }
-    const pick = (info: { object?: Marker }) => {
-      if (info.object) callbacks.pick(info.object.ids);
-    };
-    const paths = data.trace?.paths ?? (data.showLinks ? data.links : []);
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const path = (d: CandidateLink) =>
-      data.trace ? arc(d.points, reduced ? 1 : data.trace.progress) : d.points;
-    overlay.setProps({
-      layers: [
-        new ScatterplotLayer<{
-          id: string;
-          lat: number;
-          lon: number;
-          precision: number;
-        }>({
-          id: "reported-events",
-          data: data.events ?? [],
-          pickable: true,
-          stroked: true,
-          getPosition: (d) => [d.lon, d.lat],
-          getRadius: (d) => (d.precision === 1 ? 4 : 11),
-          radiusUnits: "pixels",
-          getFillColor: (d) =>
-            d.precision === 1 ? [225, 225, 220, 200] : [180, 180, 180, 35],
-          getLineColor: [220, 220, 220, 180],
-          getLineWidth: 1,
-          lineWidthUnits: "pixels",
-          onClick: (info) => {
-            if (info.object) callbacks.event?.(info.object.id);
-          },
-        }),
-        new PathLayer<CandidateLink>({
-          id: "direct-relations",
-          data: paths.filter((d) =>
-            ["observed", "documented"].includes(d.status),
-          ),
-          getPath: path,
-          getColor: [236, 236, 232],
-          getWidth: 1.5,
-          widthUnits: "pixels",
-        }),
-        new PathLayer<CandidateLink, PathStyleExtensionProps<CandidateLink>>({
-          id: "candidate-relations",
-          data: paths.filter(
-            (d) => !["observed", "documented"].includes(d.status),
-          ),
-          pickable: false,
-          getPath: path,
-          getColor: [167, 167, 167],
-          getWidth: 1.5,
-          widthUnits: "pixels",
-          getDashArray: (d) => (d.status === "scenario" ? [1, 5] : [5, 4]),
-          dashJustified: true,
-          extensions: [new PathStyleExtension({ dash: true })],
-        }),
-        new ScatterplotLayer<Marker>({
-          id: "candidate-markers",
-          data: markers,
-          pickable: true,
-          autoHighlight: false,
-          getPosition: (d) => d.point,
-          getRadius: (d) => (d.ids.length > 1 ? 12 : 7),
-          radiusUnits: "pixels",
-          stroked: true,
-          getLineWidth: 1.2,
-          lineWidthUnits: "pixels",
-          getFillColor: (d) =>
-            d.ids.includes(data.selected ?? "")
-              ? [235, 235, 230]
-              : [24, 24, 24],
-          getLineColor: [235, 235, 230],
-          onClick: pick,
-          updateTriggers: { getFillColor: data.selected },
-        }),
-        new TextLayer<Marker>({
-          id: "cluster-count",
-          data: markers.filter((m) => m.ids.length > 1),
-          getPosition: (d) => d.point,
-          getText: (d) => String(d.ids.length),
-          getSize: 11,
-          getColor: [242, 242, 240],
-          fontFamily: "system-ui",
-          getTextAnchor: "middle",
-          getAlignmentBaseline: "center",
-          pickable: false,
-        }),
-      ],
-    });
+    const features: Feature<Geometry>[] = [];
+    const point = (p:Point,properties:Record<string,unknown>) => features.push({type:"Feature",geometry:{type:"Point",coordinates:p},properties});
+    const markers: {point:Point;ids:string[]}[] = [];
+    if (data.showMarkers) for (const c of data.candidates) {
+      if (!c.point) continue;
+      const p=map.project(c.point), existing=markers.find(m=>{const q=map.project(m.point);return Math.hypot(q.x-p.x,q.y-p.y)<19;});
+      if (existing) existing.ids.push(c.anomaly.anomaly_id);
+      else markers.push({point:c.point,ids:[c.anomaly.anomaly_id]});
+    }
+    if (data.trace?.point) markers.splice(0,markers.length,{point:data.trace.point,ids:data.selected?[data.selected]:[]});
+    for (const m of markers) point(m.point,{kind:"marker",ids:JSON.stringify(m.ids),count:m.ids.length,selected:m.ids.includes(data.selected??"")});
+    for (const e of data.events??[]) point([e.lon,e.lat],{kind:"event",id:e.id,precision:e.precision});
+    const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    for (const path of data.trace?.paths??(data.showLinks?data.links:[])) {
+      const coordinates=data.trace?arc(path.points,reduced?1:data.trace.progress):path.points;
+      if (coordinates.length<2) continue;
+      features.push({type:"Feature",geometry:{type:"LineString",coordinates},properties:{kind:["observed","documented"].includes(path.status)?"direct":path.status==="scenario"?"scenario":"inferred"}});
+    }
+    (map.getSource(source) as GeoJSONSource).setData({type:"FeatureCollection",features} as FeatureCollection);
+    if (!notified) {notified=true;map.once("render",onReady);}
   };
+  const reload = () => {if(latest) render(latest);};
+  map.on("style.load",reload);
   return {
     render,
-    pick: (x: number, y: number) => overlay.pickObject({ x, y, radius: 14 }),
+    pick(x:number,y:number) {
+      const layers=["nv-markers","nv-events"].filter(id=>map.getLayer(id));
+      if (!layers.length) return null;
+      const hit=map.queryRenderedFeatures([[x-10,y-10],[x+10,y+10]],{layers})[0];
+      if (!hit) return null;
+      if (hit.properties.kind==="event") callbacks.event?.(hit.properties.id);
+      else callbacks.pick(JSON.parse(hit.properties.ids));
+      return hit;
+    },
     destroy() {
-      destroyed = true;
-      map.removeControl(overlay as unknown as IControl);
+      destroyed=true;map.off("style.load",reload);
+      for (const id of [...ids].reverse()) if(map.getLayer(id)) map.removeLayer(id);
+      if(map.getSource(source)) map.removeSource(source);
     },
   };
 }

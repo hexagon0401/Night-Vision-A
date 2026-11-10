@@ -1,6 +1,5 @@
 import maplibregl, {
   type StyleSpecification,
-  type IControl,
 } from "maplibre-gl";
 import detailStyle from "./detail-style.json";
 import type { Candidate, CandidateLink, Point } from "../cases/model";
@@ -55,7 +54,7 @@ export const style: StyleSpecification = {
       id: "land",
       type: "fill",
       source: "countries",
-      paint: { "fill-color": "#080808" },
+      paint: { "fill-color": "#202020" },
     },
     {
       id: "borders",
@@ -103,6 +102,8 @@ export function createMap(
     attributionControl: false,
     pitchWithRotate: false,
     dragRotate: false,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    fadeDuration: 0,
   });
   map.addControl(
     new maplibregl.AttributionControl({
@@ -200,14 +201,26 @@ export function createMap(
   map.on("click", (event) => {
     if (!overlay?.pick(event.point.x, event.point.y)) callbacks.dismiss();
   });
-  map.on("error", () => {
+  const fallback = () => {
     if (detailed && !failedDetail) {
       failedDetail = true;
       detailed = false;
       map.setStyle(style);
       container.dataset.basemap = "fallback";
       callbacks.basemap?.(false);
-    } else if (!failedDetail) callbacks.error();
+    }
+  };
+  // A missing glyph or a single transient tile must not discard the whole basemap.
+  let detailErrors = false;
+  const deadline = window.setTimeout(() => {
+    if (!destroyed && (!basemapLoaded || detailErrors)) fallback();
+  }, 12000);
+  map.on("error", (event) => {
+    const failure = event as typeof event & { sourceId?: string; tile?: unknown };
+    if (detailed && failure.sourceId === "openmaptiles") {
+      detailErrors = true;
+      if (!failure.tile) fallback(); // TileJSON/source failure; tile errors get a grace period.
+    } else if (!detailed && failure.sourceId === "countries") callbacks.error();
   });
   return {
     update(value) {
@@ -246,6 +259,7 @@ export function createMap(
     },
     destroy() {
       destroyed = true;
+      clearTimeout(deadline);
       overlay?.destroy();
       map.remove();
     },
