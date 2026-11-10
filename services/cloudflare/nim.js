@@ -26,7 +26,8 @@ export async function completion(env,{model,key,messages,maxTokens,timeout=60000
   }
   requireValue(response.ok,'nim_upstream_failure',502);
   const outer=await response.json(),choice=outer.choices?.[0];
-  diagnostic={...diagnostic,provider_model:outer.model??null,finish_reason:choice?.finish_reason??null,usage:outer.usage??null,content_characters:choice?.message?.content?.length??0};
+  const usage={};for(const field of ['prompt_tokens','completion_tokens','total_tokens']) if(Number.isFinite(outer.usage?.[field])&&outer.usage[field]>=0) usage[field]=outer.usage[field];
+  diagnostic={...diagnostic,provider_model:typeof outer.model==='string'?outer.model.slice(0,160):null,finish_reason:typeof choice?.finish_reason==='string'?choice.finish_reason.slice(0,40):null,usage:Object.keys(usage).length?usage:null,content_characters:choice?.message?.content?.length??0};
   requireValue(choice?.finish_reason!=='length','nim_truncated_response',502);
   requireValue(typeof choice?.message?.content==='string'&&choice.message.content.length<=30000,'invalid_ai_response',502);
   let report;try{report=JSON.parse(choice.message.content.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,''));}catch{throw new ApiError(502,'invalid_ai_response');}
