@@ -2,6 +2,7 @@ import { Miniflare, convertV4MiniflareOptions } from "miniflare";
 import { build } from "esbuild";
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
+import {reserve} from "../../../services/cloudflare/ai.js";
 import {fileURLToPath} from 'node:url';
 process.chdir(fileURLToPath(new URL('..',import.meta.url)));
 const built = await build({
@@ -329,6 +330,11 @@ try {
   assert.equal((await req('/api/internal/beta/step',{id:beta.id,step:5},betaHeaders)).status,200);assert.equal(nimCalls-betaBefore,6,'resume must not charge completed steps');
   const final=await(await req('/api/v2/beta/'+beta.id)).json();assert.equal(final.state,'complete');assert.equal(final.steps.length,6);assert.equal(final.steps[5].output.provider_model,'resolved-test-model');
   assert.equal((await req('/api/internal/beta/start',{...betaInput,topic:'different'},betaHeaders)).status,429);
+  // Six major calls plus at most two bounded retries; the global cap stays 40.
+  await db.prepare("UPDATE quotas SET count=7 WHERE bucket='user:beta' AND day=date('now')").run();
+  const retryReservations=await Promise.allSettled([reserve(db,'beta'),reserve(db,'beta')]);
+  assert.equal(retryReservations.filter(r=>r.status==='fulfilled').length,1);
+  assert.equal((await db.prepare("SELECT count FROM quotas WHERE bucket='user:beta' AND day=date('now')").first()).count,8);
   // A length-truncated provider response is never accepted as a successful report.
   await db.prepare("DELETE FROM ai_results WHERE kind='case'").run();
   finishReason='length';

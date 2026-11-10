@@ -4,7 +4,7 @@ import base64
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
 import httpx
-from nv_engine.monitor.ucdp import MonitorState,UCDPMonitor,digest
+from nv_engine.monitor.ucdp import MonitorState,UCDPMonitor,digest,published_candidate
 from nv_engine.monitor.analysis import aggregate,build_cases
 
 
@@ -63,7 +63,7 @@ def main():
             else:
                 monitor=UCDPMonitor(state,token,now=now,permit=lambda:publisher.post('ucdp-permit',{}))
                 try:
-                    annual=os.environ.get('UCDP_ANNUAL_VERSION','26.1');candidate=monitor.discover(annual)
+                    annual=os.environ.get('UCDP_ANNUAL_VERSION','26.1');candidate=monitor.discover(annual,hint=published_candidate(now))
                     complete=monitor.sync(annual,max_pages=15)
                     if candidate and not monitor.candidate_cached:complete=monitor.sync(candidate,max_pages=10) and complete
                     run['requests']=monitor.used

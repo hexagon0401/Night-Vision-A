@@ -69,7 +69,7 @@ export async function reserve(db, user, review = false) {
     stmt(db, "INSERT OR IGNORE INTO quotas VALUES(?,?,0)", day, bucket),
     stmt(db, "INSERT OR IGNORE INTO quotas VALUES(?,?,0)", day, "review"),
   ]);
-  const limit = user === "scheduled" ? 30 : user==='beta' ? 6 : 10;
+  const limit = user === "scheduled" ? 30 : user==='beta' ? 8 : 10;
   const result = await db.batch([
     stmt(
       db,

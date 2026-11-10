@@ -118,12 +118,40 @@ def test_monitor_preserves_success_when_ai_unavailable(tmp_path,monkeypatch):
  class FakeUCDP:
   candidate_cached=False;used=1
   def __init__(self,*args,**kwargs):pass
-  def discover(self,*args):return None
+  def discover(self,*args,**kwargs):return None
   def sync(self,*args,**kwargs):return True
   def merged(self,*args):return [normalize(row(),'26.1',NOW.isoformat())]
   def close(self):pass
- monkeypatch.setattr(module,'Publisher',FakePublisher);monkeypatch.setattr(module,'UCDPMonitor',FakeUCDP)
+ monkeypatch.setattr(module,'Publisher',FakePublisher);monkeypatch.setattr(module,'UCDPMonitor',FakeUCDP);monkeypatch.setattr(module,'published_candidate',lambda now:None)
  monkeypatch.setattr('sys.argv',['monitor.py','--state',str(tmp_path/'state.db')]);module.main()
  status=json.loads((tmp_path/'monitor-status.json').read_text())
  assert status['state']=='complete' and status['providers']['ucdp']['state']=='complete'
  assert status['ai']['state']=='ai_unavailable'
+
+
+def test_unreleased_candidate_400_does_not_prevent_annual_or_published_candidate(tmp_path):
+ state=MonitorState(tmp_path/'s.db');versions=[]
+ def handle(req):
+  version=req.url.path.split('/')[-1];versions.append(version)
+  if version in ('26.0.11','26.0.10'):return httpx.Response(400)
+  return httpx.Response(200,json={'Result':[row()],'TotalPages':1})
+ monitor=UCDPMonitor(state,'synthetic-token',now=NOW,sleep=lambda _:None,client=httpx.Client(transport=httpx.MockTransport(handle)))
+ assert monitor.discover()=='26.0.9' and versions==['26.0.11','26.0.10','26.0.9']
+ assert monitor.sync('26.1') is True
+ bad=UCDPMonitor(state,'synthetic-token',now=NOW,client=httpx.Client(transport=httpx.MockTransport(lambda r:httpx.Response(400))))
+ with pytest.raises(ValueError,match='ucdp_upstream_http_400'):bad.get('26.1')
+ state.close()
+
+
+def test_published_candidate_index_is_public_bounded_and_preferred(tmp_path):
+ from nv_engine.monitor.ucdp import published_candidate
+ def index(req):
+  assert req.url.host=='ucdp.uu.se' and 'x-ucdp-access-token' not in req.headers
+  return httpx.Response(200,text='<code>26.0.9</code> <code>26.0.12</code> <code>27.0.1</code>')
+ assert published_candidate(NOW,httpx.Client(transport=httpx.MockTransport(index)))=='26.0.9'
+ state=MonitorState(tmp_path/'s.db');seen=[]
+ def api(req):
+  seen.append(req.url.path.split('/')[-1]);return httpx.Response(200,json={'Result':[row()]})
+ monitor=UCDPMonitor(state,'synthetic-token',now=NOW,client=httpx.Client(transport=httpx.MockTransport(api)))
+ assert monitor.discover(hint='26.0.9')=='26.0.9' and seen==['26.0.9']
+ state.close()
