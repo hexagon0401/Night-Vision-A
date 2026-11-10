@@ -129,6 +129,11 @@ try {
   assert.equal((await req('/api/internal/run',{}, {Authorization:'Bearer '+await workload({aud:origin+'/monitor',event_name:'pull_request',workflow_ref:'hexagon0401/Night-Vision-A/.github/workflows/monitor.yml@refs/heads/main'})})).status,403,'PR workflows cannot publish');
   assert.equal((await req("/api/internal/start", {})).status, 401);
   assert.equal((await req("/api/v2/ai/analyze", { case_id: "x" })).status, 401);
+  const today=new Date().toISOString().slice(0,10);
+  await internal('aggregates',{provider:'ucdp',rows:[{country:'TEST',day:'2000-01-01',events:1},{country:'TEST',day:today,events:1}]});
+  assert.equal((await db.prepare('SELECT COUNT(*) n FROM aggregates').first()).n,2,'batches do not repeatedly scan retention');
+  await internal('run',{id:'run:retention-test',state:'complete',started:new Date().toISOString()});
+  assert.equal((await db.prepare('SELECT COUNT(*) n FROM aggregates').first()).n,1,'successful run prunes expired aggregates');
   const snapshot = {
     id: "snapshot:test",
     provider: "ucdp",
@@ -333,8 +338,8 @@ try {
   assert.equal((await req('/api/internal/beta/start',{...betaInput,topic:'different'},betaHeaders)).status,429);
   await db.prepare('INSERT OR REPLACE INTO settings VALUES(?,?)').bind('nim-health:nvidia/nemotron-3.5-lightning-30b-a3b',JSON.stringify({error:'nim_truncated_response'})).run();
   const selected=await selectModel({DB:db,NIM_REVIEW_MODEL:'meta/llama-3.3-70b-instruct'},'nvidia/nemotron-3.5-lightning-30b-a3b');
-  assert.equal(selected.model,'mistralai/mistral-large-2-instruct');assert.equal(selected.shared_model_with_critic,true);
-  assert.equal((await selectModel({DB:db},'meta/llama-3.3-70b-instruct','critic')).model,'mistralai/mistral-large-2-instruct');
+  assert.equal(selected.model,'nvidia/nemotron-3.5-lightning-30b-a3b');assert.equal(selected.shared_model_with_critic,true);
+  assert.equal((await selectModel({DB:db},'meta/llama-3.3-70b-instruct','critic')).model,'nvidia/nemotron-3.5-lightning-30b-a3b');
   await db.prepare("DELETE FROM settings WHERE key='nim-health:nvidia/nemotron-3.5-lightning-30b-a3b'").run();
   // Six major calls plus at most two bounded retries; the global cap stays 40.
   await db.prepare("UPDATE quotas SET count=7 WHERE bucket='user:beta' AND day=date('now')").run();

@@ -309,6 +309,7 @@ export async function ingest(request, env, path) {
       db,
       "DELETE FROM runs WHERE started < datetime('now','-30 days')",
     ).run();
+    if(d.state==='complete') await stmt(db,"DELETE FROM aggregates WHERE day < date('now','-13 months')").run();
     return json({ recorded: true });
   }
   if (path === "/api/internal/aggregates") {
@@ -337,10 +338,6 @@ export async function ingest(request, env, path) {
           ),
         ),
       );
-    await stmt(
-      db,
-      "DELETE FROM aggregates WHERE day < date('now','-13 months')",
-    ).run();
     return json({ accepted: d.rows.length });
   }
   throw new ApiError(404, "not_found");

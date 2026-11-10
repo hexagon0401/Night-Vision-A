@@ -17,3 +17,5 @@ External 100-point rubric: source verifiability 20, factual accuracy 20, falsifi
 Live execution remains separate from mocked tests. A successful mock proves orchestration/authorization/quotas, not real NVIDIA model access or Red Sea findings.
 
 Structured-output recovery: the known Nemotron analyst uses documented `enable_thinking=false`, short phase reports and the existing 4096-token ceiling. Other models keep provider defaults. Failed response usage/finish metadata is retained without hidden reasoning text; a diagnostic-only failed step is never rendered as a report.
+
+Current compatibility: the retired Llama reviewer ID resolves to the existing Nemotron model with key B. Analyst A keeps its configured Nemotron/key A. Record the actual model and shared-model limitation. Nemotron uses prompt-framed JSON (no forced JSON decoding), with schema/citation validation after response framing is removed. See ../implementation/monitor-ai-recovery.md for verified provider failures and current operating policy. Catalog presence alone is not proof of model access.

@@ -4,30 +4,35 @@ import {ApiError,stmt,requireValue} from './core.js';
 // Keep the existing model, but reserve its bounded completion for the JSON report.
 // https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b
 export function generationOptions(model) {
- const known=['nvidia/nemotron-3.5-lightning-30b-a3b','meta/llama-3.3-70b-instruct','mistralai/mistral-large-2-instruct'].includes(model);
+ const known=['meta/llama-3.3-70b-instruct','mistralai/mistral-large-2-instruct'].includes(model);
  return {...(known?{response_format:{type:'json_object'}}:{}),...(model==='nvidia/nemotron-3.5-lightning-30b-a3b'?{chat_template_kwargs:{enable_thinking:false}}:{})};
 }
 export function parseCompletion(text) {
  let clean=text.trim();
- // Some providers include an empty reasoning delimiter, never expose reasoning.
- clean=clean.replace(/^<think>\s*<\/think>\s*/i,'').replace(/^<\/think>\s*/i,'');
+ if(!clean.startsWith('{')&&clean.includes('</think>')) clean=clean.slice(clean.lastIndexOf('</think>')+8).trim();
+ if(clean.startsWith('<think>')) throw new Error('incomplete_reasoning_delimiter');
  clean=clean.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
- return JSON.parse(clean);
+ try{return JSON.parse(clean);}catch{}
+ // Strip framing, not JSON syntax: accept one complete object only. Never
+ // repair truncated output, synthesize fields or expose the discarded preface.
+ const objects=[];let start=-1,depth=0,quoted=false,escaped=false;
+ for(let i=0;i<clean.length;i++) {
+  const c=clean[i];
+  if(start<0){if(c==='{'){start=i;depth=1;}continue;}
+  if(quoted){if(escaped)escaped=false;else if(c==='\\')escaped=true;else if(c==='"')quoted=false;continue;}
+  if(c==='"')quoted=true;else if(c==='{')depth++;else if(c==='}'&&--depth===0){try{objects.push(JSON.parse(clean.slice(start,i+1)));}catch{}start=-1;}
+ }
+ if(objects.length!==1||start>=0)throw new Error('ambiguous_or_incomplete_json');
+ return objects[0];
 }
 export const reasoningMode=model=>generationOptions(model).chat_template_kwargs
  ? 'thinking_disabled_for_structured_output' : 'provider_default';
-const RETIRED={'meta/llama-3.3-70b-instruct':'mistralai/mistral-large-2-instruct'};
+const ACTIVE_PRIMARY='nvidia/nemotron-3.5-lightning-30b-a3b';
 export async function selectModel(env,requested,role='analyst') {
- // The legacy Llama API ended on 2026-08-25 and returns 410. The replacement
- // is in NVIDIA's current public catalog; no billing plan or API key changes.
- if(RETIRED[requested]) return {model:RETIRED[requested],requested_model:requested,fallback_reason:'provider_model_retired'};
- const alternate=RETIRED[env.NIM_REVIEW_MODEL]??env.NIM_REVIEW_MODEL;
- if(role!=='analyst'||requested!=='nvidia/nemotron-3.5-lightning-30b-a3b'||alternate!=='mistralai/mistral-large-2-instruct') return {model:requested,requested_model:requested,fallback_reason:null};
- const health=await stmt(env.DB,'SELECT value FROM settings WHERE key=?','nim-health:'+requested).first();
- const failure=health?JSON.parse(health.value):null;
- // Response-format fallback only: same A key, same budgets, never an access/quota bypass.
- if(['invalid_ai_response','nim_truncated_response'].includes(failure?.error)) return {model:alternate,requested_model:requested,fallback_reason:'primary_structured_output_failure',shared_model_with_critic:true};
- return {model:requested,requested_model:requested,fallback_reason:null};
+ // Retired Llama and its unavailable migration target never become a key or
+ // quota rotation. Use the existing first-party model with the same role key.
+ if(requested==='meta/llama-3.3-70b-instruct') return {model:ACTIVE_PRIMARY,requested_model:requested,fallback_reason:'provider_model_retired',shared_model_with_critic:true};
+ return {model:requested,requested_model:requested,fallback_reason:null,shared_model_with_critic:requested===ACTIVE_PRIMARY&&env.NIM_REVIEW_MODEL==='meta/llama-3.3-70b-instruct'};
 }
 export async function nimHealth(env,model,health) {
  await stmt(env.DB,'INSERT OR REPLACE INTO settings VALUES(?,?)','nim-health:'+model,JSON.stringify({model,checked_at:new Date().toISOString(),...health})).run();
