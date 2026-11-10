@@ -9,7 +9,7 @@ def canonical(value):return json.dumps(value,sort_keys=True,separators=(',',':')
 def digest(value):return hashlib.sha256(canonical(value).encode()).hexdigest()
 
 
-def normalize(row,version,acquired):
+def normalize(row,version,acquired,allow_invalid_estimates=False):
     identity=str(row['id']);start=date.fromisoformat(str(row['date_start'])[:10]);end=date.fromisoformat(str(row.get('date_end') or row['date_start'])[:10])
     if end<start:raise ValueError('invalid_event_interval')
     precision=int(row.get('where_prec') or 7)
@@ -18,8 +18,12 @@ def normalize(row,version,acquired):
         lat,lon=float(row['latitude']),float(row['longitude'])
         if not (-90<=lat<=90 and -180<=lon<=180):raise ValueError('invalid_coordinates')
     values={k:None if row.get(k) in (None,'') else int(row[k]) for k in ('low','best','high')}
-    if any(v is not None and v<0 for v in values.values()):raise ValueError('invalid_fatalities')
-    if values['low'] is not None and values['high'] is not None and values['low']>values['high']:raise ValueError('invalid_fatalities')
+    invalid=any(v is not None and v<0 for v in values.values()) or any(a is not None and b is not None and a>b for a,b in [(values['low'],values['best']),(values['best'],values['high']),(values['low'],values['high'])])
+    quality={}
+    if invalid:
+        if not allow_invalid_estimates:raise ValueError('invalid_fatalities')
+        quality={'upstream_estimates':{k:row.get(k) for k in ('low','best','high')},'fatality_validation':'invalid_provider_estimates','quality_warnings':['Fatality estimates rejected as inconsistent/negative; preserved as upstream values, treated as unknown, never zero.']}
+        values={k:None for k in ('low','best','high')}
     return {'id':'ucdp:'+identity,'upstream_id':identity,'kind':'ucdp','country':str(row.get('country') or 'Unknown'),
         'day':start.isoformat(),'end_day':end.isoformat(),'precision':precision,'lat':lat,'lon':lon,
         'location_status':'provider_point' if precision==1 else 'approximate' if lat is not None else 'unknown',
@@ -28,7 +32,7 @@ def normalize(row,version,acquired):
         'title':str(row.get('country') or 'Unknown')+' · '+str(row.get('side_a') or 'UCDP reported conflict')+' / '+str(row.get('side_b') or ''),
         'source_url':'https://ucdp.uu.se/','endpoint':'https://ucdpapi.pcr.uu.se/api/gedevents/'+version,
         'version':version,'dataset':'candidate' if '.0.' in version else 'annual',
-        'hash':digest(row),'acquired_at':acquired,**values}
+        'hash':digest(row),'acquired_at':acquired,**values,**quality}
 
 
 def published_candidate(now,client=None):
@@ -125,7 +129,7 @@ class UCDPMonitor:
             if result is None:raise ValueError('ucdp_version_unavailable')
             response,raw=result;records=[]
             for r in raw:
-                try:records.append(normalize(r,version,now))
+                try:records.append(normalize(r,version,now,allow_invalid_estimates=True))
                 except KeyError as error:
                     field=str(error.args[0]);field=field if field in ('id','date_start','date_end','country') else 'unknown'
                     raise ValueError('ucdp_missing_record_field_'+field) from None

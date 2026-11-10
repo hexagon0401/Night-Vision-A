@@ -155,3 +155,23 @@ def test_published_candidate_index_is_public_bounded_and_preferred(tmp_path):
  monitor=UCDPMonitor(state,'synthetic-token',now=NOW,client=httpx.Client(transport=httpx.MockTransport(api)))
  assert monitor.discover(hint='26.0.9')=='26.0.9' and seen==['26.0.9']
  state.close()
+
+
+def test_inconsistent_upstream_death_estimates_are_preserved_as_unknown(tmp_path):
+ raw=row(low=5,best=3,high=2)
+ record=normalize(raw,'26.1',NOW.isoformat(),allow_invalid_estimates=True)
+ assert record['upstream_estimates']=={'low':5,'best':3,'high':2}
+ assert all(record[k] is None for k in ('low','best','high'))
+ assert record['fatality_validation']=='invalid_provider_estimates'
+ day=aggregate([record])[0];assert day['events']==1 and day['best'] is None and day['invalid_fatality_estimates']==1
+ payload=build_cases([day],NOW)[0]['payload'];assert any('unknown, not zero' in w for w in payload['analysis']['warnings'])
+ state=MonitorState(tmp_path/'s.db')
+ monitor=UCDPMonitor(state,'synthetic-token',now=NOW,sleep=lambda _:None,client=httpx.Client(transport=httpx.MockTransport(lambda r:httpx.Response(200,json={'Result':[raw],'TotalPages':1}))))
+ assert monitor.sync('26.1') is True
+ assert monitor.merged('26.1',None)[0]['upstream_estimates']['low']==5
+ state.close()
+
+
+def test_best_estimate_outside_bounds_stays_unknown_without_reordering():
+ record=normalize(row(low=1,best=8,high=3),'26.1',NOW.isoformat(),allow_invalid_estimates=True)
+ assert record['upstream_estimates']=={'low':1,'best':8,'high':3} and record['best'] is None

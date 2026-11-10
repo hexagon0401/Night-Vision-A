@@ -16,6 +16,7 @@ def aggregate(records):
           **{k:sum(r[k] for r in values) if all(r[k] is not None for r in values) else None for k in ('low','best','high')},
           'record_ids':[r['id'] for r in values],'record_hashes':[r['hash'] for r in values],
           'interval_events':sum(r['day']!=r['end_day'] for r in values),
+          'invalid_fatality_estimates':sum(r.get('fatality_validation')=='invalid_provider_estimates' for r in values),
           'assignment':'event start day; date intervals retained, not expanded into duplicate daily events'})
     return result
 
@@ -48,6 +49,7 @@ def build_cases(aggregates,acquired,coverage_start=None,coverage_end=None,covera
         entity=Entity(entity_id=entity_id,entity_type='country_conflict_series',name=country,location=None,evidence_status='reported',provenance=Provenance(source_ids=provenance_ids,extraction_method='nv:ucdp-aggregation:1'))
         case=CaseBundle(case_id='case:ucdp:'+digest(rows),title=f'UCDP reported conflict trends — {country}',data_origin='source_backed',sources=sources,entities=[entity],observations=observations,claims=claims,events=[],anomalies=[],relations=[],hypotheses=[],narratives=[])
         report=analyze(case)
+        if any(r.get('invalid_fatality_estimates',0) for r in rows):report.warnings.append('Inconsistent provider fatality estimates excluded from numerical analysis as unknown, not zero; event counts retained and original estimates preserved.')
         if coverage_intervals is not None:report.warnings.append('coverage gaps excluded rather than zero-filled; scores uncalibrated')
         case=attach_traces(case,report)
         result.append({'country':country,'payload':{'case':case.model_dump(mode='json'),'analysis':report.model_dump(mode='json'),'aggregation_evidence':rows,'time_semantics':'observed_at_utc is the derived day bucket boundary, never a provider-reported event instant'}})
