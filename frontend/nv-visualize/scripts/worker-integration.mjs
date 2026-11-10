@@ -23,6 +23,7 @@ async function workload(overrides={}){const now=Math.floor(Date.now()/1000);cons
 let nimCalls = 0;
 let profileId = 82876856;
 let nimStatus = 200;
+let finishReason='stop';
 const mf = new Miniflare(
   await convertV4MiniflareOptions({
     workers: [
@@ -70,8 +71,10 @@ const mf = new Miniflare(
              return Response.json({model:'resolved-test-model',usage:{prompt_tokens:100,completion_tokens:50},choices:[{finish_reason:'stop',message:{content:JSON.stringify(report)}}]});
             }
             return Response.json({
+              usage:{prompt_tokens:20,completion_tokens:10},
               choices: [
                 {
+                  finish_reason:finishReason,
                   message: {
                     content: JSON.stringify({
                       summary: [],
@@ -111,6 +114,16 @@ try {
     });
   const initialStatus=await(await req('/api/v2/status')).json();
   assert.equal(initialStatus.ai_configured,true);assert.equal(initialStatus.ai_enabled,true);
+  assert.equal(initialStatus.monitoring_state,'not_started');
+  const emptySummary=await(await req('/api/v2/monitor-summary')).json();
+  assert.equal(emptySummary.statistical.mode,'statistical');assert.equal(emptySummary.statistical.providers.length,0);
+  assert.equal((await internal('monitor-ai',{})).status,200);assert.equal(nimCalls,0,'uninitialized data must not consume inference');
+  const monitorToken=await workload({aud:origin+'/monitor',event_name:'schedule',workflow_ref:'hexagon0401/Night-Vision-A/.github/workflows/monitor.yml@refs/heads/main'});
+  const monitorHeaders={Authorization:'Bearer '+monitorToken};
+  assert.equal((await req('/api/internal/run',{id:'run:oidc-test',started:new Date().toISOString(),state:'skipped'},monitorHeaders)).status,200);
+  assert.equal((await req('/api/internal/beta/start',{},monitorHeaders)).status,401,'monitor identity is not beta authority');
+  assert.equal((await req('/api/internal/run',{}, {Authorization:'Bearer '+await workload()})).status,401,'beta identity is not monitor authority');
+  assert.equal((await req('/api/internal/run',{}, {Authorization:'Bearer '+await workload({aud:origin+'/monitor',event_name:'pull_request',workflow_ref:'hexagon0401/Night-Vision-A/.github/workflows/monitor.yml@refs/heads/main'})})).status,403,'PR workflows cannot publish');
   assert.equal((await req("/api/internal/start", {})).status, 401);
   assert.equal((await req("/api/v2/ai/analyze", { case_id: "x" })).status, 401);
   const snapshot = {
@@ -315,6 +328,18 @@ try {
   assert.equal((await req('/api/internal/beta/step',{id:beta.id,step:5},betaHeaders)).status,200);assert.equal(nimCalls-betaBefore,6,'resume must not charge completed steps');
   const final=await(await req('/api/v2/beta/'+beta.id)).json();assert.equal(final.state,'complete');assert.equal(final.steps.length,6);assert.equal(final.steps[5].output.provider_model,'resolved-test-model');
   assert.equal((await req('/api/internal/beta/start',{...betaInput,topic:'different'},betaHeaders)).status,429);
+  // A length-truncated provider response is never accepted as a successful report.
+  await db.prepare("DELETE FROM ai_results WHERE kind='case'").run();
+  finishReason='length';
+  const truncated=await req('/api/v2/ai/analyze',{case_id:payload.case.case_id},{Cookie:session});
+  assert.equal(truncated.status,502);assert.equal((await truncated.json()).error,'nim_truncated_response');
+  const health=(await(await req('/api/v2/status')).json()).ai_health;
+  assert.equal(health[0].finish_reason,'length');assert.equal(health[0].usage.completion_tokens,10);
+  const stillAvailable=await(await req('/api/v2/monitor-summary')).json();
+  assert.equal(stillAvailable.statistical.records,1);assert.ok(stillAvailable.statistical.candidates>0);
+  assert.ok(!JSON.stringify(health).includes('test-nim-A'));
+  finishReason='stop';
+  assert.equal((await req('/api/v2/ai/analyze',{case_id:payload.case.case_id},{Cookie:session})).status,200);
   // Race competing global reservations using actual D1 transactions.
   await db
     .prepare("INSERT OR REPLACE INTO quotas VALUES(date('now'),'nim',39)")

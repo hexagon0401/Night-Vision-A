@@ -96,3 +96,10 @@ test("ingestion rejects credential URLs and invalid geography", () => {
   ).toThrow();
   expect(() => validateRecord({ ...record, lat: 300, lon: 0 })).toThrow();
 });
+
+import {generationOptions,reasoningMode} from '../../../services/cloudflare/nim.js';
+test('only the documented Nemotron model gets thinking control; no unsupported High flag',()=>{
+ expect(generationOptions('nvidia/nemotron-3.5-lightning-30b-a3b')).toEqual({chat_template_kwargs:{enable_thinking:false}});
+ expect(generationOptions('meta/llama-3.3-70b-instruct')).toEqual({});
+ expect(reasoningMode('meta/llama-3.3-70b-instruct')).toBe('provider_default');
+});

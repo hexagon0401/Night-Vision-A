@@ -1,3 +1,4 @@
+import {completion,reasoningMode,nimHealth} from './nim.js';
 import {ApiError,requireValue,body,json,stmt,rows,sha,utcDay} from './core.js';
 import {nimKeys} from './credentials.js';
 import {reserve} from './ai.js';
@@ -30,7 +31,7 @@ export async function betaRoute(request,env,path,actor){
   requireValue(nimKeys(env).primary&&nimKeys(env).review&&env.NIM_ENABLED==='true','nim_not_enabled',503);
   const id='beta-'+utcDay()+'-'+(await sha(JSON.stringify([d.topic,d.cutoff]))).slice(0,12);const old=await stmt(env.DB,'SELECT id FROM beta_runs WHERE day=?',utcDay()).first();
   if(old){requireValue(old.id===id,'beta_daily_run_limit',429);return json(await runView(env,id));}
-  const model={analyst:env.NIM_MODEL,critic:env.NIM_REVIEW_MODEL,reasoning_effort:'provider_default; High not asserted',output_tokens:{analyst:4096,critic:2048}};
+  const model={analyst:env.NIM_MODEL,critic:env.NIM_REVIEW_MODEL,reasoning_effort:'per-step settings; High not asserted',output_tokens:{analyst:4096,critic:2048}};
   await env.DB.batch([stmt(env.DB,'INSERT INTO beta_runs VALUES(?,?,?,?,?,?,?,?,?)',id,utcDay(),d.topic,d.cutoff,new Date().toISOString(),'running',JSON.stringify(d),JSON.stringify(model),actor.run_id),...Array.from({length:6},(_,step)=>stmt(env.DB,'INSERT INTO beta_steps(run_id,step,state) VALUES(?,?,?)',id,step,'pending'))]);return json(await runView(env,id));
  }
  requireValue(typeof d.id==='string'&&/^beta-[a-zA-Z0-9-]+$/.test(d.id),'invalid_beta_id');
@@ -45,13 +46,13 @@ export async function betaRoute(request,env,path,actor){
  const lock=await stmt(env.DB,"UPDATE beta_steps SET state='running',input_hash=?,lease_until=? WHERE run_id=? AND step=? AND (state='pending' OR (state='failed' AND ?=1) OR (state='running' AND lease_until<?)) RETURNING step",inputHash,Date.now()+180000,d.id,index,d.retry===true?1:0,Date.now()).first();requireValue(lock,'beta_step_busy_or_failed',409);
  const model=role==='analyst'?run.models.analyst:run.models.critic,start=Date.now();
  try{
+  const pause=await stmt(env.DB,'SELECT value FROM settings WHERE key=?','nim-paused:'+utcDay()+':'+model).first();
+  requireValue(!pause,'nim_quota_or_access_paused',429);
   await reserve(env.DB,'beta',role==='critic');
-  const response=await fetch('https://integrate.api.nvidia.com/v1/chat/completions',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(90000),headers:{Authorization:'Bearer '+(role==='analyst'?nimKeys(env).primary:nimKeys(env).review),'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0.1,max_tokens:role==='analyst'?4096:2048,stream:false,messages:[{role:'system',content:betaPrompt(role,round)},{role:'user',content:JSON.stringify(packet)}]})});
-  requireValue(response.ok,'beta_nim_http_'+response.status,response.status===429||response.status===402?429:502);
-  const outer=await response.json(),choice=outer.choices?.[0];requireValue(choice?.finish_reason!=='length','beta_truncated_response',502);let report;
-  try{report=JSON.parse(choice.message.content.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,''));}catch{throw new ApiError(502,'beta_invalid_json');}
+  const {report,diagnostic}=await completion(env,{model,key:role==='analyst'?nimKeys(env).primary:nimKeys(env).review,maxTokens:role==='analyst'?4096:2048,timeout:90000,messages:[{role:'system',content:betaPrompt(role,round)},{role:'user',content:JSON.stringify(packet)}]});
   validateBetaOutput(report,role,new Set(run.input.sources.map(s=>s.id)));
-  const output={round,role,model,provider_model:outer.model??null,prompt_hash:await sha(betaPrompt(role,round)),runtime_version:env.CF_VERSION_METADATA?.id??null,report,usage:outer.usage??null,duration_ms:Date.now()-start,finished_at:new Date().toISOString(),input_hash:inputHash,reasoning_effort:'provider_default'};
+  await nimHealth(env,model,{state:'available',...diagnostic});
+  const output={round,role,model,provider_model:diagnostic.provider_model,prompt_hash:await sha(betaPrompt(role,round)),runtime_version:env.CF_VERSION_METADATA?.id??null,report,usage:diagnostic.usage,duration_ms:Date.now()-start,finished_at:new Date().toISOString(),input_hash:inputHash,reasoning_effort:reasoningMode(model)};
   await env.DB.batch([stmt(env.DB,"UPDATE beta_steps SET state='complete',output=?,error=NULL WHERE run_id=? AND step=?",JSON.stringify(output),d.id,index),stmt(env.DB,'UPDATE beta_runs SET input=?,state=? WHERE id=?',JSON.stringify(run.input),index===5?'complete':'running',d.id)]);return json(output);
- }catch(e){const code=e instanceof ApiError?e.message:'beta_upstream_or_generation_failed';await env.DB.batch([stmt(env.DB,"UPDATE beta_steps SET state='failed',error=? WHERE run_id=? AND step=?",code,d.id,index),stmt(env.DB,"UPDATE beta_runs SET state='paused' WHERE id=?",d.id)]);throw new ApiError(e instanceof ApiError?e.status:502,code);}
+ }catch(e){const code=e instanceof ApiError?e.message:'beta_upstream_or_generation_failed';await nimHealth(env,model,{state:'unavailable',error:code,...(e.diagnostic??{})});await env.DB.batch([stmt(env.DB,"UPDATE beta_steps SET state='failed',error=?,output=? WHERE run_id=? AND step=?",code,e.diagnostic?JSON.stringify({diagnostic:e.diagnostic}):null,d.id,index),stmt(env.DB,"UPDATE beta_runs SET state='paused' WHERE id=?",d.id)]);throw new ApiError(e instanceof ApiError?e.status:502,code);}
 }

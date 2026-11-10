@@ -41,7 +41,7 @@ def main():
    if args.prepare_only:return
    if len(sources)<2:raise ValueError('insufficient_accessible_sources; no model report generated')
    archive=Path('extensions/claude/v3/night_vision_v3.skill');framework_hash=hashlib.sha256(archive.read_bytes()).hexdigest()
-   run=post('start',{'topic':TOPIC,'cutoff':cutoff.isoformat(),'sources':sources,'framework_sha256':framework_hash,'search_audit':research.audit,'comparison_prompt':common_prompt(cutoff),'framework':'NV Engine 2.0 beta-loop/1, informed by archived V3'} )
+   run=post('start',{'topic':TOPIC,'cutoff':cutoff.isoformat(),'sources':sources,'framework_sha256':framework_hash,'search_audit':research.audit,'comparison_prompt':common_prompt(cutoff),'framework':'NV Engine 2.0 beta-loop/2, informed by archived V3'} )
   (out/'run.json').write_text(json.dumps(run,ensure_ascii=False,indent=2));print('Beta run:',run['id'])
   for step in range(6):
    if time.monotonic()-started>1000:raise ValueError('beta_job_time_budget')

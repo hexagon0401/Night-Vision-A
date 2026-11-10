@@ -373,6 +373,8 @@ export async function publicData(url, env) {
       runs: runs.map((r) => JSON.parse(r.body)),
       last_success: last?.completed ?? null,
       stale: !last || Date.now() - Date.parse(last.completed) > 5 * 3600000,
+      monitoring_state: !runs.length ? 'not_started' : providers.length ? 'active' : 'waiting_for_sources',
+      ai_health: (await rows(db,"SELECT value FROM settings WHERE key LIKE 'nim-health:%' LIMIT 4")).map(r=>JSON.parse(r.value)),
       ai_configured: !!nimKeys(env).primary,
       runtime_version: env.CF_VERSION_METADATA?.id ?? null,
       ai_enabled: !!nimKeys(env).primary && env.NIM_ENABLED === "true",
@@ -458,7 +460,17 @@ export async function publicData(url, env) {
     return json({
       result: result ? JSON.parse(result.body) : null,
       analyzed_at: result?.created ?? null,
+      statistical: await statisticalSummary(db),
     });
   }
   throw new ApiError(404, "not_found");
+}
+
+export async function statisticalSummary(db) {
+ const providers=await rows(db,'SELECT s.provider,s.metadata FROM heads h JOIN snapshots s ON s.id=h.snapshot');
+ const count=await stmt(db,'SELECT COUNT(*) records FROM records r JOIN heads h ON r.snapshot=h.snapshot').first();
+ const cases=await rows(db,'SELECT c.body FROM cases c JOIN heads h ON c.snapshot=h.snapshot');
+ const candidates=cases.reduce((n,c)=>n+(JSON.parse(c.body).analysis?.anomalies?.length??0),0);
+ return {mode:'statistical',generated_at:new Date().toISOString(),providers:providers.map(p=>({provider:p.provider,metadata:JSON.parse(p.metadata)})),records:count.records,candidates,
+   note:providers.length?'게시된 자료에 대한 규칙·통계 집계입니다. AI 분석이나 예측 정확도를 뜻하지 않습니다.':'최초 수집 전입니다. 자료가 없다는 사실로 실제 사건 부재를 판단할 수 없습니다.'};
 }
