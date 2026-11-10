@@ -135,3 +135,11 @@ test('short model citations round-trip to exactly the supplied source records',(
  expect(restored.summary[0]).toEqual({text:'Claim [S:source:canonical-1]',source_ids:['source:canonical-1']});
  expect(()=>restoreCitations({summary:[{text:'invented',source_ids:['S99']}]},aliases)).toThrow('ai_unknown_source');
 });
+
+import {caseEvidence} from '../../../services/cloudflare/ai.js';
+test('case evidence includes bounded real detector context rather than claims alone',()=>{
+ const sources=Array.from({length:65},(_,i)=>({source_id:'source:'+i,publisher:'TEST',url:'https://example.test/',published_at_utc:null,retrieved_at_utc:'2026-01-01T00:00:00Z'}));
+ const payload={case:{case_id:'test',title:'SYNTHETIC TEST',sources,claims:[],observations:[{observation_id:'o1',observed_at_utc:'2026-01-01T00:00:00Z',metric:'test',value:3,unit:'count',evidence_status:'reported',provenance:{source_ids:['source:64']}}]},analysis:{anomalies:[{anomaly_id:'a1',observation_ids:['o1'],detector:'median-mad',baseline_description:'prior median=1',window_end_utc:'2026-01-01',window_start_utc:'2025-12-01',score:8,provenance:{source_ids:sources.map(s=>s.source_id)}}],warnings:[]}};
+ const e=caseEvidence(payload);expect(e.sources).toHaveLength(65);expect(e.candidates[0].baseline_description).toBe('prior median=1');expect(e.observations[0].value).toBe(3);
+ expect(JSON.stringify(evidenceAliases(e).packet).length).toBeLessThan(18000);
+});

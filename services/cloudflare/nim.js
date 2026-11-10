@@ -5,7 +5,7 @@ import {ApiError,stmt,requireValue} from './core.js';
 // https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b
 export function generationOptions(model) {
  const known=['meta/llama-3.3-70b-instruct','mistralai/mistral-large-2-instruct'].includes(model);
- return {...(known?{response_format:{type:'json_object'}}:{}),...(model==='nvidia/nemotron-3.5-lightning-30b-a3b'?{chat_template_kwargs:{enable_thinking:false}}:{})};
+ return {...(known?{response_format:{type:'json_object'}}:{}),...(['nvidia/nemotron-3.5-lightning-30b-a3b','nvidia/nemotron-3.5-super-vl-120b-a12b'].includes(model)?{chat_template_kwargs:{enable_thinking:false}}:{})};
 }
 export function parseCompletion(text) {
  let clean=text.trim();
@@ -35,6 +35,10 @@ const ACTIVE_PRIMARY='nvidia/nemotron-3.5-lightning-30b-a3b';
 export async function selectModel(env,requested,role='analyst') {
  // Retired Llama and its unavailable migration target never become a key or
  // quota rotation. Use the existing first-party model with the same role key.
+ if(role==='analyst'&&requested===ACTIVE_PRIMARY) {
+  const health=await stmt(env.DB,'SELECT value FROM settings WHERE key=?','nim-health:'+requested).first();
+  if(health&&['invalid_ai_response','ai_uncited_summary','ai_unknown_source','nim_truncated_response'].includes(JSON.parse(health.value).error)) return {model:'nvidia/nemotron-3.5-super-vl-120b-a12b',requested_model:requested,fallback_reason:'primary_grounding_or_format_failure',shared_model_with_critic:false};
+ }
  if(requested==='meta/llama-3.3-70b-instruct') return {model:ACTIVE_PRIMARY,requested_model:requested,fallback_reason:'provider_model_retired',shared_model_with_critic:true};
  return {model:requested,requested_model:requested,fallback_reason:null,shared_model_with_critic:requested===ACTIVE_PRIMARY&&env.NIM_REVIEW_MODEL==='meta/llama-3.3-70b-instruct'};
 }
