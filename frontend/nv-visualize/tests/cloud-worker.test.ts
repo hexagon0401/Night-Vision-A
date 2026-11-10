@@ -143,3 +143,13 @@ test('case evidence includes bounded real detector context rather than claims al
  const e=caseEvidence(payload);expect(e.sources).toHaveLength(65);expect(e.candidates[0].baseline_description).toBe('prior median=1');expect(e.observations[0].value).toBe(3);
  expect(JSON.stringify(evidenceAliases(e).packet).length).toBeLessThan(18000);
 });
+
+
+test('case baseline citations retain all known references within the evidence bound', () => {
+ const ids=Array.from({length:65},(_,i)=>'S'+(i+1));
+ const answer={summary:[{text:'Synthetic test baseline',source_ids:ids}],alternatives:[],counterevidence:[],unknowns:[]};
+ expect(validateAnswer(answer,new Set(ids))).toBe(answer);
+ expect(()=>validateAnswer(answer,new Set(ids.slice(1)))).toThrow('ai_unknown_source');
+ const tooMany=Array.from({length:73},(_,i)=>'S'+i);
+ expect(()=>validateAnswer({...answer,summary:[{text:'Synthetic',source_ids:tooMany}]},new Set(tooMany))).toThrow('invalid_ai_response');
+});
