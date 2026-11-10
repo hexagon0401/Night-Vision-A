@@ -391,11 +391,14 @@ export async function publicData(url, env) {
       sql += " AND r.country=?";
       args.push(country);
     }
-    sql += " ORDER BY r.day DESC,r.id LIMIT 501";
+    const limit=Number(url.searchParams.get('limit')??500);
+    requireValue(Number.isInteger(limit)&&limit>=1&&limit<=500,'invalid_limit');
+    sql += " ORDER BY r.day DESC,r.id LIMIT ?";args.push(limit+1);
     const records = await rows(db, sql, ...args);
     return json({
-      records: records.slice(0, 500).map((r) => JSON.parse(r.body)),
-      limited: records.length > 500,
+      records: records.slice(0, limit).map((r) => JSON.parse(r.body)),
+      limited: records.length > limit,
+      limit,
     });
   }
   if (path === "/api/v2/overview") {

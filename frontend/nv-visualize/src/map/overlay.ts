@@ -7,6 +7,7 @@ import type { Point } from "../cases/model";
 export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: () => void) {
   const source = "nv-overlay";
   const ids = ["nv-direct", "nv-inferred", "nv-scenario", "nv-events", "nv-markers", "nv-counts"];
+  let lastRendered: MapData | undefined;
   let latest: MapData | undefined, destroyed = false, notified = false;
   const arc = (points: Point[], progress: number): Point[] => {
     if (points.length < 2) return points;
@@ -35,6 +36,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
   const render = (data: MapData) => {
     latest = data;
     if (destroyed) return;
+    if(map.getSource(source)&&lastRendered===data&&!data.trace&&!data.candidates.some(c=>c.point))return;
     if (!map.getSource(source)) {
       if (!map.isStyleLoaded()) return;
       map.addSource(source,{type:"geojson",data:{type:"FeatureCollection",features:[]}});
@@ -44,6 +46,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
       map.addLayer({id:"nv-markers",type:"circle",source,filter:["==",["get","kind"],"marker"],paint:{"circle-radius":["case",[">",["get","count"],1],12,7],"circle-color":["case",["get","selected"],"#ebebe6","#181818"],"circle-stroke-color":"#ebebe6","circle-stroke-width":1.2}});
       map.addLayer({id:"nv-counts",type:"symbol",source,filter:["all",["==",["get","kind"],"marker"],[">",["get","count"],1]],layout:{"text-field":["to-string",["get","count"]],"text-font":["Noto Sans Regular"],"text-size":11,"text-allow-overlap":true},paint:{"text-color":"#f2f2f0"}});
     }
+    lastRendered=data;
     const features: Feature<Geometry>[] = [];
     const point = (p:Point,properties:Record<string,unknown>) => features.push({type:"Feature",geometry:{type:"Point",coordinates:p},properties});
     const markers=groupMarkers(data);

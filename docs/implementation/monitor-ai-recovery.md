@@ -29,3 +29,9 @@ Public map/statistics remain usable independently of AI. An always-visible monit
 The repaired source cycle published 1,764 recent UCDP records and 116 uncalibrated candidates. Counts are dataset observations/candidates, not verified threats or detector accuracy. UCDP publication lag remains distinct from check time. RSS is still opt-in pending terms review; no external notifications, permanent server or GPU were added. Free provider/Workers/D1 limits remain authoritative.
 
 References inspected: https://ucdp.uu.se/apidocs/ · https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b · https://build.nvidia.com/meta/llama-3_3-70b-instruct · https://integrate.api.nvidia.com/v1/models.
+
+Ordinary short-summary interoperability accepts text items, explicitly supplied scalar/alias citation IDs and omitted uncertainty sections without adding factual support. Unknown citations and links/coordinates still fail validation, including invented inline citation IDs. Format adaptations are recorded; omitted sections do not imply a completed review. Response diagnostics contain field names/types rather than model reasoning or raw text. Full beta phase/evaluation requirements remain strict.
+
+With live data present, the initial world view requests 100 recent records and advertises truncation. Country/period filters request up to 500. Complete dataset statistics/detection remain unchanged. Native static event overlays do not resubmit identical GeoJSON on camera movement; candidate clustering and Trace remain dynamic.
+
+Ordinary model requests use short, server-generated source aliases (S1, S2...) and an explicit allowed-ID list. Every alias is a bijective mapping to an already-selected canonical record; returned IDs and inline markers are mapped back only after validation. No source link is guessed or invented. The mapping is recorded for reproducibility and cache identity retains the canonical evidence.

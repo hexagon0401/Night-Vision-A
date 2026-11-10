@@ -5,11 +5,13 @@ for (const width of [1440, 390])
   }) => {
     await page.setViewportSize({ width, height: 900 });
     const errors: string[] = [];
+    const eventLimits: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.route("**/*", async (route) => {
       const u = new URL(route.request().url());
       if (u.hostname !== "127.0.0.1") return route.abort();
       if (!u.pathname.startsWith("/api/")) return route.continue();
+      if(u.pathname==="/api/v2/events")eventLimits.push(u.searchParams.get("limit")??"");
       const responses: Record<string, unknown> = {
         "/api/v2/status": {
           runs_per_day: 12,
@@ -71,6 +73,10 @@ for (const width of [1440, 390])
       page.getByRole("heading", { name: "세계 분쟁 감시" }),
     ).toBeVisible();
     await expect(page.locator(".monitor-status")).toContainText("하루 12회");
+    expect(eventLimits).toContain('100');
+    await page.getByLabel('국가 선택').selectOption('SYNTHETIC TEST');
+    await page.getByRole('button',{name:'조회',exact:true}).click();
+    await expect.poll(()=>eventLimits.at(-1)).toBe('500');
     await page
       .getByRole("button", { name: "2026-11-01 · SYNTHETIC TEST <img src=x>" })
       .click();
