@@ -1,6 +1,6 @@
 """Resumable bounded UCDP annual + Candidate acquisition, with revision lineage."""
 from datetime import date,datetime,timedelta,timezone
-import hashlib,json,sqlite3,time
+import hashlib,json,sqlite3,time,re
 from pathlib import Path
 import httpx
 
@@ -31,6 +31,24 @@ def normalize(row,version,acquired):
         'hash':digest(row),'acquired_at':acquired,**values}
 
 
+def published_candidate(now,client=None):
+    """Read bounded public version metadata without sending the API credential."""
+    owned=client is None;client=client or httpx.Client(timeout=10,follow_redirects=False)
+    try:
+        with client.stream('GET','https://ucdp.uu.se/apidocs/') as response:
+            if response.status_code!=200:return None
+            content=bytearray()
+            for chunk in response.iter_bytes():
+                if len(content)+len(chunk)>300000:return None
+                content.extend(chunk)
+        versions=set(re.findall(r'(?<![0-9.])(\d{2}\.0\.\d{1,2})(?![0-9.])',content.decode('utf8','replace')))
+        eligible=[v for v in versions if now.year-1<=int(v.split('.')[0])+2000<=now.year and 1<=int(v.split('.')[2])<=12 and (int(v.split('.')[0])+2000,int(v.split('.')[2]))<=(now.year,now.month)]
+        return max(eligible,key=lambda v:tuple(map(int,v.split('.')))) if eligible else None
+    except httpx.HTTPError:return None
+    finally:
+        if owned:client.close()
+
+
 class MonitorState:
     def __init__(self,path):
         Path(path).parent.mkdir(parents=True,exist_ok=True)
@@ -54,7 +72,7 @@ class UCDPMonitor:
     def __init__(self,state,token,client=None,now=None,max_requests=500,sleep=time.sleep,permit=None):
         self.state=state;self.token=token;self.client=client or httpx.Client(timeout=30,follow_redirects=False);self.owned=client is None
         self.now=now or datetime.now(timezone.utc);self.max_requests=max_requests;self.sleep=sleep;self.used=0;self.permit=permit;self.candidate_cached=False
-    def get(self,version,page=1,size=250,window=None):
+    def get(self,version,page=1,size=250,window=None,missing_ok=False):
         if not self.token:raise ValueError('missing_UCDP_ACCESS_TOKEN')
         if self.permit:self.permit()
         self.state.charge(self.now.date().isoformat(),self.max_requests);self.used+=1
@@ -64,22 +82,26 @@ class UCDPMonitor:
         try:r=self.client.get('https://ucdpapi.pcr.uu.se/api/gedevents/'+version,params=params,headers={'x-ucdp-access-token':self.token})
         except httpx.HTTPError:raise ValueError('ucdp_transport_failure') from None
         if r.status_code in (401,403):raise ValueError('ucdp_auth_rejected')
-        if r.status_code==404:return None
+        if r.status_code==404 or (missing_ok and r.status_code==400):return None
         if r.status_code==429:raise ValueError('ucdp_rate_limited')
-        if r.status_code!=200:raise ValueError('ucdp_upstream_failure')
+        if r.status_code!=200:raise ValueError('ucdp_upstream_http_'+str(r.status_code))
         if len(r.content)>10000000:raise ValueError('ucdp_response_budget')
         try:d=r.json();records=d.get('Result',d.get('result'))
         except (ValueError,AttributeError):raise ValueError('ucdp_invalid_response') from None
         if not isinstance(records,list):raise ValueError('ucdp_invalid_response')
         return d,records
-    def discover(self,annual='26.1'):
-        # Probe only the current and previous two monthly Candidate versions, never follow NextPageUrl.
-        year,month=self.now.year,self.now.month
+    def discover(self,annual='26.1',hint=None):
+        # Prefer the published version index; otherwise probe three bounded months. Never follow NextPageUrl.
+        year,month=self.now.year,self.now.month;versions=[]
+        if hint and re.fullmatch(r'\d{2}\.0\.\d{1,2}',hint):versions.append(hint)
         for _ in range(3):
-            result=self.get(f'{year-2000}.0.{month}',size=1)
-            if result and result[1]:return f'{year-2000}.0.{month}'
+            version=f'{year-2000}.0.{month}'
+            if version not in versions:versions.append(version)
             month-=1
             if month==0:month=12;year-=1
+        for version in versions:
+            result=self.get(version,size=1,missing_ok=True)
+            if result and result[1]:return version
         # Temporary discovery gaps must not erase the last completed monthly data.
         cutoff=int(annual.split('.')[0])+1999
         cached=[v for (v,) in self.state.db.execute('SELECT version FROM cursors WHERE complete=1') if '.0.' in v and int(v.split('.')[0])+2000>cutoff]

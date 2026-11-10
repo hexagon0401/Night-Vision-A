@@ -97,9 +97,16 @@ test("ingestion rejects credential URLs and invalid geography", () => {
   expect(() => validateRecord({ ...record, lat: 300, lon: 0 })).toThrow();
 });
 
-import {generationOptions,reasoningMode} from '../../../services/cloudflare/nim.js';
+import {generationOptions,reasoningMode,parseCompletion} from '../../../services/cloudflare/nim.js';
 test('only the documented Nemotron model gets thinking control; no unsupported High flag',()=>{
- expect(generationOptions('nvidia/nemotron-3.5-lightning-30b-a3b')).toEqual({chat_template_kwargs:{enable_thinking:false}});
- expect(generationOptions('meta/llama-3.3-70b-instruct')).toEqual({});
+ expect(generationOptions('nvidia/nemotron-3.5-lightning-30b-a3b')).toEqual({response_format:{type:'json_object'},chat_template_kwargs:{enable_thinking:false}});
+ expect(generationOptions('meta/llama-3.3-70b-instruct')).toEqual({response_format:{type:'json_object'}});
  expect(reasoningMode('meta/llama-3.3-70b-instruct')).toBe('provider_default');
+});
+
+test('provider formatting is normalized without inventing JSON or exposing reasoning',()=>{
+ expect(parseCompletion(' \n```json\n{"summary":[]}\n``` \n')).toEqual({summary:[]});
+ expect(parseCompletion('</think>\n{"summary":[]}')).toEqual({summary:[]});
+ expect(()=>parseCompletion('<think>private reasoning</think>{"summary":[]}')).toThrow();
+ expect(()=>parseCompletion('{"summary":[')).toThrow();
 });

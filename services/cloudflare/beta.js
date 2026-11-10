@@ -44,7 +44,7 @@ export async function betaRoute(request,env,path,actor){
  requireValue(JSON.stringify(packet).length<=70000,'beta_input_budget',413);
  const inputHash=await sha(JSON.stringify([role,round,packet]));
  const lock=await stmt(env.DB,"UPDATE beta_steps SET state='running',input_hash=?,lease_until=? WHERE run_id=? AND step=? AND (state='pending' OR (state='failed' AND ?=1) OR (state='running' AND lease_until<?)) RETURNING step",inputHash,Date.now()+180000,d.id,index,d.retry===true?1:0,Date.now()).first();requireValue(lock,'beta_step_busy_or_failed',409);
- await stmt(env.DB,'UPDATE beta_runs SET input=? WHERE id=?',JSON.stringify(run.input),d.id).run();
+ await stmt(env.DB,"UPDATE beta_runs SET input=?,state='running' WHERE id=?",JSON.stringify(run.input),d.id).run();
  const model=role==='analyst'?run.models.analyst:run.models.critic,start=Date.now();
  try{
   const pause=await stmt(env.DB,'SELECT value FROM settings WHERE key=?','nim-paused:'+utcDay()+':'+model).first();
