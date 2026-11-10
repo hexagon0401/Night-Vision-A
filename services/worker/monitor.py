@@ -81,6 +81,7 @@ def main():
                             if version_rows:intervals.append((min(r['day'] for r in version_rows),max(r['end_day'] for r in version_rows)))
                         metadata['coverage_intervals']=intervals
                         metadata['candidate_cached']=monitor.candidate_cached
+                        metadata['invalid_fatality_estimates']=sum(r.get('fatality_validation')=='invalid_provider_estimates' for r in recent)
                         cases=build_cases(aggregates,now,coverage_intervals=intervals) if aggregates else []
                         for case in cases:case['payload']['map_context']=[r for r in recent if r['country']==case['country'] and r['lat'] is not None][-250:]
                         snapshot=publisher.snapshot('ucdp',recent,metadata,cases)

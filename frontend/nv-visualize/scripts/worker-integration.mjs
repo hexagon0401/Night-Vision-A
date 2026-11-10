@@ -333,7 +333,8 @@ try {
   assert.equal((await req('/api/internal/beta/start',{...betaInput,topic:'different'},betaHeaders)).status,429);
   await db.prepare('INSERT OR REPLACE INTO settings VALUES(?,?)').bind('nim-health:nvidia/nemotron-3.5-lightning-30b-a3b',JSON.stringify({error:'nim_truncated_response'})).run();
   const selected=await selectModel({DB:db,NIM_REVIEW_MODEL:'meta/llama-3.3-70b-instruct'},'nvidia/nemotron-3.5-lightning-30b-a3b');
-  assert.equal(selected.model,'meta/llama-3.3-70b-instruct');assert.equal(selected.shared_model_with_critic,true);
+  assert.equal(selected.model,'mistralai/mistral-large-2-instruct');assert.equal(selected.shared_model_with_critic,true);
+  assert.equal((await selectModel({DB:db},'meta/llama-3.3-70b-instruct','critic')).model,'mistralai/mistral-large-2-instruct');
   await db.prepare("DELETE FROM settings WHERE key='nim-health:nvidia/nemotron-3.5-lightning-30b-a3b'").run();
   // Six major calls plus at most two bounded retries; the global cap stays 40.
   await db.prepare("UPDATE quotas SET count=7 WHERE bucket='user:beta' AND day=date('now')").run();

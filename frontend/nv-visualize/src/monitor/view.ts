@@ -14,6 +14,8 @@ interface EventRecord {
   best?: number | null;
   high?: number | null;
   version?: string;
+  upstream_estimates?: {low: number|null; best:number|null; high:number|null};
+  fatality_validation?:string;
   source_url: string;
   acquired_at?: string;
   hash: string;
@@ -244,7 +246,7 @@ export function mountMonitor(
         }
       }
     }
-    if(data.fallback_reason) parent.append(el('p',`분석 모델 대체: ${data.requested_model} → ${data.model}. 분석과 검토에 같은 모델을 사용하며, 두 결과의 일치는 독립 검증이 아닙니다.`));
+    if(data.fallback_reason) parent.append(el('p',`분석 모델 대체: ${data.requested_model} → ${data.model}. 같은 모델을 분석과 검토에 사용한 경우 두 결과의 일치는 독립 검증이 아닙니다.`));
     parent.append(
       el(
         "p",
@@ -276,6 +278,7 @@ export function mountMonitor(
           `사망자 추정: 최저 ${r.low ?? "미상"} / 최적 ${r.best ?? "미상"} / 최고 ${r.high ?? "미상"}`,
         ),
       );
+    if(r.fatality_validation==='invalid_provider_estimates') detail.append(el('p',`원본 사망자 추정값을 유효한 범위로 확정할 수 없어 사망자 집계에서 제외했습니다. 원본 보존: ${JSON.stringify(r.upstream_estimates)}. 미상으로 처리하며 0명으로 바꾸지 않습니다.`));
     detail.append(
       el(
         "p",
@@ -397,6 +400,8 @@ export function mountMonitor(
       }
       if (!d.providers.length)
         status.append(el("p", "공급원 연결·최초 수집 대기 중입니다."));
+      const invalidEstimates=d.providers.reduce((n:number,p:any)=>n+(p.metadata.invalid_fatality_estimates??0),0);
+      if(invalidEstimates) status.append(el('p',`사망자 추정값 미확정 ${invalidEstimates}건 · 미상으로 집계하며 원본 값은 보존합니다.`));
       const lastRun=d.runs?.[0];
       notice.textContent = !d.providers.length ? '수집 대기 · 현황에서 연결 확인' : d.stale ? '자료 갱신 지연 · 현황 확인' : '감시 자료 게시됨 · 현황 확인';
       if (!d.providers.length) {

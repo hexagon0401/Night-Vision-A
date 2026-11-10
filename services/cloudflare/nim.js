@@ -4,7 +4,7 @@ import {ApiError,stmt,requireValue} from './core.js';
 // Keep the existing model, but reserve its bounded completion for the JSON report.
 // https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b
 export function generationOptions(model) {
- const known=['nvidia/nemotron-3.5-lightning-30b-a3b','meta/llama-3.3-70b-instruct'].includes(model);
+ const known=['nvidia/nemotron-3.5-lightning-30b-a3b','meta/llama-3.3-70b-instruct','mistralai/mistral-large-2-instruct'].includes(model);
  return {...(known?{response_format:{type:'json_object'}}:{}),...(model==='nvidia/nemotron-3.5-lightning-30b-a3b'?{chat_template_kwargs:{enable_thinking:false}}:{})};
 }
 export function parseCompletion(text) {
@@ -16,12 +16,17 @@ export function parseCompletion(text) {
 }
 export const reasoningMode=model=>generationOptions(model).chat_template_kwargs
  ? 'thinking_disabled_for_structured_output' : 'provider_default';
+const RETIRED={'meta/llama-3.3-70b-instruct':'mistralai/mistral-large-2-instruct'};
 export async function selectModel(env,requested,role='analyst') {
- if(role!=='analyst'||requested!=='nvidia/nemotron-3.5-lightning-30b-a3b'||env.NIM_REVIEW_MODEL!=='meta/llama-3.3-70b-instruct') return {model:requested,requested_model:requested,fallback_reason:null};
+ // The legacy Llama API ended on 2026-08-25 and returns 410. The replacement
+ // is in NVIDIA's current public catalog; no billing plan or API key changes.
+ if(RETIRED[requested]) return {model:RETIRED[requested],requested_model:requested,fallback_reason:'provider_model_retired'};
+ const alternate=RETIRED[env.NIM_REVIEW_MODEL]??env.NIM_REVIEW_MODEL;
+ if(role!=='analyst'||requested!=='nvidia/nemotron-3.5-lightning-30b-a3b'||alternate!=='mistralai/mistral-large-2-instruct') return {model:requested,requested_model:requested,fallback_reason:null};
  const health=await stmt(env.DB,'SELECT value FROM settings WHERE key=?','nim-health:'+requested).first();
  const failure=health?JSON.parse(health.value):null;
  // Response-format fallback only: same A key, same budgets, never an access/quota bypass.
- if(['invalid_ai_response','nim_truncated_response'].includes(failure?.error)) return {model:env.NIM_REVIEW_MODEL,requested_model:requested,fallback_reason:'primary_structured_output_failure',shared_model_with_critic:true};
+ if(['invalid_ai_response','nim_truncated_response'].includes(failure?.error)) return {model:alternate,requested_model:requested,fallback_reason:'primary_structured_output_failure',shared_model_with_critic:true};
  return {model:requested,requested_model:requested,fallback_reason:null};
 }
 export async function nimHealth(env,model,health) {
@@ -36,7 +41,7 @@ export async function completion(env,{model,key,messages,maxTokens,timeout=60000
    body:JSON.stringify({model,temperature:.1,max_tokens:maxTokens,stream:false,...generationOptions(model),messages}),
   });
   diagnostic.http_status=response.status;
-  if([401,402,403,404,429].includes(response.status)) {
+  if([401,402,403,404,410,429].includes(response.status)) {
    await stmt(env.DB,'INSERT OR REPLACE INTO settings VALUES(?,?)','nim-paused:'+new Date().toISOString().slice(0,10)+':'+model,String(response.status)).run();
    throw new ApiError([402,429].includes(response.status)?429:503,'nim_quota_or_model_unavailable');
   }
