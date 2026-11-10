@@ -9,8 +9,8 @@ export function temporal(record,time,live=false) {if(live)return 'present_contex
 export function item(provider,kind,id,title,url,now) {
  return {id:provider+':'+id,kind,provider_id:provider,source_id:provider+':'+id,title:String(title).slice(0,500),url:safeURL(url),thumbnail_url:null,description:null,publisher:null,author:null,acquired_at_utc:now,published_at_utc:null,observed_from_utc:null,observed_to_utc:null,location:{lat:null,lon:null,accuracy_m:null,geometry_geojson:null,location_claim:null},satellite:null,camera:null,temporal_role:'unknown',evidence_role:'context_only',relation_reasons:[],disconfirming_checks:['Same place or date is not proof of incident identity.'],relevance:{tier:'unscored',feature_scores:{}},media_license_status:'link_only',attribution:null,source_independence_group:null,warnings:[],raw_source_ref:null};
 }
-export async function boundedJSON(url,options={},max=1000000) {
- const response=await fetch(url,{...options,redirect:'manual',signal:AbortSignal.timeout(10000)});
+export async function boundedJSON(url,options={},max=1000000,timeoutMs=10000) {
+ const response=await fetch(url,{...options,redirect:'manual',signal:AbortSignal.timeout(timeoutMs)});
  if(response.status===429){const seconds=Number(response.headers.get('retry-after'));const e=new Error('rate_limited');e.retry=new Date(Date.now()+(Number.isFinite(seconds)&&seconds>0?Math.min(seconds,86400):3600)*1000).toISOString();throw e;}
  if(!response.ok)throw new Error('upstream_http_'+response.status);
  if(!response.headers.get('content-type')?.includes('json'))throw new Error('upstream_not_json');

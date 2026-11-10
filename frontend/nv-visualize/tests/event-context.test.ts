@@ -37,3 +37,8 @@ test('camera provider returns only current-context metadata and an official link
 });
 
 test('changed canonical event hashes invalidate the selected-record client view',()=>expect(()=>readContext(fixture,fixture.event_ref.id,'b'.repeat(64))).toThrow('갱신'));
+
+test('historical scene search queries both sides rather than only the newest page',async()=>{
+ const ranges:string[]=[];vi.stubGlobal('fetch',vi.fn(async(_url:any,opts:any)=>{const q=JSON.parse(opts.body);ranges.push(q.datetime);return Response.json({features:[]});}));
+ await discover({id:'earth_search_stac'},event,fixture.generated_at_utc);expect(ranges).toHaveLength(2);expect(ranges[0]).toContain('2025-12-31T23:59:59Z');expect(ranges[1]).toContain('2026-01-01T00:00:00Z');
+});

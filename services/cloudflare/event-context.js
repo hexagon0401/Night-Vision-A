@@ -4,7 +4,7 @@ import {validateRecord} from './data.js';
 import {providers,eligibility,policy} from './provider-policy.js';
 import {discover} from './event-context-providers/discover.js';
 import {shift,validateBundle,roles} from './event-context-providers/common.js';
-const VERSION='context:2';
+const VERSION='context:3';
 export async function resolveEvent(env,id){
  requireValue(/^ucdp:[\w.:-]{1,175}$/.test(id),'invalid_event_id');
  const found=await stmt(env.DB,"SELECT r.body,r.snapshot FROM records r JOIN heads h ON r.snapshot=h.snapshot WHERE r.id=? AND r.kind='ucdp' AND h.provider='ucdp' LIMIT 1",id).first();requireValue(found,'unknown_event',404);
