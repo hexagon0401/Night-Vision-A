@@ -14,7 +14,7 @@ for (const viewport of [
         ? route.continue()
         : route.abort(),
     );
-    await page.goto("/");
+    await page.goto("/?case=synthetic");
     await expect(page.locator('[data-map-ready="true"]')).toBeVisible();
     await expect(page.locator(".demo-label")).toContainText("SYNTHETIC DATA");
     await expect(page.getByRole("region", { name: "후보 증거" })).toBeHidden();
@@ -59,7 +59,7 @@ for (const viewport of [
 test("native map cluster picking opens choices and sourced marker evidence", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?case=synthetic");
   await expect(page.locator('[data-map-ready="true"]')).toBeVisible();
   const bounds = await page
     .getByRole("region", { name: "지정학 지도" })
@@ -83,7 +83,7 @@ test("native map cluster picking opens choices and sourced marker evidence", asy
 test("Trace scenes, language, pause and Explore preserve the selected case", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?case=synthetic");
   await expect(page.locator('[data-map-ready="true"]')).toBeVisible();
   await page.getByRole("button", { name: "Trace", exact: true }).click();
   const dock = page.getByRole("region", { name: "Trace 재생" });
@@ -113,7 +113,7 @@ test("Trace scenes, language, pause and Explore preserve the selected case", asy
 test("Foundry export defaults to observed scope and downloads a real ZIP", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?case=synthetic");
   await expect(page.locator('[data-map-ready="true"]')).toBeVisible();
   await page.getByRole("button", { name: "Export", exact: true }).click();
   const link = page.getByRole("link", { name: "Download Foundry CSV ZIP" });

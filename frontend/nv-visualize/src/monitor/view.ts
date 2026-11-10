@@ -1,3 +1,4 @@
+import {contextDrawer} from "./context/drawer";
 import { accountControl, readSession } from "../ui/controls";
 import { createMap, type MapPort } from "../map/renderer";
 import {icon} from "../ui/controls";
@@ -80,6 +81,7 @@ export function mountMonitor(
   notice.setAttribute('aria-label','감시 상태 확인');
   notice.onclick=()=>{panel.hidden=false;setPanelTab('overview');};
   root.querySelector('main')!.append(notice);
+  let disposeContext=()=>{};
   let records: EventRecord[] = [],
     cases: { id: string; country: string }[] = [],
     selected: EventRecord | null = null,
@@ -266,6 +268,7 @@ export function mountMonitor(
     );
   }
   function clearSelection() {
+    disposeContext();
     selected=null;detail.hidden=true;updateMap();syncSelection();nav.querySelector<HTMLButtonElement>('button')?.focus({preventScroll:true});
   }
   function syncSelection() {
@@ -274,6 +277,7 @@ export function mountMonitor(
     }
   }
   function showEvent(r: EventRecord, focusMap=true) {
+    disposeContext();
     selected=r;detail.hidden=false;if(focusMap)panel.hidden=true;
     updateMap();syncSelection();
     const header=el('div','','inspector-header');
@@ -313,6 +317,9 @@ export function mountMonitor(
     const c=cases.find(c=>c.country===r.country);
     if(c) {const trace=link('관련 추이·Trace','/?case=live&id='+encodeURIComponent(c.id));trace.append(icon(ChevronRight));actions.append(trace);}
     detail.append(actions);
+    const contextHost=el('div'),investigate=button('사건 자료 탐색',()=>{investigate.disabled=true;disposeContext=contextDrawer(contextHost,r.id);contextHost.scrollIntoView({block:'nearest',behavior:'instant'});});
+    investigate.className='investigate-button';const copy=button('링크 복사',()=>{const url=new URL(window.location.href);url.searchParams.set('view','monitor');url.searchParams.set('event',r.id);void navigator.clipboard.writeText(url.href).then(()=>copy.textContent='복사됨').catch(()=>copy.textContent='링크 복사 실패');});
+    const contextActions=el('div','','event-actions');contextActions.append(investigate,copy);detail.append(contextActions,contextHost);
     const provenance=el('details','','event-disclosure verification');const provenanceTitle=el('summary','출처·검증 정보');provenanceTitle.prepend(icon(ShieldCheck));provenance.append(provenanceTitle);
     const facts=el('dl','','event-facts');
     for(const [k,v] of [['자료 버전',`${r.kind.toUpperCase()} ${r.version??'미제공'}`],['자료 구분',r.dataset==='candidate'?'잠정 자료 (Candidate)':r.dataset==='annual'?'연간 확정 자료':'미제공'],['원본 사건 ID',r.upstream_id??r.id],['수집 시각',when(r.acquired_at??null)],['진행 상태','미확인 · 기록 날짜는 현재 상태를 뜻하지 않음'],['원본 해시',r.hash]])facts.append(el('dt',k),el('dd',v));
@@ -415,6 +422,11 @@ export function mountMonitor(
       country.value = previous;
       cases = caseData.cases;
       user = me.user;
+      const requestedEvent=new URL(window.location.href).searchParams.get('event');
+      if(requestedEvent&&!selected&&/^ucdp:[\w.:-]{1,175}$/.test(requestedEvent)) {
+        const record=await api('/api/v2/events/'+encodeURIComponent(requestedEvent)).catch(()=>null);
+        if(record&&!destroyed){if(!records.some(r=>r.id===record.id))records.push(record);showEvent(record);}
+      }
       displayAI(summary, s.result);
       if(s.statistical) {
         const stat=s.statistical;
@@ -436,6 +448,7 @@ export function mountMonitor(
   const authChanged = () => void refresh();
   window.addEventListener("nv:auth-change", authChanged);
   return () => {
+    disposeContext();
     destroyed = true;
     clearInterval(timer);
     window.removeEventListener("nv:auth-change", authChanged);

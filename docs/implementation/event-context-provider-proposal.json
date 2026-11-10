@@ -1,0 +1,140 @@
+{
+  "schema": "nv2-provider-policy-proposal.v1",
+  "as_of": "2026-11-10",
+  "status": "PROPOSAL_NOT_DEPLOYED",
+  "provider_gate_rule": "New providers default disabled until credentials, terms, quota, actual live test, and attribution are reviewed. No browser secret leakage.",
+  "providers": [
+    {
+      "id": "ucdp_existing",
+      "category": "source",
+      "endpoint_docs": "https://ucdp.uu.se/apidocs/index.html",
+      "default_enabled": true,
+      "mode": "already_ingested_event_metadata",
+      "historical": true,
+      "requires_key_for_new_upstream_requests": true,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P0",
+      "event_gate": "all_ucdp_records"
+    },
+    {
+      "id": "gdelt_doc",
+      "category": "article",
+      "endpoint_docs": "https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/",
+      "default_enabled": false,
+      "mode": "title_url_date_metadata_only",
+      "historical": true,
+      "requires_key_for_new_upstream_requests": false,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P0",
+      "event_gate": "text_and_date_queries_supported"
+    },
+    {
+      "id": "earth_search_stac",
+      "category": "satellite",
+      "endpoint_docs": "https://github.com/Element84/earth-search",
+      "default_enabled": false,
+      "mode": "stac_scene_metadata_and_permitted_preview",
+      "historical": true,
+      "requires_key_for_new_upstream_requests": false,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P0",
+      "event_gate": "sufficiently_resolved_geospatial_geometry"
+    },
+    {
+      "id": "nasa_worldview",
+      "category": "satellite",
+      "endpoint_docs": "https://worldview.earthdata.nasa.gov/",
+      "default_enabled": false,
+      "mode": "official_viewer_link_then_wmts_policy_review",
+      "historical": true,
+      "requires_key_for_new_upstream_requests": false,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P1",
+      "event_gate": "remote_sensing_useful_for_incident_type"
+    },
+    {
+      "id": "windy_webcams_v3",
+      "category": "cctv",
+      "endpoint_docs": "https://api.windy.com/webcams/docs",
+      "default_enabled": false,
+      "mode": "licensed_api_and_authorized_embed_or_operator_link",
+      "historical": "timelapse_dependent_on_plan",
+      "requires_key_for_new_upstream_requests": true,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P1",
+      "event_gate": "location_precision_and_camera_catalog_and_relevance"
+    },
+    {
+      "id": "us_road_cameras_official",
+      "category": "cctv",
+      "endpoint_docs": "https://github.com/bilawalsidhu/gods-eye-view/blob/bb40ac5e5477f355b05fcffa9fb3ba3507797f7f/DATA_SOURCES.md",
+      "default_enabled": false,
+      "mode": "regional_operator_catalog_metadata_link_only_first",
+      "historical": false,
+      "requires_key_for_new_upstream_requests": "per_region",
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P1",
+      "event_gate": "regional_catalog_coverage_and_geographic_precision"
+    },
+    {
+      "id": "mapillary_street_photo",
+      "category": "photo",
+      "endpoint_docs": "https://www.mapillary.com/developer",
+      "default_enabled": false,
+      "mode": "permitted_coverage_and_image_link",
+      "historical": true,
+      "requires_key_for_new_upstream_requests": true,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P1",
+      "event_gate": "street_scene_context_relevant"
+    },
+    {
+      "id": "noaa_ais_archive",
+      "category": "ais",
+      "endpoint_docs": "https://coast.noaa.gov/digitalcoast/tools/ais.html",
+      "default_enabled": false,
+      "mode": "historical_aggregate_or_approved_public_subset",
+      "historical": true,
+      "requires_key_for_new_upstream_requests": false,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P2",
+      "event_gate": "us_waters_and_marine_incident"
+    },
+    {
+      "id": "aisstream",
+      "category": "ais",
+      "endpoint_docs": "https://aisstream.io/",
+      "default_enabled": false,
+      "mode": "opt_in_external_relay_and_live_context_only",
+      "historical": false,
+      "requires_key_for_new_upstream_requests": true,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P2",
+      "event_gate": "marine_incident_and_live_context_requested"
+    },
+    {
+      "id": "opensky",
+      "category": "adsb",
+      "endpoint_docs": "https://openskynetwork.github.io/opensky-api/rest.html",
+      "default_enabled": false,
+      "mode": "historical_if_authorized_else_present_context_only",
+      "historical": "permission_and_quota_dependent",
+      "requires_key_for_new_upstream_requests": "for_specific_historical_endpoints",
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P2",
+      "event_gate": "aviation_relevance_explicitly_supported"
+    },
+    {
+      "id": "adsb_lol",
+      "category": "adsb",
+      "endpoint_docs": "https://api.adsb.lol/docs",
+      "default_enabled": false,
+      "mode": "regional_civilian_aggregate_present_context_only",
+      "historical": "not_assumed_from_live_endpoint",
+      "requires_key_for_new_upstream_requests": false,
+      "terms_review_required_for_new_fetches": true,
+      "priority": "P2",
+      "event_gate": "aviation_relevance_explicitly_supported"
+    }
+  ]
+}

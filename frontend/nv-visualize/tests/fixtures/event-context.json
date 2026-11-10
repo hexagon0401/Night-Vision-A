@@ -1,0 +1,41 @@
+{
+  "schema_version": "event_context.v1",
+  "event_ref": {
+    "id": "ucdp:synthetic-test-only",
+    "provider": "ucdp",
+    "upstream_id": "synthetic-test-only",
+    "provider_version": "synthetic-version",
+    "original_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "country": "Fictional country",
+    "title": "SYNTHETIC TEST ONLY — invented event, never display as real",
+    "actors": ["Synthetic A", "Synthetic B"],
+    "conflict_type": "synthetic",
+    "interval": {"from":"2026-01-01","to":"2026-01-01","precision_code":1},
+    "location": {"lat":null,"lon":null,"where_prec":6,"geometry_geojson":null,"geometry_source":null,"certainty":"regional_only"}
+  },
+  "generated_at_utc": "2026-11-10T05:00:00Z",
+  "query_plan": {
+    "aliases": ["synthetic event"],
+    "languages": ["en"],
+    "radius_policy": "disabled_country_level_precision",
+    "chronology_window": {"from":"2025-12-18","to":"2026-01-15"},
+    "eligible_sources": ["ucdp_existing"],
+    "skipped_sources": {
+      "public_camera_catalog": "country_level_precision",
+      "ais_historical": "no_maritime_evidence",
+      "adsb_historical": "no_aviation_evidence"
+    }
+  },
+  "provider_runs": [{
+    "provider_id":"ucdp_existing",
+    "status":"ok",
+    "started_at_utc":"2026-11-10T05:00:00Z",
+    "completed_at_utc":"2026-11-10T05:00:00Z",
+    "cached":true,
+    "retry_after_utc":null,
+    "diagnostics_code":null,
+    "fetched_count":0
+  }],
+  "items": [],
+  "counts": {"direct":0,"corroborating":0,"candidate":0,"context_only":0,"contradictory":0,"total":0,"inaccessible":0}
+}
