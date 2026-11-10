@@ -39,6 +39,7 @@ export const sharedMap: typeof createMap = (container, callbacks) => {
   }
   const instance = map;
   return {
+    center: () => instance.center(),
     update: (d) => instance.update(d),
     focus: (p, a) => instance.focus(p, a),
     stop: () => instance.stop?.(),

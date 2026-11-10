@@ -1,0 +1,27 @@
+import type {MapPort} from '../map/renderer';
+type NearbyItem={id:string;kind:string;title:string;lat?:number;lon?:number;observed_at?:string|null;source_url?:string;cloud_pct?:number|null};
+const el=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
+export function mountNearby(host:HTMLElement,map:MapPort,update:(items:{id:string;kind:string;lat:number;lon:number}[])=>void){
+ const panel=el('section','','monitor-evidence nearby-panel');panel.setAttribute('aria-label','주변 현황');host.append(panel);
+ let abort=new AbortController(),objectUrl:string|null=null,closed=false,generation=0;
+ const cleanupImage=()=>{panel.querySelectorAll('img').forEach(img=>img.remove());if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}};
+ const close=()=>{closed=true;generation++;abort.abort();cleanupImage();update([]);panel.remove();};
+ const header=el('div','','inspector-header'),closeButton=el('button','닫기') as HTMLButtonElement;closeButton.onclick=close;header.append(el('h2','주변 현황'),closeButton);
+ const summary=el('p','지도의 현재 중심 주변을 조회합니다.','muted'),radius=document.createElement('select');radius.setAttribute('aria-label','조회 반경');for(const n of [10,25,50]){const o=document.createElement('option');o.value=String(n);o.textContent=n+' km';radius.append(o);}radius.value='25';
+ const tabs=el('div','','monitor-tabs'),body=el('div');const gps=el('button','내 위치로 이동') as HTMLButtonElement;gps.onclick=()=>{if(!navigator.geolocation){summary.textContent='이 기기에서 위치를 사용할 수 없습니다.';return;}navigator.geolocation.getCurrentPosition(p=>{if(closed)return;map.focus([[p.coords.longitude,p.coords.latitude]]);void load();},()=>{summary.textContent='위치 권한을 확인하세요. 지도 중심으로도 조회할 수 있습니다.';},{timeout:10000});};panel.append(header,summary,radius,gps,tabs,body);
+ const types=[['aircraft','비행기'],['vessels','선박'],['webcams','웹캠'],['satellite','위성']] as const;let current:typeof types[number][0]='aircraft';
+ const load=async()=>{
+  const currentGeneration=++generation;abort.abort();abort=new AbortController();cleanupImage();update([]);body.replaceChildren(el('p','자료 조회 중…'));const point=map.center();
+  const query=new URLSearchParams({lat:String(point.lat),lon:String(point.lon),radius:radius.value,type:current});
+  try{const res=await fetch('/api/v2/nearby?'+query,{signal:abort.signal,cache:'no-store'});if(!res.ok)throw Error('조회 실패');const data=await res.json();if(closed||generation!==currentGeneration)return;body.replaceChildren();summary.textContent=`지도 중심 ${point.lat.toFixed(2)}, ${point.lon.toFixed(2)} · 반경 ${radius.value} km · 조회 ${new Date(data.queried_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}`;
+   if(data.status!=='ok'){const labels:Record<string,string>={empty:'이 범위에서 표시할 자료가 없습니다. 수신 누락이 있을 수 있습니다.',key_required:`연결 키 설정이 필요합니다: ${data.reason}`,rate_limited:'조회 한도에 도달했습니다.',disabled:'공급원이 비활성 상태입니다.',temporarily_failed:'공급원 연결을 확인할 수 없습니다.'};body.append(el('p',labels[data.status]??'자료를 불러오지 못했습니다.'));return;}
+   const items=data.items as NearbyItem[];update(items.filter((i):i is NearbyItem&{lat:number;lon:number}=>Number.isFinite(i.lat)&&Number.isFinite(i.lon)).map(i=>({id:i.id,kind:i.kind,lat:i.lat,lon:i.lon})));
+   for(const item of items){const card=el('article','','context-card');card.append(el('h3',item.title),el('p',item.observed_at?'관측·촬영: '+new Date(item.observed_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})+' KST':'관측 시각 미확인'));if(item.source_url){try{const url=new URL(item.source_url);if(url.protocol==='https:'&&!url.username&&!url.password){const a=el('a','원출처 열기') as HTMLAnchorElement;a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';card.append(a);}}catch{}}
+    if(item.kind==='satellite'){card.append(el('p',`Copernicus Sentinel-2 · 구름 ${item.cloud_pct??'미상'}% · 실시간 사진 아님`));const show=el('button','위성 사진 보기') as HTMLButtonElement;show.onclick=async()=>{cleanupImage();show.disabled=true;try{const r=await fetch('/api/v2/nearby/preview?scene='+encodeURIComponent(item.id),{signal:abort.signal,cache:'no-store'});if(!r.ok)throw Error();const blob=await r.blob();if(closed||generation!==currentGeneration)return;objectUrl=URL.createObjectURL(blob);const img=document.createElement('img');img.src=objectUrl;img.alt='Copernicus Sentinel-2 위성 미리보기';img.style.maxWidth='100%';card.append(img);}catch{if(!closed)card.append(el('p','위성 미리보기를 불러오지 못했습니다.'));}finally{show.disabled=false;}};card.append(show);}
+    body.append(card);
+   }
+   body.append(el('p','주변 현황은 선택한 사건의 증거가 아닙니다. 수신 누락과 지연이 있을 수 있습니다.','muted'));
+  }catch(e){if(!closed&&(e as Error).name!=='AbortError')body.replaceChildren(el('p','주변 자료 연결을 확인하세요.'));}
+ };
+ for(const [id,label] of types){const b=el('button',label) as HTMLButtonElement;b.onclick=()=>{current=id;void load();};tabs.append(b);}radius.onchange=()=>void load();void load();return close;
+}
