@@ -246,6 +246,7 @@ export function mountMonitor(
         }
       }
     }
+    if(data.shared_model_with_critic) parent.append(el('p','분석·검토는 같은 모델의 서로 다른 역할입니다. 두 응답의 일치는 독립 검증이 아닙니다.'));
     if(data.fallback_reason) parent.append(el('p',`분석 모델 대체: ${data.requested_model} → ${data.model}. 같은 모델을 분석과 검토에 사용한 경우 두 결과의 일치는 독립 검증이 아닙니다.`));
     parent.append(
       el(
