@@ -197,10 +197,10 @@ try {
   const missingContext=await req('/api/v2/events/ucdp%3Amissing/context');assert.equal(missingContext.status,404);assert.equal(contextCalls,0);
   const contextPath='/api/v2/events/ucdp%3A1/context';
   const contextResponse=await req(contextPath);assert.equal(contextResponse.status,200);const context=await contextResponse.json();
-  assert.equal(context.event_ref.id,record.id);assert.equal(context.counts.direct,0);assert.equal(contextCalls,1);
+  assert.equal(context.event_ref.id,record.id);assert.equal(context.counts.direct,0);assert.equal(contextCalls,2);
   assert.equal(context.provider_runs.find(p=>p.provider_id==='earth_search_stac').status,'empty');
   assert.equal((await req(contextPath+'/refresh',{})).status,401);
-  await req(contextPath);assert.equal(contextCalls,1,'cached context must not refetch');
+  await req(contextPath);assert.equal(contextCalls,2,'cached context must not refetch');
   assert.equal((await req(contextPath+'?include=unknown')).status,400);
   const savedCache=await db.prepare('SELECT COUNT(*) n FROM event_context_cache').first();assert.equal(savedCache.n,2);
   await internal('start',{...snapshot,id:'snapshot:context-empty',expected:0});

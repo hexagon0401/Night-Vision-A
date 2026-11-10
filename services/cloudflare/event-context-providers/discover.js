@@ -3,8 +3,15 @@ export async function discover(p,r,now,env){
  if(p.id==='ucdp_existing') {const i=item(p.id,'official_notice',r.id,r.title,r.source_url,now);i.attribution='UCDP';i.raw_source_ref=r.id;i.description='이미 게시된 UCDP 보고 기록. 개별 기사 인용은 원자료에 없으면 미확인.';i.warnings=['missing_primary_event_citation'];return [i];}
  if(p.id==='earth_search_stac') {
   const bounds=bbox(r);if(!bounds)throw new Error('geometry_required');
-  const data=await boundedJSON('https://earth-search.aws.element84.com/v1/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bbox:bounds,datetime:shift(r.day,-30)+'T00:00:00Z/'+shift(r.end_day,30)+'T23:59:59Z',collections:['sentinel-2-l2a'],limit:12})});
-  if(!Array.isArray(data.features))throw new Error('invalid_stac');
+  const features=[];
+  // Separate bounded searches guarantee an opportunity to retrieve both sides
+  // of the incident interval rather than taking only the newest catalog page.
+  for(const [start,end] of [[shift(r.day,-30),shift(r.day,-1)],[r.day,shift(r.end_day,30)]]) {
+   const data=await boundedJSON('https://earth-search.aws.element84.com/v1/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bbox:bounds,datetime:start+'T00:00:00Z/'+end+'T23:59:59Z',collections:['sentinel-2-l2a'],limit:3})},1000000,4500);
+   if(!Array.isArray(data.features))throw new Error('invalid_stac');
+   features.push(...data.features.slice(0,3).filter(f=>{const day=iso(f.properties?.datetime)?.slice(0,10);return day&&day>=start&&day<=end;}));
+  }
+  const data={features};
   return data.features.slice(0,12).flatMap(f=>{
    const t=iso(f.properties?.datetime);if(!t||t.slice(0,10)<shift(r.day,-30)||t.slice(0,10)>shift(r.end_day,30)||typeof f.id!=='string'||f.collection!=='sentinel-2-l2a')return [];
    const url='https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/'+encodeURIComponent(f.id);
