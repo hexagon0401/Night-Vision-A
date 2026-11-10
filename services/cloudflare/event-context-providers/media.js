@@ -2,13 +2,13 @@ import {boundedJSON,item,iso,temporal,safeURL} from './common.js';
 export async function discoverMapillary(r,now,env){
  // Current Entity API requires bbox area <0.01 square degrees. This is a
  // limited search window, never an uncertainty radius or full regional coverage.
- const d=.02,bounds=[r.lon-d,r.lat-d,r.lon+d,r.lat+d];
- const url=new URL('https://graph.mapillary.com/images');url.search=new URLSearchParams({fields:'id,captured_at,geometry',bbox:bounds.join(','),limit:'10'}).toString();
+ const d=.004,bounds=[r.lon-d,r.lat-d,r.lon+d,r.lat+d];
+ const url=new URL('https://graph.mapillary.com/images');url.search=new URLSearchParams({fields:'id,captured_at,geometry',bbox:bounds.join(','),limit:'5'}).toString();
  const data=await boundedJSON(url.href,{headers:{Authorization:'OAuth '+env.MAPILLARY_ACCESS_TOKEN}});
  if(data.error){const code=data.error.code;throw new Error(code===190?'upstream_authentication_failed':[10,200].includes(code)?'upstream_permission_denied':'upstream_invalid_response');}
  if(!Array.isArray(data.data))throw new Error('upstream_invalid_response');
  const seen=new Set();
- return data.data.slice(0,10).flatMap(photo=>{
+ return data.data.slice(0,5).flatMap(photo=>{
   const id=String(photo.id??''),p=photo.geometry?.coordinates;
   if(seen.has(id)||!/^\d{1,30}$/.test(id)||photo.geometry?.type!=='Point'||!Array.isArray(p)||p.length!==2||!p.every(Number.isFinite)||p[0]<bounds[0]||p[0]>bounds[2]||p[1]<bounds[1]||p[1]>bounds[3])return [];
   seen.add(id);
