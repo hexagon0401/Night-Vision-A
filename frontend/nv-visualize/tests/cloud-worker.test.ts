@@ -113,3 +113,14 @@ test('provider formatting is normalized without inventing JSON or exposing reaso
  expect(()=>parseCompletion('<think>private reasoning')).toThrow();
  expect(()=>parseCompletion('{"summary":[')).toThrow();
 });
+
+import {normalizeAnswer} from '../../../services/cloudflare/ai.js';
+test('schema interoperability never supplies missing factual citations',()=>{
+ const ids=new Set(['source:1']);
+ const safe=normalizeAnswer({summary:[{text:'reported',source_ids:'source:1'}],alternatives:['possible alternative'],counterevidence:[],unknowns:[{text:'not known'}]},ids);
+ expect(validateAnswer(safe.value,ids)).toEqual({summary:[{text:'reported',source_ids:['source:1']}],alternatives:[{text:'possible alternative',source_ids:[]}],counterevidence:[],unknowns:[{text:'not known',source_ids:[]}]});
+ expect(()=>validateAnswer(normalizeAnswer({summary:['uncited factual statement'],alternatives:[],counterevidence:[],unknowns:[]},ids).value,ids)).toThrow('ai_uncited_summary');
+ expect(()=>normalizeAnswer({summary:[{text:'bad',source_id:'invented'}]},ids)).toThrow('ai_unknown_source');
+});
+
+test('inline invented citations cannot enter an adapted answer',()=>{expect(()=>validateAnswer({summary:[{text:'claim [S:invented]',source_ids:['source:1']}],alternatives:[],counterevidence:[],unknowns:[]},new Set(['source:1']))).toThrow('ai_unknown_source');});

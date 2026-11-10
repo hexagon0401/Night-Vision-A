@@ -134,6 +134,8 @@ try {
   assert.equal((await db.prepare('SELECT COUNT(*) n FROM aggregates').first()).n,2,'batches do not repeatedly scan retention');
   await internal('run',{id:'run:retention-test',state:'complete',started:new Date().toISOString()});
   assert.equal((await db.prepare('SELECT COUNT(*) n FROM aggregates').first()).n,1,'successful run prunes expired aggregates');
+  assert.equal((await req('/api/v2/events?limit=0')).status,400);
+  assert.equal((await req('/api/v2/events?limit=501')).status,400);
   const snapshot = {
     id: "snapshot:test",
     provider: "ucdp",

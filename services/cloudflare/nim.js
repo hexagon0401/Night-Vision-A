@@ -25,6 +25,10 @@ export function parseCompletion(text) {
  if(objects.length!==1||start>=0)throw new Error('ambiguous_or_incomplete_json');
  return objects[0];
 }
+export function responseShape(value) {
+ if(!value||typeof value!=='object'||Array.isArray(value))return {type:Array.isArray(value)?'array':typeof value};
+ return Object.fromEntries(Object.entries(value).slice(0,12).map(([k,v])=>[k.slice(0,40),Array.isArray(v)?{type:'array',length:v.length,item_types:v.slice(0,2).map(x=>typeof x),item_fields:v.slice(0,2).map(x=>x&&typeof x==='object'?Object.keys(x).slice(0,8):[])}:{type:typeof v}]));
+}
 export const reasoningMode=model=>generationOptions(model).chat_template_kwargs
  ? 'thinking_disabled_for_structured_output' : 'provider_default';
 const ACTIVE_PRIMARY='nvidia/nemotron-3.5-lightning-30b-a3b';
@@ -59,6 +63,7 @@ export async function completion(env,{model,key,messages,maxTokens,timeout=60000
   const text=choice.message.content;
   diagnostic.format={starts_json:text.trimStart().startsWith('{'),has_fence:text.includes('```'),has_reasoning_delimiter:/<\/?think>/i.test(text)};
   let report;try{report=parseCompletion(text);}catch{throw new ApiError(502,'invalid_ai_response');}
+  diagnostic.response_shape=responseShape(report);
   await nimHealth(env,model,{state:'responded',...diagnostic});
   return {report,diagnostic};
  }catch(e) {
