@@ -23,7 +23,7 @@ const script = built.outputFiles[0].text.replace(
 const rsa=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
 const jwk={...await crypto.subtle.exportKey('jwk',rsa.publicKey),kid:'beta-test-key',alg:'RS256'};
 async function workload(overrides={}){const now=Math.floor(Date.now()/1000);const header=Buffer.from(JSON.stringify({alg:'RS256',kid:jwk.kid})).toString('base64url');const claims=Buffer.from(JSON.stringify({iss:'https://token.actions.githubusercontent.com',aud:'https://example.test/beta',iat:now,exp:now+300,repository:'hexagon0401/Night-Vision-A',repository_id:'1204033173',ref:'refs/heads/main',event_name:'workflow_dispatch',workflow_ref:'hexagon0401/Night-Vision-A/.github/workflows/beta-comparison.yml@refs/heads/main',run_id:'42',sha:'test-sha',...overrides})).toString('base64url');const signature=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',rsa.privateKey,new TextEncoder().encode(header+'.'+claims));return header+'.'+claims+'.'+Buffer.from(signature).toString('base64url');}
-let contextCalls=0;
+let contextCalls=0,mediaCalls=0,gdeltCalls=0;
 let nimCalls = 0;
 let profileId = 82876856;
 let nimStatus = 200;
@@ -46,6 +46,7 @@ const mf = new Miniflare(
           NVIDIA_API_KEY_A: "test-nim-A",
           NVIDIA_API_KEY_B: "test-nim-B",
           NIM_ENABLED: "true",
+          MAPILLARY_ACCESS_TOKEN:"test-mapillary-secret",WINDY_API_KEY:"test-windy-secret",
           NIM_MODEL: "test-model",
           NIM_REVIEW_MODEL: "test-model",
         },
@@ -93,6 +94,9 @@ const mf = new Miniflare(
             });
           }
           if(new URL(request.url).hostname==='earth-search.aws.element84.com'){contextCalls++;return Response.json({features:[]});}
+          if(u.hostname==='api.gdeltproject.org'){gdeltCalls++;return Response.json({articles:[]});}
+          if(u.hostname==='graph.mapillary.com'){mediaCalls++;assert.equal(request.headers.get('Authorization'),'OAuth test-mapillary-secret');assert.ok(!u.search.includes('secret'));return Response.json({data:[{id:'42',captured_at:Date.parse('2025-12-01'),geometry:{type:'Point',coordinates:[22,12]}}],paging:{next:'https://graph.mapillary.com/images?access_token=test-mapillary-secret'}});}
+          if(u.hostname==='api.windy.com'){mediaCalls++;assert.equal(request.headers.get('x-windy-api-key'),'test-windy-secret');return Response.json({total:0,webcams:[]});}
           return new Response("unexpected outbound", { status: 500 });
         },
       },
@@ -202,7 +206,10 @@ try {
   assert.equal((await req(contextPath+'/refresh',{})).status,401);
   await req(contextPath);assert.equal(contextCalls,2,'cached context must not refetch');
   assert.equal((await req(contextPath+'?include=unknown')).status,400);
-  const savedCache=await db.prepare('SELECT COUNT(*) n FROM event_context_cache').first();assert.equal(savedCache.n,2);
+  const savedCache=await db.prepare('SELECT COUNT(*) n FROM event_context_cache').first();assert.equal(savedCache.n,2);assert.equal(gdeltCalls,0);
+  const media=await(await req(contextPath+'?include=mapillary_street_photo,windy_webcams_v3')).json();
+  assert.equal(mediaCalls,2);assert.equal(media.provider_runs.find(p=>p.provider_id==='mapillary_street_photo').status,'ok');assert.equal(media.provider_runs.find(p=>p.provider_id==='windy_webcams_v3').status,'empty');
+  assert.ok(!JSON.stringify(media).includes('test-mapillary-secret'));assert.ok(!JSON.stringify(media).includes('test-windy-secret'));assert.equal(nimCalls,0,'context discovery never uses NIM');
   await internal('start',{...snapshot,id:'snapshot:context-empty',expected:0});
   await db.prepare('UPDATE heads SET snapshot=? WHERE provider=?').bind('snapshot:context-empty','ucdp').run();
   assert.equal((await req(contextPath)).status,404,'unpublished record is not resolved from the old cache');

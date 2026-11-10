@@ -42,3 +42,16 @@ test('historical scene search queries both sides rather than only the newest pag
  const ranges:string[]=[];vi.stubGlobal('fetch',vi.fn(async(_url:any,opts:any)=>{const q=JSON.parse(opts.body);ranges.push(q.datetime);return Response.json({features:[]});}));
  await discover({id:'earth_search_stac'},event,fixture.generated_at_utc);expect(ranges).toHaveLength(2);expect(ranges[0]).toContain('2025-12-31T23:59:59Z');expect(ranges[1]).toContain('2026-01-01T00:00:00Z');
 });
+
+import {discoverMapillary,discoverWindy} from '../../../services/cloudflare/event-context-providers/media.js';
+test('Mapillary uses a bounded bbox and header token, ignores pagination tokens and preserves capture time',async()=>{
+ let requested:any;vi.stubGlobal('fetch',vi.fn(async(u:any,o:any)=>{requested={u,o};return Response.json({data:[{id:'123',captured_at:Date.parse('2025-12-01'),geometry:{type:'Point',coordinates:[71,35]}}],paging:{next:'https://graph.mapillary.com/?access_token=private-test'}});}));
+ const [i]=await discoverMapillary(event,fixture.generated_at_utc,{MAPILLARY_ACCESS_TOKEN:'private-test'});const b=new URL(requested.u).searchParams.get('bbox')!.split(',').map(Number);expect((b[2]-b[0])*(b[3]-b[1])).toBeLessThan(.01);expect(requested.o.headers.Authorization).toBe('OAuth private-test');expect(String(requested.u)).not.toContain('private-test');expect(JSON.stringify(i)).not.toContain('private-test');expect(i.observed_from_utc).toBe('2025-12-01T00:00:00.000Z');expect(i.evidence_role).toBe('context_only');expect(i.thumbnail_url).toBeNull();
+});
+test('Mapillary skips outside-box points rather than relocating them',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json({data:[{id:'1',geometry:{type:'Point',coordinates:[0,0]}}]})));expect(await discoverMapillary(event,fixture.generated_at_utc,{MAPILLARY_ACCESS_TOKEN:'test'})).toEqual([]);});
+test('Windy leaves frame time unknown, strips signed query strings and never returns images',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async(_u:any,o:any)=>{expect(o.headers['x-windy-api-key']).toBe('test');return Response.json({total:1,webcams:[{webcamId:123,title:'SYNTHETIC CAMERA',status:'active',location:{latitude:35,longitude:71},lastUpdatedOn:'2026-11-01T12:00:00Z',urls:{detail:'https://webcams.windy.com/webcams/123?token=secret-test'},images:{current:{preview:'https://signed.invalid/?key=secret-test'}}}]});}));
+ const [i]=await discoverWindy(event,fixture.generated_at_utc,{WINDY_API_KEY:'test'});expect(i.temporal_role).toBe('present_context');expect(i.evidence_role).toBe('context_only');expect(i.camera.frame_captured_at_utc).toBeNull();expect(i.observed_from_utc).toBeNull();expect(JSON.stringify(i)).not.toContain('secret-test');expect(i.attribution).toContain('Windy.com');
+});
+test('Mapillary JSON auth errors on HTTP 500 are safely classified without exposing bodies',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json({error:{code:190,message:'secret-test'}},{status:500})));await expect(boundedJSON('https://graph.mapillary.com/images')).rejects.toThrow('upstream_authentication_failed');});
+test('provider timeout has an actionable constant error',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>{throw new DOMException('private URL','TimeoutError');}));await expect(boundedJSON('https://example.invalid')).rejects.toThrow('upstream_timeout');});
