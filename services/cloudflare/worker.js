@@ -12,7 +12,7 @@ import { ingest, publicData } from "./data.js";
 import { auth, requireUser } from "./auth.js";
 import { analyzeCase, monitorSummary, reason } from "./ai.js";
 import { initialize } from "./database.js";
-import {betaAuthorization} from './workload.js';
+import {betaAuthorization,monitorAuthorization} from './workload.js';
 import {betaRoute} from './beta.js';
 
 export default {
@@ -53,7 +53,7 @@ export default {
       if (url.pathname.startsWith("/api/auth/"))
         return await auth(request, env, url);
       if (url.pathname.startsWith("/api/internal/")) {
-        await internal(request, env);
+        await monitorAuthorization(request, env);
         if (request.method !== "POST")
           throw new ApiError(405, "method_not_allowed");
         if (url.pathname === "/api/internal/monitor-ai") {
@@ -104,6 +104,8 @@ export default {
         requireValue(request.method === "POST", "method_not_allowed", 405);
         sameOrigin(request);
         const user = await requireUser(request, env);
+        const diagnostic = await body(request,2000);
+        requireValue(!diagnostic.role || ['analyst','critic'].includes(diagnostic.role),'invalid_ai_role');
         return json(
           await reason(
             env,
@@ -113,6 +115,7 @@ export default {
             },
             user.user_id,
             "diagnostic",
+            diagnostic.role === "critic",
           ),
         );
       }

@@ -33,7 +33,8 @@ def main():
  research=Research(cutoff);started=time.monotonic();run=None
  try:
   if args.resume_id:
-   r=client.get(origin+'/api/v2/beta/'+args.resume_id);r.raise_for_status();run=r.json();cutoff=timestamp(run['cutoff']);research.cutoff=cutoff;research.start=cutoff-__import__('datetime').timedelta(days=90);research.sources={s['id']:s for s in run['input']['sources']}
+   r=client.get(origin+'/api/v2/beta/'+args.resume_id);r.raise_for_status();run=r.json();cutoff=timestamp(run['cutoff']);research.cutoff=cutoff;research.start=cutoff-__import__('datetime').timedelta(days=90);research.sources={s['id']:s for s in run['input']['sources']};research.fetched={s['url'] for s in run['input']['sources']}
+   if run['steps'][0]['state']!='complete':research.discover(['official shipping safety update'])
    (out/'comparison-prompt.md').write_text(common_prompt(cutoff))
   else:
    sources=research.discover(['shipping attacks disruption','vessel transit rerouting'])
@@ -41,7 +42,7 @@ def main():
    if args.prepare_only:return
    if len(sources)<2:raise ValueError('insufficient_accessible_sources; no model report generated')
    archive=Path('extensions/claude/v3/night_vision_v3.skill');framework_hash=hashlib.sha256(archive.read_bytes()).hexdigest()
-   run=post('start',{'topic':TOPIC,'cutoff':cutoff.isoformat(),'sources':sources,'framework_sha256':framework_hash,'search_audit':research.audit,'comparison_prompt':common_prompt(cutoff),'framework':'NV Engine 2.0 beta-loop/1, informed by archived V3'} )
+   run=post('start',{'topic':TOPIC,'cutoff':cutoff.isoformat(),'sources':sources,'framework_sha256':framework_hash,'search_audit':research.audit,'comparison_prompt':common_prompt(cutoff),'framework':'NV Engine 2.0 beta-loop/2, informed by archived V3'} )
   (out/'run.json').write_text(json.dumps(run,ensure_ascii=False,indent=2));print('Beta run:',run['id'])
   for step in range(6):
    if time.monotonic()-started>1000:raise ValueError('beta_job_time_budget')

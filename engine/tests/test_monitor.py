@@ -84,3 +84,46 @@ def test_unchanged_snapshot_does_not_reupload_records():
  p=object.__new__(module.Publisher);calls=[]
  def post(path,data):calls.append(path);return {'state':'published'}
  p.post=post;p.snapshot('ucdp',[],{'records':0});assert calls==['start']
+
+
+def test_publisher_uses_fresh_scoped_oidc_without_shared_key(monkeypatch):
+ spec=importlib.util.spec_from_file_location('monitor_oidc',Path(__file__).resolve().parents[2]/'services/worker/monitor.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ monkeypatch.setenv('ACTIONS_ID_TOKEN_REQUEST_URL','https://identity.example.test/token?api-version=2')
+ monkeypatch.setenv('ACTIONS_ID_TOKEN_REQUEST_TOKEN','synthetic-request-guard')
+ calls=[]
+ def handle(req):
+  calls.append(req)
+  if req.url.host=='identity.example.test':
+   assert req.url.params['audience']=='https://example.test/monitor'
+   assert req.headers['Authorization']=='Bearer synthetic-request-guard'
+   return httpx.Response(200,json={'value':'synthetic-workload-token'})
+  assert req.headers['Authorization']=='Bearer synthetic-workload-token'
+  return httpx.Response(200,json={'recorded':True})
+ publisher=module.Publisher('https://example.test','stale-legacy-key');publisher.client.close();publisher.client=httpx.Client(transport=httpx.MockTransport(handle))
+ publisher.post('run',{});publisher.post('run',{})
+ assert len(calls)==4
+ publisher.client.close()
+
+
+def test_monitor_preserves_success_when_ai_unavailable(tmp_path,monkeypatch):
+ spec=importlib.util.spec_from_file_location('monitor_cycle',Path(__file__).resolve().parents[2]/'services/worker/monitor.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ monkeypatch.setenv('NV_WORKER_ORIGIN','https://example.test');monkeypatch.setenv('NV_INGEST_TOKEN','synthetic-test-key');monkeypatch.setenv('UCDP_ACCESS_TOKEN','synthetic-test-key');monkeypatch.setenv('NV_UCDP_ENABLED','true');monkeypatch.delenv('NV_RSS_ENABLED',raising=False)
+ class FakePublisher:
+  client=type('Client',(),{'close':lambda self:None})()
+  def __init__(self,*args):pass
+  def post(self,path,data):
+   if path=='monitor-ai':raise ValueError('publication_failed_502')
+   return {'recorded':True}
+  def snapshot(self,*args):return 'snapshot:test'
+ class FakeUCDP:
+  candidate_cached=False;used=1
+  def __init__(self,*args,**kwargs):pass
+  def discover(self,*args):return None
+  def sync(self,*args,**kwargs):return True
+  def merged(self,*args):return [normalize(row(),'26.1',NOW.isoformat())]
+  def close(self):pass
+ monkeypatch.setattr(module,'Publisher',FakePublisher);monkeypatch.setattr(module,'UCDPMonitor',FakeUCDP)
+ monkeypatch.setattr('sys.argv',['monitor.py','--state',str(tmp_path/'state.db')]);module.main()
+ status=json.loads((tmp_path/'monitor-status.json').read_text())
+ assert status['state']=='complete' and status['providers']['ucdp']['state']=='complete'
+ assert status['ai']['state']=='ai_unavailable'

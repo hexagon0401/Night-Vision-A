@@ -5,7 +5,7 @@ from email.utils import parsedate_to_datetime
 from html import unescape
 from html.parser import HTMLParser
 import hashlib,json,re
-from urllib.parse import urlsplit,urlunsplit
+from urllib.parse import urlsplit,urlunsplit,urljoin
 import httpx
 
 OFFICIAL=[
@@ -48,22 +48,33 @@ class Research:
  def __init__(self,cutoff,client=None):
   self.cutoff=cutoff;self.start=cutoff-timedelta(days=90);self.client=client or httpx.Client(timeout=15,follow_redirects=False,headers={'User-Agent':'NightVisionResearch/2.0 (+https://github.com/hexagon0401/Night-Vision-A)'})
   self.sources={};self.audit=[];self.fetched=set();self.query_count=0
- def get(self,url,params=None):
+ def get(self,url,params=None,redirect_limit=0,chain=None):
   try:
-   with self.client.stream('GET',url,params=params) as r:
-    if r.status_code!=200:return None,'http_'+str(r.status_code)
-    result=bytearray()
-    for chunk in r.iter_bytes():
-     if len(result)+len(chunk)>300000:return None,'response_limit'
-     result.extend(chunk)
-    return bytes(result),r.headers.get('Content-Type','')
+   for hop in range(redirect_limit+1):
+    with self.client.stream('GET',url,params=params) as r:
+     if r.status_code in (301,302,303,307,308) and hop<redirect_limit:
+      try:target=safe_url(urljoin(url,r.headers.get('Location','')))
+      except ValueError:return None,'unsafe_redirect'
+      host=urlsplit(target).hostname.lower()
+      if not any(host==d or host.endswith('.'+d) for d in HOSTS):return None,'redirect_outside_allowlist'
+      url=target;params=None
+      if chain is not None:chain.append(target)
+      continue
+     if r.status_code!=200:return None,'http_'+str(r.status_code)
+     result=bytearray()
+     for chunk in r.iter_bytes():
+      if len(result)+len(chunk)>300000:return None,'response_limit'
+      result.extend(chunk)
+     return bytes(result),r.headers.get('Content-Type','')
+   return None,'redirect_limit'
   except httpx.HTTPError:return None,'transport_failure'
  def fetch_source(self,item):
   try:url=safe_url(item['url'])
   except (ValueError,KeyError):return None,{'state':'unsafe_url'}
   host=urlsplit(url).hostname.lower();allowed=any(host==d or host.endswith('.'+d) for d in HOSTS)
   if not allowed:return None,{'url':url,'state':'discovered_not_fetched','reason':'publisher outside bounded fetch allowlist'}
-  content,kind=self.get(url)
+  chain=[];content,kind=self.get(url,redirect_limit=3,chain=chain)
+  if chain:url=chain[-1];host=urlsplit(url).hostname.lower()
   if content is None:return None,{'url':url,'state':kind}
   if 'html' not in kind and 'text/plain' not in kind:return None,{'url':url,'state':'unsupported_document_type'}
   raw=content.decode('utf8','replace');parser=Page()
@@ -76,12 +87,13 @@ class Research:
   if published and published>self.cutoff:return None,{'url':url,'state':'after_cutoff'}
   text=re.sub(r'\s+',' ',unescape(' '.join(parser.parts))).strip()
   if not text:return None,{'url':url,'state':'no_extractable_text'}
+  if re.search(r'Just a moment|Access denied|Request blocked|Checking your browser|Verify you are human',(' '.join(parser.title)+' '+text[:500]),re.I):return None,{'url':url,'state':'access_challenge'}
   # Prefer the topic-bearing passage, keeping only a short attributable excerpt.
   match=re.search(r'Red Sea|Suez|Houthi|Yemen|홍해',text,re.I);at=max(0,match.start()-120) if match else 0
   excerpt=text[at:at+1000]
   sha=hashlib.sha256(content).hexdigest();identity='src_'+hashlib.sha256((url+sha).encode()).hexdigest()[:16]
   source={'id':identity,'url':url,'title':(' '.join(parser.title) or item.get('title') or host)[:500],'publisher_family':host.removeprefix('www.'),'family_status':'domain proxy; editorial independence requires review','excerpt':excerpt,'published_at':published.isoformat() if published else None,'indexed_at':item.get('indexed_at'),'retrieved_at':datetime.now(timezone.utc).isoformat(),'content_sha256':sha,'scope':'window' if published and published>=self.start else 'background' if published else 'publication_date_unknown','extraction':'bounded HTML excerpt; original document not reproduced'}
-  return source,{'url':url,'state':'retrieved','source_id':identity,'date_status':source['scope']}
+  return source,{'url':url,'state':'retrieved','source_id':identity,'date_status':source['scope'],'redirects':chain}
  def discover(self,queries):
   items=[{'url':u} for u in OFFICIAL] if not self.fetched else []
   for query in queries[:3]:
@@ -126,7 +138,8 @@ def markdown(run):
  lines=[f"# NV Engine 2.0 — {run['topic']}",f"상태: {run['state']} · 종료시각: {run['cutoff']}",f"모델: {json.dumps(run['models'],ensure_ascii=False)}"]
  for step in run.get('steps',[]):
   lines.extend([f"\n## {step['step']//2+1}회차 — {'분석' if step['step']%2==0 else '평가'}",f"상태: {step['state']}"])
-  if step.get('output'):
+  if step.get('output',{} ) and step['output'].get('diagnostic'):lines.append('진단: '+json.dumps(step['output']['diagnostic'],ensure_ascii=False))
+  if step.get('output') and step['output'].get('report'):
    o=step['output'];lines.append(f"모델 {o['model']} · {o['duration_ms']}ms · 사용량 {o.get('usage')}")
    r=o['report']
    for key,value in r.get('sections',{}).items():lines.extend([f'### {key}',value])

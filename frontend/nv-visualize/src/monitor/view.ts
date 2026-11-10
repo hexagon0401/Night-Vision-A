@@ -51,6 +51,10 @@ async function api(path: string, body?: unknown) {
         "모델 접근 권한 또는 무료 한도를 확인하세요.",
       nim_quota_or_access_paused:
         "무료 한도 또는 접근 오류로 오늘의 새 AI 호출이 중단됐습니다.",
+      nim_truncated_response: "AI 응답이 길이 한도에서 잘렸습니다. 기존 통계 탐지는 유지됩니다.",
+      invalid_ai_response: "AI 응답 형식을 검증하지 못했습니다. 결과를 채택하지 않았습니다.",
+      nim_transport_failure: "NIM 연결이 지연되거나 중단됐습니다. 기존 통계 탐지는 유지됩니다.",
+      monitor_data_unavailable: "먼저 공급원의 정상 자료 수집이 필요합니다.",
       ai_daily_budget_exhausted: "오늘의 AI 사용 한도에 도달했습니다.",
       service_unavailable:
         "서비스 연결을 확인할 수 없습니다. 기존 자료는 유지됩니다.",
@@ -61,6 +65,12 @@ async function api(path: string, body?: unknown) {
     );
   }
   return d;
+}
+function stateLabel(value:string) {
+ return ({complete:'정상 완료',running:'실행 중',failed:'실패',skipped:'건너뜀',setup_required:'설정 필요',backfill_pending:'초기 자료 수집 진행 중',available:'응답 검증 완료',responded:'응답 수신 · 검증 전',unavailable:'사용 불가'} as Record<string,string>)[value]??value;
+}
+function failureLabel(value:string) {
+ return ({ucdp_auth_rejected:'UCDP 토큰이 거부됐습니다. GitHub 감시 작업의 UCDP_ACCESS_TOKEN을 확인하세요.',ucdp_version_unavailable:'설정한 UCDP 자료 버전을 찾지 못했습니다.',ucdp_rate_limited:'UCDP 요청 한도에 도달했습니다.',ucdp_upstream_failure:'UCDP 제공기관 응답 오류',nim_truncated_response:'AI 응답이 출력 한도에서 잘림',nim_quota_or_model_unavailable:'모델 접근 권한 또는 무료 한도 문제',nim_transport_failure:'NIM 연결 지연 또는 중단',invalid_ai_response:'AI 응답 형식 검증 실패','UCDP_ACCESS_TOKEN and NV_UCDP_ENABLED=true required':'GitHub 저장소의 비밀 설정에 UCDP_ACCESS_TOKEN을 등록해야 합니다.','RSS not enabled; metadata terms review required':'RSS 연결과 이용 조건 검토가 필요합니다.','next run resumes saved page; last published data retained':'다음 회차에서 이어받습니다. 이전 정상 자료는 유지됩니다.'} as Record<string,string>)[value]??value;
 }
 function when(value: string | null) {
   return value
@@ -79,6 +89,10 @@ export function mountMonitor(
     detail = root.querySelector<HTMLElement>(".monitor-evidence")!,
     nav = root.querySelector("nav")!,
     message = root.querySelector<HTMLElement>(".map-message")!;
+  const notice = el('button','감시 연결 확인 중…','monitor-notice');
+  notice.setAttribute('aria-label','감시 상태 확인');
+  notice.onclick=()=>{panel.hidden=false;};
+  root.querySelector('main')!.append(notice);
   let records: EventRecord[] = [],
     cases: { id: string; country: string }[] = [],
     selected: EventRecord | null = null,
@@ -382,11 +396,24 @@ export function mountMonitor(
       }
       if (!d.providers.length)
         status.append(el("p", "공급원 연결·최초 수집 대기 중입니다."));
+      const lastRun=d.runs?.[0];
+      notice.textContent = !d.providers.length ? '수집 대기 · 현황에서 연결 확인' : d.stale ? '자료 갱신 지연 · 현황 확인' : '감시 자료 게시됨 · 현황 확인';
+      if (!d.providers.length) {
+        status.append(el('p','현재 지도에 사건이 없는 이유는 최초 수집이 완료되지 않았기 때문입니다.'));
+        const workflow=link('GitHub 감시 실행·설정 열기','https://github.com/hexagon0401/Night-Vision-A/actions/workflows/monitor.yml');
+        workflow.target='_blank';workflow.rel='noopener noreferrer';status.append(workflow);
+      }
+      for (const [provider,value] of Object.entries(lastRun?.providers??{})) {
+        const p=value as {state:string;reason?:string};
+        status.append(el('p',`${provider}: ${stateLabel(p.state)} · ${failureLabel(p.reason??'')}`));
+      }
+      status.append(el('p',!d.ai_enabled?'AI 비활성 · 통계 탐지는 별도로 동작합니다.':!d.ai_health?.length?'AI 키 등록됨 · 실제 모델 연결은 아직 검증 전입니다.':'AI 연결 상태'));
+      for(const h of d.ai_health??[]) status.append(el('p',`${h.model}: ${stateLabel(h.state)} · ${failureLabel(h.error??'응답 확인')} · ${when(h.checked_at)}`));
       const history = el("details");
       history.append(el("summary", "최근 감시 실행 이력"));
       for (const r of d.runs)
         history.append(
-          el("p", `${when(r.started)} · ${r.state} · ${r.error ?? ""}`),
+          el("p", `${when(r.started)} · ${stateLabel(r.state)} · ${failureLabel(r.error ?? "")}`),
         );
       status.append(history);
 
@@ -401,8 +428,13 @@ export function mountMonitor(
       cases = caseData.cases;
       user = me.user;
       displayAI(summary, s.result);
+      if(s.statistical) {
+        const stat=s.statistical;
+        summary.prepend(el('h3','통계 기반 현황 · AI와 별도'),el('p',stat.providers.length?`게시 자료 ${stat.records}건 · 이상징후 후보 ${stat.candidates}개`:'최초 수집 대기 중'),el('p',stat.note));
+      }
     } catch (e) {
       if (!destroyed) {
+        notice.textContent="감시 연결 오류 · 현황 확인";
         status.replaceChildren(
           el("p", "운영 기능 설정 대기: " + (e as Error).message),
           link("키·데이터베이스 설정 안내", "/setup.html"),

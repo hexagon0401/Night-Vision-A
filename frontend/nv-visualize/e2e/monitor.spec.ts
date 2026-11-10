@@ -85,3 +85,24 @@ for (const width of [1440, 390])
     ).toHaveAttribute("href", "/?case=live&id=case%3Aucdp%3Atest");
     expect(errors).toEqual([]);
   });
+
+
+test('never-started monitoring stays explicit and does not claim zero real events',async({page})=>{
+ await page.route('**/*',route=>{
+  const u=new URL(route.request().url());if(u.hostname!=='127.0.0.1')return route.abort();
+  if(!u.pathname.startsWith('/api/'))return route.continue();
+  const values:Record<string,unknown>={
+   '/api/auth/me':{user:null,configured:true},
+   '/api/v2/status':{runs_per_day:12,last_success:null,stale:true,providers:[],runs:[],ai_enabled:true,ai_health:[{model:'test-model',state:'unavailable',error:'nim_truncated_response',checked_at:'2026-11-10T00:00:00Z'}]},
+   '/api/v2/overview':{countries:[]},'/api/v2/cases':{cases:[]},'/api/v2/events':{records:[]},
+   '/api/v2/monitor-summary':{result:null,statistical:{providers:[],records:0,candidates:0,note:'최초 수집 전입니다. 실제 사건 부재를 판단할 수 없습니다.'}},
+  };return route.fulfill({json:values[u.pathname]??{}});
+ });
+ await page.goto('/?view=monitor');
+ await expect(page.getByRole('button',{name:'감시 상태 확인'})).toContainText('수집 대기');
+ await page.getByRole('button',{name:'감시 상태 확인'}).click();
+ await expect(page.locator('.monitor-status')).toContainText('최초 수집이 완료되지 않았기 때문');
+ await expect(page.locator('.monitor-status')).toContainText('출력 한도에서 잘림');
+ await expect(page.locator('.monitor-summary')).toContainText('통계 기반 현황 · AI와 별도');
+ await expect(page.locator('.monitor-summary')).toContainText('실제 사건 부재를 판단할 수 없습니다');
+});

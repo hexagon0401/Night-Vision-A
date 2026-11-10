@@ -5,18 +5,19 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  id-token: write
 concurrency:
   group: nv-monitor-production
   cancel-in-progress: false
 jobs:
   monitor:
-    if: vars.NV_MONITOR_ENABLED == 'true'
+    if: vars.NV_MONITOR_ENABLED != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       MONITOR_RUNS_PER_DAY: ${{ vars.MONITOR_RUNS_PER_DAY || '12' }}
-      NV_WORKER_ORIGIN: ${{ vars.NV_WORKER_ORIGIN }}
-      NV_UCDP_ENABLED: ${{ vars.NV_UCDP_ENABLED }}
+      NV_WORKER_ORIGIN: ${{ vars.NV_WORKER_ORIGIN || 'https://nightvision.hexagon0401.workers.dev' }}
+      NV_UCDP_ENABLED: ${{ vars.NV_UCDP_ENABLED || 'true' }}
       UCDP_ANNUAL_VERSION: ${{ vars.UCDP_ANNUAL_VERSION || '26.1' }}
       NV_RSS_ENABLED: ${{ vars.NV_RSS_ENABLED }}
       NV_RSS_RIGHTS_REVIEWED: ${{ vars.NV_RSS_RIGHTS_REVIEWED }}
@@ -51,3 +52,9 @@ jobs:
             .local/monitor.sqlite
             .local/monitor-rss
           key: nv-monitor-v1-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nv-monitor-${{ github.run_id }}
+          path: .local/monitor-status.json
+          retention-days: 7

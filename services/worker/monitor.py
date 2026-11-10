@@ -18,9 +18,19 @@ class Publisher:
         from urllib.parse import urlsplit
         u=urlsplit(url)
         if u.scheme!='https' or not u.hostname or u.username or u.password or u.query or u.fragment or u.path not in ('','/'):raise ValueError('invalid_worker_origin')
-        self.url=url.rstrip('/');self.client=httpx.Client(timeout=60,follow_redirects=False,headers={'Authorization':'Bearer '+token})
+        self.url=url.rstrip('/');self.token=token;self.client=httpx.Client(timeout=120,follow_redirects=False)
+    def authorization(self):
+        from urllib.parse import quote
+        url=os.environ.get('ACTIONS_ID_TOKEN_REQUEST_URL');guard=os.environ.get('ACTIONS_ID_TOKEN_REQUEST_TOKEN')
+        if not url or not guard:
+            if self.token:return self.token
+            raise ValueError('workload_identity_unavailable')
+        try:
+            r=self.client.get(url+('&' if '?' in url else '?')+'audience='+quote(self.url+'/monitor',safe=''),headers={'Authorization':'Bearer '+guard})
+            r.raise_for_status();return r.json()['value']
+        except (httpx.HTTPError,KeyError,ValueError):raise ValueError('workload_identity_unavailable') from None
     def post(self,path,value):
-        try:r=self.client.post(self.url+'/api/internal/'+path,json=value)
+        try:r=self.client.post(self.url+'/api/internal/'+path,json=value,headers={'Authorization':'Bearer '+self.authorization()})
         except httpx.HTTPError:raise ValueError('publication_transport_failure') from None
         if r.status_code!=200:raise ValueError('publication_failed_'+str(r.status_code))
         return r.json()
@@ -41,8 +51,8 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--state',type=Path,default=Path('.local/monitor.sqlite'));p.add_argument('--scheduled',action='store_true');args=p.parse_args()
     now=datetime.now(timezone.utc);runs=int(os.environ.get('MONITOR_RUNS_PER_DAY','12'))
     if args.scheduled and not due(now,runs):print('Outside configured monitoring slot');return
-    origin=os.environ.get('NV_WORKER_ORIGIN');publish_token=os.environ.get('NV_INGEST_TOKEN')
-    if not origin or not publish_token:print('Setup required: NV_WORKER_ORIGIN / NV_INGEST_TOKEN');return
+    origin=os.environ.get('NV_WORKER_ORIGIN','https://nightvision.hexagon0401.workers.dev');publish_token=os.environ.get('NV_INGEST_TOKEN')
+    if not publish_token and not os.environ.get('ACTIONS_ID_TOKEN_REQUEST_TOKEN'):raise SystemExit('Setup required: GitHub Actions workload identity or NV_INGEST_TOKEN')
     publisher=Publisher(origin,publish_token);run={'id':'run:'+os.environ.get('GITHUB_RUN_ID',uuid.uuid4().hex)+':'+os.environ.get('GITHUB_RUN_ATTEMPT','1'),'started':now.isoformat(),'state':'running','providers':{},'requests':0}
     publisher.post('run',run);state=MonitorState(args.state)
     try:
@@ -76,9 +86,10 @@ def main():
                         snapshot=publisher.snapshot('ucdp',recent,metadata,cases)
                         run['providers']['ucdp']={'state':'complete','snapshot':snapshot,'records':len(recent),'candidates':sum(len(c['payload']['analysis']['anomalies']) for c in cases),'limited':limited}
                     else:run['providers']['ucdp']={'state':'backfill_pending','reason':'next run resumes saved page; last published data retained'}
-                finally:monitor.close()
-        except Exception:
-            run['providers']['ucdp']={'state':'failed','reason':'source acquisition or publication failed; previous data retained'}
+                finally:run['requests']=monitor.used;monitor.close()
+        except Exception as error:
+            safe=str(error) if isinstance(error,ValueError) and str(error).startswith(('ucdp_','publication_','daily_request_')) else 'source_acquisition_or_publication_failed'
+            run['providers']['ucdp']={'state':'failed','reason':safe}
         if os.environ.get('NV_RSS_ENABLED')=='true':
             try:
                 from nv_engine.monitor.rss import collect_official
@@ -87,10 +98,15 @@ def main():
                 run['providers']['rss']={'state':'complete','snapshot':snapshot,'records':len(records)}
             except Exception:
                 run['providers']['rss']={'state':'failed','reason':'RSS fetch, rights review or publication failed; previous data retained'}
+        if os.environ.get('NV_RSS_ENABLED')!='true':run['providers']['rss']={'state':'setup_required','reason':'RSS not enabled; metadata terms review required'}
         run['state']='complete' if any(v['state']=='complete' for v in run['providers'].values()) else 'failed' if any(v['state']=='failed' for v in run['providers'].values()) else 'skipped'
         run['completed']=datetime.now(timezone.utc).isoformat();publisher.post('run',run)
-        try:publisher.post('monitor-ai',{'run_id':run['id']})
-        except ValueError:pass  # AI availability never invalidates a successful source publication.
+        if run['state']=='complete':
+            try:run['ai']=publisher.post('monitor-ai',{'run_id':run['id']})
+            except ValueError:run['ai']={'state':'ai_unavailable','error':'analysis_request_failed'}
+        else:run['ai']={'state':'waiting_for_data','error':'monitor_data_unavailable'}
+        publisher.post('run',run)  # Keep AI status separate from successful statistical detection.
+        args.state.parent.mkdir(parents=True,exist_ok=True);(args.state.parent/'monitor-status.json').write_text(json.dumps(run,ensure_ascii=False,indent=2))
         print(json.dumps({'run_id':run['id'],'state':run['state'],'providers':run['providers']}))
         if run['state']=='failed':raise SystemExit('All enabled providers failed; previous published data retained')
     except Exception:

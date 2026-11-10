@@ -16,15 +16,15 @@ The public source snapshot is switched atomically only after all expected record
 
 Use the Korean `/setup.html` guide on the deployed site. Secrets are entered by the owner in service settings, never in browser bundles or Git. Runtime templates are in frontend/nv-visualize/.dev.vars.example and are not frontend build-time variables.
 
-- Cloudflare runtime secrets: NVIDIA_API_KEY, optional NVIDIA_SECONDARY_API_KEY, GITHUB_CLIENT_SECRET, NV_INGEST_TOKEN.
+- Cloudflare runtime secrets: NVIDIA_API_KEY_A, optional NVIDIA_API_KEY_B, GITHUB_CLIENT_SECRET. Legacy aliases remain supported; NV_INGEST_TOKEN is now an optional operator alternative to workload identity.
 - Runtime non-secret values: GITHUB_CLIENT_ID, GITHUB_ALLOWED_USER_IDS (default 82876856, verified GitHub ID for hexagon0401), NIM_ENABLED=true after verifying free API entitlement; NIM_MODEL and NIM_REVIEW_MODEL are configurable.
-- GitHub Actions secrets: UCDP_ACCESS_TOKEN and the same NV_INGEST_TOKEN.
-- Actions variables: NV_WORKER_ORIGIN, NV_MONITOR_ENABLED=true, NV_UCDP_ENABLED=true, MONITOR_RUNS_PER_DAY=12. Match the runtime frequency setting.
+- GitHub Actions secret: UCDP_ACCESS_TOKEN. Monitor publication normally uses short-lived GitHub OIDC; no duplicated ingest key is required. An existing NV_INGEST_TOKEN still works.
+- Actions defaults: existing nightvision Worker origin, monitor enabled unless NV_MONITOR_ENABLED=false, UCDP attempted with its token unless NV_UCDP_ENABLED=false, MONITOR_RUNS_PER_DAY=12. Match the runtime frequency setting. RSS remains opt-in.
 - Optional UN News metadata: NV_RSS_ENABLED=true and NV_RSS_RIGHTS_REVIEWED=true after checking UN terms. Headlines/links only; no full-text/media scraping or invented event coordinates. Subsequent optional providers remain GDELT then FIRMS.
 
 GitHub OAuth needs a separate OAuth App, with callback `<origin>/api/auth/github/callback`; it requests read:user, never repository write. Hash-only opaque session tokens expire after seven days; one-use state expires after ten minutes and is bound to a Secure HttpOnly SameSite cookie plus PKCE verifier. User IDs, not mutable usernames, enforce the allowlist. AI/diagnostic/logout POST requires same origin.
 
-NIM only receives server-selected evidence. Cache identity includes prompt/model/role/evidence and is checked before charging. Global 40/day and direct-user 10/day quotas reserve atomically; scheduled calls have a 30/day ceiling, sufficient for 24 summaries plus three primary candidate analyses and three second-model reviews. The reviewer receives the primary interpretation alongside the same cited evidence. Inputs are capped at 18,000 characters and output at 1,024 tokens. There is no paid fallback. Model/access/quota failures pause new calls for that model until next UTC day (09:00 KST). Cached results and normal data remain available. Review agreement is not independent corroboration. Unknown citations/added fields/links/coordinate pairs are rejected; natural-language entailment is not certified, so AI text remains inferred and cannot create canonical facts.
+NIM only receives server-selected evidence. Cache identity includes prompt/model/role/evidence and is checked before charging. Global 40/day and direct-user 10/day quotas reserve atomically; scheduled calls have a 30/day ceiling, sufficient for 24 summaries plus three primary candidate analyses and three second-model reviews. The reviewer receives the primary interpretation alongside the same cited evidence. Inputs are capped at 18,000 characters and ordinary output at 1,536 tokens (beta A/B 4,096/2,048). The documented Nemotron model disables thinking for bounded JSON; other models use provider defaults. There is no paid fallback. Model/access/quota failures pause new calls for that model until next UTC day (09:00 KST). Cached results and normal data remain available. Review agreement is not independent corroboration. Unknown citations/added fields/links/coordinate pairs are rejected; natural-language entailment is not certified, so AI text remains inferred and cannot create canonical facts.
 
 ## Interfaces
 
@@ -42,3 +42,5 @@ Python tests cover UCDP pagination resume, request budgets, revision precedence,
 Cloudflare must remain on Workers/D1 free plans; those service limits remain authoritative and may stop requests. No code can turn a provider's paid account into a free account. Reaching D1 storage/write limits retains the last published data and reports unavailability; monitoring is not a production SLA, completeness claim, seismic/geopolitical predictor or independently calibrated risk score.
 
 Runtime key aliases: NVIDIA_API_KEY_A is preferred for primary analysis and NVIDIA_API_KEY_B for review. Legacy NVIDIA_API_KEY and NVIDIA_SECONDARY_API_KEY remain supported; A/B take precedence when both conventions exist. With only A, review uses A under the same global budget. Key selection never rotates keys to evade quotas.
+
+See [monitor and AI recovery](monitor-ai-recovery.md) for scoped workload authentication, independent statistical fallback, safe response diagnostics and production acceptance requirements.

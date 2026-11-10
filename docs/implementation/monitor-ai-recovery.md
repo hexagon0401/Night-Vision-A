@@ -1,0 +1,20 @@
+# Monitoring and NIM recovery — 2026-11-10
+
+## Diagnosed production state
+
+The last scheduled monitor job was skipped, and the public service had no provider snapshots, runs or last successful analysis. Configured NIM keys did not imply working collection or model inference. A separate beta run failed on a length-truncated model response.
+
+## Changes
+
+- The main-branch scheduled workflow now runs unless `NV_MONITOR_ENABLED=false` explicitly disables it. Twelve daily slots remain the default; the hourly workflow skips non-due slots. Its Worker origin has the existing production URL as a default.
+- Publication accepts GitHub OIDC for the exact `monitor.yml@refs/heads/main` workflow, pinned repository ID, main ref, schedule/manual events and `/monitor` audience. Beta and monitor tokens cannot authorize each other's routes. Existing shared ingest tokens remain supported. Workload tokens are obtained per request and never written to artifacts.
+- UCDP is attempted when the Actions `UCDP_ACCESS_TOKEN` exists, unless explicitly disabled. No token is fabricated, copied from frontend settings or retrieved from chat. Missing credentials, backfill, authentication and upstream errors stay explicit. RSS enablement and terms review are still required; a failed terms-page request is not a completed license review.
+- Successful data collection/statistical detection is recorded independently from AI availability. Each run records AI status; source failure retains the last published snapshot. A small run-status artifact records actual operation without secrets.
+- The documented Nemotron 3.5 Lightning request template enables thinking by default. For bounded structured reports only, send `chat_template_kwargs: {enable_thinking:false}` to that exact model. Llama and unknown models retain provider defaults. No High claim or paid/model/key rotation is introduced. Reference: https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b (official template inspected 2026-11-10).
+- Ordinary summaries use compact JSON and 1,536 completion tokens; beta remains A 4,096/B 2,048 with short phase outputs. Cache prompt version changes so failed/older settings are not reused as new analysis. Global 40/day, beta 6 attempts/day, account 10/day and reviewer 3/day remain unchanged.
+- Truncated responses are rejected, safe usage/finish metadata is retained, and incomplete beta steps can be resumed. Model health records expose status, model and usage, never response bodies, prompts, hidden reasoning or keys. Login/allowlist checks still protect user-triggered NIM.
+- The monitor shows an always-visible collection-state control, last-run setup failures and model health. A public statistical summary remains available separately from cached AI, and an empty corpus is explicitly unknown coverage rather than zero real incidents. Uninitialized data never consumes scheduled NIM calls.
+
+## Acceptance
+
+Run Python tests, Worker/D1 integration, frontend tests/build and browser tests. Live monitoring and both NIM roles must be checked after deployment; passing mocks alone does not establish real source access. If no UCDP token exists in Actions, collection stays setup-required until the owner registers it. Do not label that state operational.
