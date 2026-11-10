@@ -69,7 +69,7 @@ async function api(path: string, body?: unknown) {
   return d;
 }
 function stateLabel(value:string) {
- return ({complete:'정상 완료',running:'실행 중',failed:'실패',skipped:'건너뜀',setup_required:'설정 필요',backfill_pending:'초기 자료 수집 진행 중',available:'응답 검증 완료',responded:'응답 수신 · 검증 전',unavailable:'사용 불가'} as Record<string,string>)[value]??value;
+ return ({complete:'정상 완료',running:'실행 중',failed:'실패',skipped:'건너뜀',setup_required:'설정 필요',backfill_pending:'초기 자료 수집 진행 중',available:'응답 검증 완료',responded:'응답 수신 · 검증 전',unavailable:'사용 불가',withheld:'근거 검증 보류'} as Record<string,string>)[value]??value;
 }
 function failureLabel(value:string) {
  return ({ucdp_auth_rejected:'UCDP 토큰이 거부됐습니다. GitHub 감시 작업의 UCDP_ACCESS_TOKEN을 확인하세요.',ucdp_version_unavailable:'설정한 UCDP 자료 버전을 찾지 못했습니다.',ucdp_rate_limited:'UCDP 요청 한도에 도달했습니다.',ucdp_upstream_failure:'UCDP 제공기관 응답 오류',nim_truncated_response:'AI 응답이 출력 한도에서 잘림',nim_quota_or_model_unavailable:'모델 접근 권한 또는 무료 한도 문제',nim_transport_failure:'NIM 연결 지연 또는 중단',invalid_ai_response:'AI 응답 형식 검증 실패','UCDP_ACCESS_TOKEN and NV_UCDP_ENABLED=true required':'GitHub 저장소의 비밀 설정에 UCDP_ACCESS_TOKEN을 등록해야 합니다.','RSS not enabled; metadata terms review required':'RSS 연결과 이용 조건 검토가 필요합니다.','next run resumes saved page; last published data retained':'다음 회차에서 이어받습니다. 이전 정상 자료는 유지됩니다.'} as Record<string,string>)[value]??value;
@@ -212,6 +212,10 @@ export function mountMonitor(
     });
   function displayAI(parent: HTMLElement, data: any) {
     parent.replaceChildren();
+    if(data?.status==='withheld') {
+      parent.append(el('p','AI 응답이 근거 검증을 통과하지 못해 표시하지 않습니다. 통계 기반 현황·Trace는 계속 사용할 수 있습니다.'),el('small',`${data.model} · 검증 보류: ${data.validation_error??'응답 형식/출처 연결'}`));
+      return;
+    }
     const result = data?.result;
     if (!result) {
       parent.append(

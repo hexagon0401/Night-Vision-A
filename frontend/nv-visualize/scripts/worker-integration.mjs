@@ -27,6 +27,7 @@ let nimCalls = 0;
 let profileId = 82876856;
 let nimStatus = 200;
 let finishReason='stop';
+let uncitedAnswer=false;
 const mf = new Miniflare(
   await convertV4MiniflareOptions({
     workers: [
@@ -80,7 +81,7 @@ const mf = new Miniflare(
                   finish_reason:finishReason,
                   message: {
                     content: JSON.stringify({
-                      summary: [],
+                      summary: uncitedAnswer?["Uncited claim must be withheld"]:[],
                       alternatives: [],
                       counterevidence: [],
                       unknowns: [],
@@ -340,7 +341,7 @@ try {
   assert.equal((await req('/api/internal/beta/start',{...betaInput,topic:'different'},betaHeaders)).status,429);
   await db.prepare('INSERT OR REPLACE INTO settings VALUES(?,?)').bind('nim-health:nvidia/nemotron-3.5-lightning-30b-a3b',JSON.stringify({error:'nim_truncated_response'})).run();
   const selected=await selectModel({DB:db,NIM_REVIEW_MODEL:'meta/llama-3.3-70b-instruct'},'nvidia/nemotron-3.5-lightning-30b-a3b');
-  assert.equal(selected.model,'nvidia/nemotron-3.5-lightning-30b-a3b');assert.equal(selected.shared_model_with_critic,true);
+  assert.equal(selected.model,'nvidia/nemotron-3.5-super-vl-120b-a12b');assert.equal(selected.shared_model_with_critic,false);
   assert.equal((await selectModel({DB:db},'meta/llama-3.3-70b-instruct','critic')).model,'nvidia/nemotron-3.5-lightning-30b-a3b');
   await db.prepare("DELETE FROM settings WHERE key='nim-health:nvidia/nemotron-3.5-lightning-30b-a3b'").run();
   // Six major calls plus at most two bounded retries; the global cap stays 40.
@@ -360,6 +361,13 @@ try {
   assert.ok(!JSON.stringify(health).includes('test-nim-A'));
   finishReason='stop';
   assert.equal((await req('/api/v2/ai/analyze',{case_id:payload.case.case_id},{Cookie:session})).status,200);
+  await db.prepare("DELETE FROM ai_results WHERE kind='case'").run();uncitedAnswer=true;
+  const withheld=await(await req('/api/v2/ai/analyze',{case_id:payload.case.case_id},{Cookie:session})).json();
+  assert.equal(withheld.status,'withheld');assert.equal(withheld.result,null);assert.equal(withheld.validation_error,'ai_uncited_summary');
+  const callsBeforeCache=nimCalls;
+  const reused=await(await req('/api/v2/ai/analyze',{case_id:payload.case.case_id},{Cookie:session})).json();
+  assert.equal(reused.cached,true);assert.equal(nimCalls,callsBeforeCache,'rejected content does not burn another same-day call');
+  uncitedAnswer=false;
   // Race competing global reservations using actual D1 transactions.
   await db
     .prepare("INSERT OR REPLACE INTO quotas VALUES(date('now'),'nim',39)")

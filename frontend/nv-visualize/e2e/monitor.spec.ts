@@ -38,7 +38,7 @@ for (const width of [1440, 390])
           cases: [{ id: "case:ucdp:test", country: "SYNTHETIC TEST" }],
         },
         "/api/auth/me": { user: null, configured: true },
-        "/api/v2/monitor-summary": { result: null },
+        "/api/v2/monitor-summary": { result: {status:"withheld",model:"test-model",validation_error:"ai_uncited_summary",result:null} },
         "/api/v2/events": {
           records: [
             {
@@ -74,6 +74,7 @@ for (const width of [1440, 390])
     ).toBeVisible();
     await expect(page.locator(".monitor-status")).toContainText("하루 12회");
     expect(eventLimits).toContain('100');
+    await expect(page.locator(".monitor-summary")).toContainText("근거 검증을 통과하지 못해");
     await page.getByLabel('국가 선택').selectOption('SYNTHETIC TEST');
     await page.getByRole('button',{name:'조회',exact:true}).click();
     await expect.poll(()=>eventLimits.at(-1)).toBe('500');
