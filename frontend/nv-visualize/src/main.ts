@@ -19,7 +19,7 @@ async function render() {
   enhanceCleanup?.();
   accountCleanup?.();
   if(url.searchParams.get('view')==='beta')cleanup=mountBeta(root);
-  else if (url.searchParams.get("view") === "monitor")
+  else if (url.searchParams.get("view") === "monitor" || (!url.searchParams.has("view")&&!url.searchParams.has("case")))
     cleanup = mountMonitor(root, sharedMap);
   else {
     const kind =

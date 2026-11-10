@@ -23,6 +23,7 @@ const script = built.outputFiles[0].text.replace(
 const rsa=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
 const jwk={...await crypto.subtle.exportKey('jwk',rsa.publicKey),kid:'beta-test-key',alg:'RS256'};
 async function workload(overrides={}){const now=Math.floor(Date.now()/1000);const header=Buffer.from(JSON.stringify({alg:'RS256',kid:jwk.kid})).toString('base64url');const claims=Buffer.from(JSON.stringify({iss:'https://token.actions.githubusercontent.com',aud:'https://example.test/beta',iat:now,exp:now+300,repository:'hexagon0401/Night-Vision-A',repository_id:'1204033173',ref:'refs/heads/main',event_name:'workflow_dispatch',workflow_ref:'hexagon0401/Night-Vision-A/.github/workflows/beta-comparison.yml@refs/heads/main',run_id:'42',sha:'test-sha',...overrides})).toString('base64url');const signature=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',rsa.privateKey,new TextEncoder().encode(header+'.'+claims));return header+'.'+claims+'.'+Buffer.from(signature).toString('base64url');}
+let contextCalls=0;
 let nimCalls = 0;
 let profileId = 82876856;
 let nimStatus = 200;
@@ -91,6 +92,7 @@ const mf = new Miniflare(
               ],
             });
           }
+          if(new URL(request.url).hostname==='earth-search.aws.element84.com'){contextCalls++;return Response.json({features:[]});}
           return new Response("unexpected outbound", { status: 500 });
         },
       },
@@ -192,6 +194,19 @@ try {
   );
   assert.equal((await internal("publish", { id: snapshot.id })).status, 200);
   assert.equal((await (await req("/api/v2/events")).json()).records.length, 1);
+  const missingContext=await req('/api/v2/events/ucdp%3Amissing/context');assert.equal(missingContext.status,404);assert.equal(contextCalls,0);
+  const contextPath='/api/v2/events/ucdp%3A1/context';
+  const contextResponse=await req(contextPath);assert.equal(contextResponse.status,200);const context=await contextResponse.json();
+  assert.equal(context.event_ref.id,record.id);assert.equal(context.counts.direct,0);assert.equal(contextCalls,1);
+  assert.equal(context.provider_runs.find(p=>p.provider_id==='earth_search_stac').status,'empty');
+  assert.equal((await req(contextPath+'/refresh',{})).status,401);
+  await req(contextPath);assert.equal(contextCalls,1,'cached context must not refetch');
+  assert.equal((await req(contextPath+'?include=unknown')).status,400);
+  const savedCache=await db.prepare('SELECT COUNT(*) n FROM event_context_cache').first();assert.equal(savedCache.n,2);
+  await internal('start',{...snapshot,id:'snapshot:context-empty',expected:0});
+  await db.prepare('UPDATE heads SET snapshot=? WHERE provider=?').bind('snapshot:context-empty','ucdp').run();
+  assert.equal((await req(contextPath)).status,404,'unpublished record is not resolved from the old cache');
+  await db.prepare('UPDATE heads SET snapshot=? WHERE provider=?').bind(snapshot.id,'ucdp').run();
   const exported = await req(
     "/api/v2/cases/" + encodeURIComponent(payload.case.case_id) + "/export",
   );

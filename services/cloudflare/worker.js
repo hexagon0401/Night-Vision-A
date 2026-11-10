@@ -15,6 +15,8 @@ import { initialize } from "./database.js";
 import {betaAuthorization,monitorAuthorization} from './workload.js';
 import {betaRoute} from './beta.js';
 
+import {contextRoute,resolveEvent} from './event-context.js';
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -43,6 +45,8 @@ export default {
           503,
         );
       await initialize(env.DB);
+      if(/^\/api\/v2\/events\/[^/]+$/.test(url.pathname)&&request.method==='GET')return json((await resolveEvent(env,decodeURIComponent(url.pathname.split('/').pop()))).r);
+      if(/^\/api\/v2\/events\/[^/]+\/context(?:\/|$)/.test(url.pathname))return await contextRoute(request,env,url);
       if(url.pathname.startsWith('/api/internal/beta/')){
         requireValue(request.method==='POST','method_not_allowed',405);
         const actor=await betaAuthorization(request,env);return await betaRoute(request,env,url.pathname,actor);

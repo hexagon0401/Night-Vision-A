@@ -1,3 +1,5 @@
+import {readFileSync} from "node:fs";
+const contextFixture=JSON.parse(readFileSync(new URL("../tests/fixtures/event-context.json",import.meta.url),"utf8"));
 import { test, expect } from "@playwright/test";
 for (const width of [1440, 390])
   test(`monitor status, approximate source events and gated AI ${width}px`, async ({
@@ -66,6 +68,7 @@ for (const width of [1440, 390])
           limited: false,
         },
       };
+      responses['/api/v2/events/ucdp%3Atest/context']={...contextFixture,event_ref:{...contextFixture.event_ref,id:'ucdp:test'}};
       return route.fulfill({
         contentType: "application/json",
         body: JSON.stringify(responses[u.pathname] ?? {}),
@@ -108,6 +111,10 @@ for (const width of [1440, 390])
     await expect(
       detail.getByRole("link", { name: "관련 추이·Trace" }),
     ).toHaveAttribute("href", "/?case=live&id=case%3Aucdp%3Atest");
+    await detail.getByRole('button',{name:'사건 자료 탐색',exact:true}).click();
+    await expect(detail.locator('.context-state')).toContainText('발견 0건');
+    await detail.getByRole('tab',{name:'위성',exact:true}).click();
+    await expect(detail.locator('.context-content')).toContainText('표시할 자료가 없습니다');
     await detail.getByRole('button',{name:'닫기',exact:true}).click();
     await expect(detail).toBeHidden();
     await page.getByText('사건 표시',{exact:true}).click();
