@@ -106,6 +106,7 @@ export function mountMonitor(
         ? ""
         : "상세 지도 연결 실패 · 윤곽 지도 표시 중";
     },
+    nearby:(id)=>root.querySelector('main')?.dispatchEvent(new CustomEvent('nv:nearby-pick',{detail:id})),
     event: (id) => {
       const r = records.find((r) => r.id === id);
       if (r) showEvent(r);
@@ -122,6 +123,7 @@ export function mountMonitor(
     link("합성 실험", "/?case=synthetic"),
     link("USGS Alpha", "/?case=alpha"),
     button("현황", () => {
+      disposeNearby();
       panel.hidden = !panel.hidden;
     }),
     button("새로고침", () => void refresh()),
@@ -282,6 +284,7 @@ export function mountMonitor(
     }
   }
   function showEvent(r: EventRecord, focusMap=true) {
+    if(focusMap)disposeNearby();
     disposeContext();
     selected=r;detail.hidden=false;if(focusMap)panel.hidden=true;
     updateMap();syncSelection();

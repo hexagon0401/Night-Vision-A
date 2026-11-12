@@ -76,6 +76,8 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
         const p=map.project(m.point);
         if(Math.hypot(p.x-x,p.y-y)<=22) {callbacks.pick(m.ids);return m;}
       }
+      const nearby=(latest.nearby??[]).map(e=>{const p=map.project([e.lon,e.lat]);return {e,d:Math.hypot(p.x-x,p.y-y)};}).filter(({d})=>d<=11).sort((a,b)=>a.d-b.d)[0]?.e;
+      if(nearby){callbacks.nearby?.(nearby.id);return nearby;}
       const event=(latest.events??[]).map(e=>{const p=map.project([e.lon,e.lat]);return {e,d:Math.hypot(p.x-x,p.y-y)};}).filter(({e,d})=>d<=Math.max(10,(e.radius??5)+3)).sort((a,b)=>a.d-b.d)[0]?.e;
       if(event){callbacks.event?.(event.id);return event;}
       return null;

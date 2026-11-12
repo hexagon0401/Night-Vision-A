@@ -23,6 +23,9 @@ const script = built.outputFiles[0].text.replace(
 const rsa=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
 const jwk={...await crypto.subtle.exportKey('jwk',rsa.publicKey),kid:'beta-test-key',alg:'RS256'};
 async function workload(overrides={}){const now=Math.floor(Date.now()/1000);const header=Buffer.from(JSON.stringify({alg:'RS256',kid:jwk.kid})).toString('base64url');const claims=Buffer.from(JSON.stringify({iss:'https://token.actions.githubusercontent.com',aud:'https://example.test/beta',iat:now,exp:now+300,repository:'hexagon0401/Night-Vision-A',repository_id:'1204033173',ref:'refs/heads/main',event_name:'workflow_dispatch',workflow_ref:'hexagon0401/Night-Vision-A/.github/workflows/beta-comparison.yml@refs/heads/main',run_id:'42',sha:'test-sha',...overrides})).toString('base64url');const signature=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',rsa.privateKey,new TextEncoder().encode(header+'.'+claims));return header+'.'+claims+'.'+Buffer.from(signature).toString('base64url');}
+const nearbyDate=new Date(Date.now()-86400000).toISOString();
+const nearbyScene='S2B_52SBG_'+nearbyDate.slice(0,10).replaceAll('-','')+'_0_L2A';
+const nearbyAsset='https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/52/S/BG/'+nearbyDate.slice(0,4)+'/'+Number(nearbyDate.slice(5,7))+'/'+nearbyScene+'/preview.jpg';
 let contextCalls=0,mediaCalls=0,gdeltCalls=0;
 let nimCalls = 0;
 let profileId = 82876856;
@@ -93,7 +96,13 @@ const mf = new Miniflare(
               ],
             });
           }
-          if(new URL(request.url).hostname==='earth-search.aws.element84.com'){contextCalls++;return Response.json({features:[]});}
+          if(u.hostname==='earth-search.aws.element84.com'){
+           if(u.pathname.endsWith('/items/'+nearbyScene))return Response.json({id:nearbyScene,collection:'sentinel-2-l2a',assets:{thumbnail:{href:nearbyAsset}}});
+           if(request.method==='POST'&&JSON.parse(await request.clone().text()).limit===4)return Response.json({features:[{id:nearbyScene,properties:{datetime:nearbyDate,'eo:cloud_cover':3}}]});
+           contextCalls++;return Response.json({features:[]});
+          }
+          if(u.hostname==='sentinel-cogs.s3.us-west-2.amazonaws.com')return new Response(new Uint8Array([255,216,255,217]),{headers:{'Content-Type':'image/jpeg'}});
+          if(u.hostname==='api.adsb.lol')return Response.json({now:Date.now(),ac:[{flight:'KAL1244',t:'B738',r:'HL1234',lat:37.51,lon:126.92,seen_pos:5}]});
           if(u.hostname==='api.gdeltproject.org'){gdeltCalls++;return Response.json({articles:[]});}
           if(u.hostname==='graph.mapillary.com'){mediaCalls++;assert.equal(request.headers.get('Authorization'),'OAuth test-mapillary-secret');assert.ok(!u.search.includes('secret'));return Response.json({data:[{id:'42',captured_at:Date.parse('2025-12-01'),geometry:{type:'Point',coordinates:[22,12]}}],paging:{next:'https://graph.mapillary.com/images?access_token=test-mapillary-secret'}});}
           if(u.hostname==='api.windy.com'){mediaCalls++;assert.equal(request.headers.get('x-windy-api-key'),'test-windy-secret');return Response.json({total:0,webcams:[]});}
@@ -214,6 +223,13 @@ try {
   await db.prepare('UPDATE heads SET snapshot=? WHERE provider=?').bind('snapshot:context-empty','ucdp').run();
   assert.equal((await req(contextPath)).status,404,'unpublished record is not resolved from the old cache');
   await db.prepare('UPDATE heads SET snapshot=? WHERE provider=?').bind(snapshot.id,'ucdp').run();
+  const nearBase='/api/v2/nearby?lat=37.5&lon=126.9&radius=25&type=';
+  assert.equal((await req('/api/v2/nearby?lat=&lon=1')).status,400);
+  const air=await(await req(nearBase+'aircraft')).json();assert.equal(air.status,'ok');assert.equal(air.items[0].kind,'aircraft');
+  const vessels=await(await req(nearBase+'vessels')).json();assert.equal(vessels.status,'key_required');
+  const sat=await(await req(nearBase+'satellite')).json();assert.equal(sat.status,'ok');assert.equal(sat.items.length,1);
+  const image=await req('/api/v2/nearby/preview?scene='+nearbyScene);assert.equal(image.status,200);assert.match(image.headers.get('Cache-Control'),/no-store/);assert.equal(new Uint8Array(await image.arrayBuffer())[0],255);
+  assert.equal((await req('/api/v2/nearby/preview?scene=https%3A%2F%2Fevil.example')).status,400);
   const exported = await req(
     "/api/v2/cases/" + encodeURIComponent(payload.case.case_id) + "/export",
   );

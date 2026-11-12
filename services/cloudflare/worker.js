@@ -17,6 +17,7 @@ import {betaRoute} from './beta.js';
 
 import {contextRoute,resolveEvent} from './event-context.js';
 
+import {webcamImage} from './nearby-webcam.js';
 import {nearbyRoute} from './nearby.js';
 import {preview} from './nearby-preview.js';
 
@@ -31,7 +32,7 @@ export default {
         headers.set("Referrer-Policy", "no-referrer");
         headers.set(
           "Content-Security-Policy",
-          "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.openfreemap.org https://assets.openfreemap.com; connect-src 'self' https://*.openfreemap.org https://assets.openfreemap.com; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'",
+          "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.openfreemap.org https://assets.openfreemap.com https://*.windy.com; connect-src 'self' https://*.openfreemap.org https://assets.openfreemap.com; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'",
         );
         return new Response(response.body, {
           status: response.status,
@@ -49,6 +50,7 @@ export default {
         );
       await initialize(env.DB);
       if(url.pathname==='/api/v2/nearby')return await nearbyRoute(request,env,url);
+      if(url.pathname==='/api/v2/nearby/webcam')return await webcamImage(request,env,url);
       if(url.pathname==='/api/v2/nearby/preview')return await preview(request,env,url);
       if(/^\/api\/v2\/events\/[^/]+$/.test(url.pathname)&&request.method==='GET')return json((await resolveEvent(env,decodeURIComponent(url.pathname.split('/').pop()))).r);
       if(/^\/api\/v2\/events\/[^/]+\/context(?:\/|$)/.test(url.pathname))return await contextRoute(request,env,url);

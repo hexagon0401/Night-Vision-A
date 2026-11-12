@@ -31,6 +31,7 @@ export interface MapCallbacks {
   dismiss(): void;
   basemap?(detailed: boolean): void;
   event?(id: string): void;
+  nearby?(id:string):void;
 }
 interface Marker {
   point: Point;

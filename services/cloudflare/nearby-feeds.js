@@ -4,7 +4,7 @@ export const distance=(a,b)=>{const rad=x=>x*Math.PI/180,h=Math.sin(rad(b.lat-a.
 export const validPoint=p=>Number.isFinite(p?.lat)&&Number.isFinite(p?.lon)&&Math.abs(p.lat)<=90&&Math.abs(p.lon)<=180;
 export const coarse=p=>({lat:Math.round(p.lat*100)/100,lon:Math.round(p.lon*100)/100});
 const AIRLINES=/^(KAL|AAR|JJA|JNA|TWB|ABL|ESR|ASV|JAL|ANA|APJ|JJP|DAL|AAL|UAL|SWA|FFT|JBU|ACA|WJA|BAW|AFR|KLM|DLH|SWR|AUA|FIN|SAS|RYR|EZY|THY|SIA|CPA|HDA|CSN|CCA|CES|UAE|QTR|ETH|QFA|ANZ|LAN|TAM|AVA|AMX|VOI|VIV)\d[A-Z0-9]*$/;
-const AIRLINER=/^(A(19|20|21|22|23|25|26|30|31|32|33|34|35|36|38)|B(37|38|39|74|75|76|77|78)|BCS[13]|E(17|19)|AT[47]|DH8)/;
+const AIRLINER=/^(A(19|20|21|22|23|25|26|30|31|32|33|34|35|36|38)|B(73|38|39|74|75|76|77|78)|BCS[13]|E(17|19)|AT[47]|DH8)/;
 export function civilianAircraft(data,q,now=Date.now()) {
  if(!Array.isArray(data.ac)||!Number.isFinite(data.now)||Math.abs(now-data.now)>180000)throw Error('stale_aircraft_snapshot');
  const seen=new Set();return data.ac.slice(0,500).flatMap(a=>{

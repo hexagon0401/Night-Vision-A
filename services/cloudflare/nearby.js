@@ -9,7 +9,7 @@ export function nearbyQuery(url){
 }
 export async function nearbyRoute(request,env,url){
  requireValue(request.method==='GET','method_not_allowed',405);const q=nearbyQuery(url),now=new Date().toISOString(),key='nearby:v1:'+q.type+':'+q.lat+':'+q.lon+':'+q.radius;
- const base={schema_version:'nearby_context.v1',query:q,queried_at:now,status:'empty',items:[],note:'조회한 주변 현황이며 사건 증거가 아닙니다. 수신 누락·지연이 있을 수 있습니다.'};
+ const base={schema_version:'nearby_context.v1',query:q,queried_at:now,status:'empty',items:[],note:q.type==='webcams'&&q.radius>25?'웹캠은 중심에서 최대 25km만 조회합니다. 사건 증거가 아니며 수신 누락·지연이 있을 수 있습니다.':'조회한 주변 현황이며 사건 증거가 아닙니다. 수신 누락·지연이 있을 수 있습니다.'};
  if(q.type==='vessels'&&!env.AISSTREAM_API_KEY)return json({...base,status:'key_required',reason:'AISSTREAM_API_KEY'});
  if(q.type==='webcams'&&!env.WINDY_API_KEY)return json({...base,status:'key_required',reason:'WINDY_API_KEY'});
  if((env.NEARBY_DISABLED_PROVIDERS??'').split(',').includes(q.type))return json({...base,status:'disabled'});
