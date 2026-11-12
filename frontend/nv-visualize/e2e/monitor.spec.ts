@@ -68,6 +68,7 @@ for (const width of [1440, 390])
           limited: false,
         },
       };
+      responses['/api/v2/engine/investigate']={schema_version:'nv-investigation/2.0',detector:{state:'published_python_engine',candidates:[]},ai:{state:'not_requested'},module_results:[],quality_gate_results:{},source_ledger:[]};
       responses['/api/v2/events/ucdp%3Atest/context']={...contextFixture,event_ref:{...contextFixture.event_ref,id:'ucdp:test'}};
       return route.fulfill({
         contentType: "application/json",
@@ -111,10 +112,12 @@ for (const width of [1440, 390])
     await expect(
       detail.getByRole("link", { name: "관련 추이·Trace" }),
     ).toHaveAttribute("href", "/?case=live&id=case%3Aucdp%3Atest");
+    await detail.getByRole('button',{name:'NV 엔진으로 검토',exact:true}).click();await expect(detail.locator('.nv-engine-panel')).toContainText('통계 후보 0건');
     await detail.getByRole('button',{name:'사건 자료 탐색',exact:true}).click();
     await expect(detail.locator('.context-state')).toContainText('발견 0건');
     await detail.getByRole('tab',{name:'위성',exact:true}).click();
     await expect(detail.locator('.context-content')).toContainText('표시할 자료가 없습니다');
+    await page.screenshot({path:test.info().outputPath('nv-evidence-ui.png')});
     await detail.getByRole('button',{name:'닫기',exact:true}).click();
     await expect(detail).toBeHidden();
     await page.getByText('사건 표시',{exact:true}).click();
@@ -122,6 +125,7 @@ for (const width of [1440, 390])
     await page.getByLabel('사건 표시 크기',{exact:true}).selectOption('1.3');
     await expect(page.getByLabel('사건 색상',{exact:true})).toHaveValue('amber');
     await page.getByRole('button',{name:'현황',exact:true}).click();
+    await page.getByRole('tab',{name:'사건 목록',exact:true}).click();
     const selectedRow=page.getByRole('button',{name:'2026-11-01 · SYNTHETIC TEST <img src=x>',includeHidden:true});
     await expect(selectedRow).toHaveAttribute('aria-pressed','false');
     await selectedRow.click();
