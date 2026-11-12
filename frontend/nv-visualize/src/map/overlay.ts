@@ -6,7 +6,7 @@ import type { Point } from "../cases/model";
 // One MapLibre context for basemap, events and Trace. No second WebGL canvas.
 export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: () => void) {
   const source = "nv-overlay";
-  const ids = ["nv-evidence-points","nv-evidence-lines","nv-evidence-areas","nv-footprints","nv-direct", "nv-inferred", "nv-scenario", "nv-events", "nv-nearby", "nv-event-selection", "nv-markers", "nv-counts"];
+  const ids = ["nv-ontology-fill","nv-ontology-outline","nv-ontology-points","nv-ontology-selected","nv-evidence-points","nv-evidence-lines","nv-evidence-areas","nv-footprints","nv-direct", "nv-inferred", "nv-scenario", "nv-events", "nv-nearby", "nv-event-selection", "nv-markers", "nv-counts"];
   let lastRendered: MapData | undefined;
   let latest: MapData | undefined, destroyed = false, notified = false;
   const arc = (points: Point[], progress: number): Point[] => {
@@ -40,6 +40,10 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
     if (!map.getSource(source)) {
       if (!map.isStyleLoaded()) return;
       map.addSource(source,{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+      map.addLayer({id:'nv-ontology-fill',type:'fill',source,filter:['all',['==',['get','kind'],'ontology-object'],['==',['geometry-type'],'Polygon']],paint:{'fill-color':['match',['get','object_kind'],'satellite_scene','#a89fc7','#8fb7aa'],'fill-opacity':.14}});
+      map.addLayer({id:'nv-ontology-outline',type:'line',source,filter:['all',['==',['get','kind'],'ontology-object'],['==',['geometry-type'],'Polygon']],paint:{'line-color':['case',['get','object_selected'],'#fff','#a89fc7'],'line-width':['case',['get','object_selected'],2,1]}});
+      map.addLayer({id:'nv-ontology-points',type:'circle',source,filter:['all',['==',['get','kind'],'ontology-object'],['==',['geometry-type'],'Point']],paint:{'circle-radius':7,'circle-color':['match',['get','object_kind'],'vessel','#d1a568','aircraft','#86b6d8','camera','#8fba9f','event','#c87970','#b7b8bc'],'circle-stroke-color':'#e8ecee','circle-stroke-width':1}});
+      map.addLayer({id:'nv-ontology-selected',type:'circle',source,filter:['all',['==',['get','kind'],'ontology-object'],['==',['geometry-type'],'Point'],['==',['get','object_selected'],true]],paint:{'circle-radius':12,'circle-opacity':0,'circle-stroke-color':'#fff','circle-stroke-width':1.5}});
       for (const [id,kind,dash] of [["nv-direct","direct",null],["nv-inferred","inferred",[5,4]],["nv-scenario","scenario",[1,5]]] as const)
         map.addLayer({id,type:"line",source,filter:["==",["get","kind"],kind],paint:{"line-color":kind==="direct"?"#ecece8":"#a7a7a7","line-width":1.5,...(dash?{"line-dasharray":[...dash]}:{})}});
     map.addLayer({id:'nv-footprints',type:'fill',source,filter:['==',['get','kind'],'satellite'],paint:{'fill-color':'#9a91bf','fill-opacity':.12,'fill-outline-color':'#aaa0d0'}});
@@ -58,6 +62,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
     const point = (p:Point,properties:Record<string,unknown>) => features.push({type:"Feature",geometry:{type:"Point",coordinates:p},properties});
     for(const f of data.footprints??[])features.push({type:'Feature',geometry:f.geometry,properties:{kind:'satellite',id:f.id}});
     for(const f of data.evidenceFeatures??[])features.push({...f,properties:{...f.properties,kind:'evidence'}});
+    for(const f of data.ontologyFeatures?.features??[])features.push({...f,properties:{...f.properties,object_kind:f.properties?.object_kind??f.properties?.kind,object_selected:f.properties?.object_id===data.selectedObject,kind:'ontology-object'}});
     const markers=groupMarkers(data);
     for (const m of markers) point(m.point,{kind:"marker",ids:JSON.stringify(m.ids),count:m.ids.length,selected:m.ids.includes(data.selected??"")});
     for (const e of data.events??[]) point([e.lon,e.lat],{kind:"event",id:e.id,precision:e.precision,color:e.color??"#e1e1dc",radius:e.radius??5,selected:e.id===data.selected});
@@ -82,6 +87,12 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
       for(const m of groupMarkers(latest)) {
         const p=map.project(m.point);
         if(Math.hypot(p.x-x,p.y-y)<=22) {callbacks.pick(m.ids);return m;}
+      }
+      if(latest.ontologyFeatures?.features.length){
+        const matches=map.queryRenderedFeatures?.([[x-9,y-9],[x+9,y+9]],{layers:['nv-ontology-points','nv-ontology-fill']})??[];
+        const match=matches[0];if(match?.properties?.object_id){callbacks.object?.({...match.properties,kind:match.properties.object_kind});return match;}
+        const point=(latest.ontologyFeatures.features.filter(f=>f.geometry.type==='Point').map(f=>{const p=map.project((f.geometry as import('geojson').Point).coordinates as Point);return {f,d:Math.hypot(p.x-x,p.y-y)};}).filter(v=>v.d<=12).sort((a,b)=>a.d-b.d))[0]?.f;
+        if(point){callbacks.object?.(point.properties??{});return point;}
       }
       const nearby=(latest.nearby??[]).map(e=>{const p=map.project([e.lon,e.lat]);return {e,d:Math.hypot(p.x-x,p.y-y)};}).filter(({d})=>d<=11).sort((a,b)=>a.d-b.d)[0]?.e;
       if(nearby){callbacks.nearby?.(nearby.id);return nearby;}

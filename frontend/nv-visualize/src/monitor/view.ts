@@ -1,3 +1,4 @@
+import {mountOntology,isMappedLegacyEvent} from './ontology/workbench';
 import {readEvidenceMap} from './evidence-map';
 import {enginePanel} from './engine-panel';
 import {layerControl,type LayerPoint} from './layers';
@@ -85,6 +86,7 @@ export function mountMonitor(
   notice.setAttribute('aria-label','감시 상태 확인');
   notice.onclick=()=>{panel.hidden=false;setPanelTab('overview');};
   root.querySelector('main')!.append(notice);
+  let ontologyUI:ReturnType<typeof mountOntology>|null=null;let ontologyFeatures:import("geojson").FeatureCollection<import("geojson").Geometry>={type:"FeatureCollection",features:[]};let ontologySelection:string|null=null;let ontologyEnabled=false;
   let disposeContext=()=>{};let disposeEngine=()=>{};let evidenceFeatures:import("geojson").Feature<import("geojson").Geometry>[]=[];let layerEvents=true;let layerPoints:LayerPoint[]=[];let layerFootprints:any[]=[];
   let nearbyItems:{id:string;lat:number;lon:number;kind:string}[]=[];
   let disposeNearby=()=>{};
@@ -109,6 +111,7 @@ export function mountMonitor(
         ? ""
         : "상세 지도 연결 실패 · 윤곽 지도 표시 중";
     },
+    object:(props)=>ontologyUI?.selectFeature(props),
     nearby:(id)=>root.querySelector('main')?.dispatchEvent(new CustomEvent('nv:nearby-pick',{detail:id})),
     event: (id) => {
       const r = records.find((r) => r.id === id);
@@ -197,6 +200,7 @@ export function mountMonitor(
   panel.append(panelHeader,tabs,overviewPane,eventsPane,aiPane);setPanelTab('overview');
   const updateMap = () =>
     map.update({
+      ontologyFeatures:layerEvents?ontologyFeatures:{...ontologyFeatures,features:ontologyFeatures.features.filter(f=>(f.properties?.kind??f.properties?.object_kind)!=='event')},selectedObject:ontologySelection,
       nearby:[...layerPoints,...nearbyItems].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i),
       footprints:layerFootprints,
       evidenceFeatures,
@@ -205,7 +209,7 @@ export function mountMonitor(
       selected: selected?.id ?? null,
       showMarkers: true,
       showLinks: false,
-      events: (layerEvents?records:[])
+      events: (layerEvents?records:[]).filter(r=>!ontologyEnabled||!isMappedLegacyEvent(r,ontologyFeatures))
         .filter(
           (r): r is EventRecord & { lat: number; lon: number } =>
             r.lat !== null && r.lon !== null,
@@ -219,6 +223,7 @@ export function mountMonitor(
         })),
     });
   const disposeLayers=layerControl(root.querySelector('main')!,map,(events,points,footprints)=>{layerEvents=events;layerPoints=points;layerFootprints=footprints;updateMap();},(type)=>{disposeNearby();panel.hidden=true;detail.hidden=true;disposeNearby=mountNearby(root.querySelector('main')!,map,(items)=>{nearbyItems=items;updateMap();},type);});
+  ontologyUI=mountOntology(root.querySelector('main')!,map,(features,selected,enabled)=>{ontologyFeatures=features;ontologySelection=selected;ontologyEnabled=enabled;updateMap();},()=>{panel.hidden=true;detail.hidden=true;disposeNearby();});
   const legend=el('details','','event-legend');
   const legendTitle=el('summary','사건 표시');legendTitle.prepend(icon(Activity));legend.append(legendTitle);
   const legendBody=el('div','','legend-body');
@@ -291,6 +296,7 @@ export function mountMonitor(
     }
   }
   function showEvent(r: EventRecord, focusMap=true) {
+    if(ontologySelection)ontologyUI?.clear();
     if(focusMap)disposeNearby();
     disposeContext();
     selected=r;detail.hidden=false;if(focusMap)panel.hidden=true;
@@ -469,7 +475,7 @@ export function mountMonitor(
     clearInterval(timer);
     window.removeEventListener("nv:auth-change", authChanged);
     root.removeEventListener("keydown",escapeSelection);
-    disposeLayers();disposeEngine();accountCleanup();
+    ontologyUI?.dispose();disposeLayers();disposeEngine();accountCleanup();
     map.destroy();
   };
 }
