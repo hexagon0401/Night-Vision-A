@@ -151,13 +151,14 @@ def test_disputed_is_not_silently_changed_to_refuted(payload):
 
 
 @pytest.mark.parametrize('with_existing_schema', [False, True])
-def test_sql_proposal_is_additive_idempotent_and_not_registered(with_existing_schema):
+def test_sql_proposal_is_additive_idempotent_and_not_auto_applied(with_existing_schema):
     proposal=ROOT/'docs/design/nv3.2/0004_ontology_v2.proposed.sql'
     sql=proposal.read_text()
     db=sqlite3.connect(':memory:')
     try:
         if with_existing_schema:
             for p in sorted((ROOT/'services/cloudflare/migrations').glob('*.sql')):
+                if p.name >= '0004':continue
                 db.executescript(p.read_text())
             db.execute("INSERT INTO settings(key,value) VALUES('pr1-sentinel','preserve')")
         before={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -168,7 +169,10 @@ def test_sql_proposal_is_additive_idempotent_and_not_registered(with_existing_sc
         assert list(db.execute('PRAGMA foreign_key_check'))==[]
         if with_existing_schema:
             assert db.execute("SELECT value FROM settings WHERE key='pr1-sentinel'").fetchone()[0]=='preserve'
-        assert not (ROOT/'services/cloudflare/migrations/0004_ontology_v2.sql').exists()
+        assert '0004_ontology_v2' not in (ROOT/'services/cloudflare/database.js').read_text()
+        active=(ROOT/'services/cloudflare/migrations/0004_ontology_v2.sql').read_text()
+        strip=lambda value:'\n'.join(line for line in value.splitlines() if not line.lstrip().startswith('--'))
+        assert strip(active)==strip(sql)
         # SQL NULL semantics must not allow only one coordinate to be populated.
         db.execute("INSERT INTO nv2_sources(source_id,source_kind,license_status,access_status) VALUES('source:test','unknown','unknown','metadata_only')")
         db.execute("INSERT INTO nv2_entities(entity_id,kind,display_name,status,privacy_class,updated_at_utc) VALUES('entity:test','location','TEST','reported','public','2026-11-12T00:00:00Z')")
