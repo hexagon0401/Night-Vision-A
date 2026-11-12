@@ -25,9 +25,10 @@ test('429 preserves bounded retry time',async()=>{vi.stubGlobal('fetch',vi.fn(as
 test('oversized upstream JSON is rejected',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>new Response('{"large":"'+ 'x'.repeat(100)+'"}',{headers:{'content-type':'application/json'}})));await expect(boundedJSON('https://example.invalid',{},50)).rejects.toThrow('upstream_size_limit');});
 test('STAC does not accept out-of-window or malformed scene metadata',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json({features:[{id:'bad',collection:'sentinel-2-l2a',properties:{datetime:'2030-01-01T00:00:00Z'}}]})));expect(await discover({id:'earth_search_stac'},event,fixture.generated_at_utc)).toEqual([]);});
 
-test('copied article titles never create multiple independent confirmations',async()=>{
- vi.stubGlobal('fetch',vi.fn(async()=>Response.json({articles:[{url:'https://example.invalid/a',title:'SYNTHETIC WIRE',seendate:'20260101T120000Z'},{url:'https://example.invalid/b',title:'SYNTHETIC WIRE',seendate:'20260101T130000Z'}]})));
- const items=await discover({id:'gdelt_doc'},event,fixture.generated_at_utc);expect(items).toHaveLength(1);expect(items[0].evidence_role).toBe('candidate');expect(items[0].published_at_utc).toBeNull();expect(items[0].temporal_role).toBe('unknown');
+test('same titles at distinct URLs remain unresolved candidates, not independent confirmations',async()=>{
+ const day=new Date(Date.parse(fixture.generated_at_utc)-86400000).toISOString().slice(0,10),seen=day.replaceAll('-','');
+ vi.stubGlobal('fetch',vi.fn(async()=>Response.json({articles:[{url:'https://example.invalid/a',title:'SYNTHETIC WIRE',seendate:seen+'T120000Z'},{url:'https://example.invalid/b',title:'SYNTHETIC WIRE',seendate:seen+'T130000Z'}]})));
+ const items=await discover({id:'gdelt_doc'},{...event,day,end_day:day},fixture.generated_at_utc);expect(items).toHaveLength(2);for(const i of items){expect(i.evidence_role).toBe('candidate');expect(i.published_at_utc).toBeNull();expect(i.temporal_role).toBe('unknown');expect(i.source_independence_group).toBeNull();}
 });
 test('camera provider returns only current-context metadata and an official link',async()=>{
  vi.stubGlobal('fetch',vi.fn(async()=>Response.json({data:[{cctv:{index:'test',location:{latitude:'37.8',longitude:'-122.3',locationName:'SYNTHETIC CAMERA',direction:'West'}}}]})));

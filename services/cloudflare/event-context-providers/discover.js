@@ -1,5 +1,13 @@
 import {discoverMapillary,discoverWindy} from './media.js';
 import {boundedJSON,bbox,item,shift,iso,temporal,safeURL,validGeometry} from './common.js';
+export function gdeltWindow(record,cutoff){
+ const end=new Date(cutoff);if(!Number.isFinite(+end))throw Error('upstream_invalid_cutoff');
+ const from=[shift(record.day,-14),shift(end.toISOString().slice(0,10),-90)].sort().at(-1)+'T00:00:00Z';
+ const requestedTo=shift(record.end_day,14)+'T23:59:59Z';const to=Date.parse(requestedTo)<+end?requestedTo:end.toISOString();
+ if(Date.parse(from)>Date.parse(to))throw Error('upstream_out_of_coverage');
+ const compact=value=>new Date(value).toISOString().replace(/[-:]/g,'').replace(/T/,'').slice(0,14);
+ return {from,to,startdatetime:compact(from),enddatetime:compact(to)};
+}
 export async function discover(p,r,now,env){
  if(p.id==='mapillary_street_photo')return discoverMapillary(r,now,env);
  if(p.id==='windy_webcams_v3')return discoverWindy(r,now,env);
@@ -45,9 +53,9 @@ export async function discover(p,r,now,env){
   const quote=s=>'"'+s.replace(/[^\p{L}\p{N} -]/gu,' ').slice(0,100)+'"';
   const actors=(r.actors??[]).filter(Boolean).slice(0,2).map(quote);
   const terms=quote(r.country)+(actors.length?' ('+actors.join(' OR ')+')':'');
-  const u=new URL('https://api.gdeltproject.org/api/v2/doc/doc');u.search=new URLSearchParams({query:terms,mode:'artlist',format:'json',maxrecords:'20',startdatetime:[shift(r.day,-14),shift(now.slice(0,10),-90)].sort().at(-1).replaceAll('-','')+'000000',enddatetime:shift(r.end_day,14).replaceAll('-','')+'235959'}).toString();
-  const data=await boundedJSON(u.href);const seen=new Set();
-  return (data.articles??[]).slice(0,20).flatMap((a,index)=>{const url=safeURL(a.url),day=typeof a.seendate==='string'?a.seendate.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/,'$1-$2-$3T$4:$5:$6Z'):null,t=iso(day);if(!url||!t||t.slice(0,10)<shift(r.day,-14)||t.slice(0,10)>shift(r.end_day,14))return [];const title=String(a.title??'');const key=title.toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');if(seen.has(key))return [];seen.add(key);const i=item(p.id,'article',String(index),title,url,now);i.published_at_utc=t;i.publisher=new URL(url).hostname;i.evidence_role='candidate';i.source_independence_group='unresolved:'+key.slice(0,100);i.temporal_role='unknown';i.warnings=['Metadata search candidate; original text and citation chain not verified.','GDELT seen time is an index timestamp, not a verified original publication time.'];i.published_at_utc=null;i.raw_source_ref=a.seendate;return [i];});
+  const window=gdeltWindow(r,now);const u=new URL('https://api.gdeltproject.org/api/v2/doc/doc');u.search=new URLSearchParams({query:terms,mode:'artlist',format:'json',maxrecords:'20',startdatetime:window.startdatetime,enddatetime:window.enddatetime}).toString();
+  const data=await boundedJSON(u.href);if(!Array.isArray(data.articles))throw Error('upstream_invalid_response');const seen=new Set();
+  return data.articles.slice(0,20).flatMap((a,index)=>{if(!a||typeof a!=='object')return [];const url=safeURL(a.url),day=typeof a.seendate==='string'?a.seendate.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/,'$1-$2-$3T$4:$5:$6Z'):null,t=iso(day);if(!url||!t||t.slice(0,19)!==day?.slice(0,19)||t<window.from||t>window.to)return [];const title=String(a.title??'');const canonical=new URL(url);canonical.hash='';for(const k of [...canonical.searchParams.keys()])if(/^utm_/i.test(k)||['fbclid','gclid'].includes(k))canonical.searchParams.delete(k);canonical.searchParams.sort();const key=canonical.href;if(seen.has(key))return [];seen.add(key);const i=item(p.id,'article',String(index),title,url,now);i.published_at_utc=t;i.publisher=new URL(url).hostname;i.evidence_role='candidate';i.source_independence_group=null;i.indexed_at_utc=t;i.temporal_role='unknown';i.warnings=['Metadata search candidate; original text and citation chain not verified.','GDELT seen time is an index timestamp, not a verified original publication time.'];i.published_at_utc=null;i.raw_source_ref=a.seendate;return [i];});
  }
  throw new Error('adapter_not_activated');
 }
