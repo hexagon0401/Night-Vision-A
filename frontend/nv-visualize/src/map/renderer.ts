@@ -5,6 +5,7 @@ import detailStyle from "./detail-style.json";
 import type { Candidate, CandidateLink, Point } from "../cases/model";
 
 export interface MapData {
+  nearby?: {id:string; lat:number; lon:number; kind:string}[];
   events?: { id: string; lat: number; lon: number; precision: number; color?: string; radius?: number }[];
   candidates: Candidate[];
   links: CandidateLink[];
@@ -14,6 +15,7 @@ export interface MapData {
   trace?: { paths: CandidateLink[]; progress: number; point: Point | null };
 }
 export interface MapPort {
+  center(): {lat:number; lon:number};
   update(data: MapData): void;
   focus(points: Point[], animate?: boolean): void;
   stop?(): void;
@@ -29,6 +31,7 @@ export interface MapCallbacks {
   dismiss(): void;
   basemap?(detailed: boolean): void;
   event?(id: string): void;
+  nearby?(id:string):void;
 }
 interface Marker {
   point: Point;
@@ -136,6 +139,7 @@ export function createMap(
     overlayReady = false;
   const needed = () =>
     Boolean(
+      data.nearby?.length ||
       data.events?.length ||
       data.trace?.point ||
       (data.links.length && data.showLinks) ||
@@ -223,6 +227,7 @@ export function createMap(
     } else if (!detailed && failure.sourceId === "countries") callbacks.error();
   });
   return {
+    center:()=>{const c=map.getCenter();return {lat:c.lat,lon:c.lng};},
     update(value) {
       data = value;
       render();

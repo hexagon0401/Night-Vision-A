@@ -1,3 +1,4 @@
+import {mountNearby} from "./nearby";
 import {contextDrawer} from "./context/drawer";
 import { accountControl, readSession } from "../ui/controls";
 import { createMap, type MapPort } from "../map/renderer";
@@ -82,6 +83,8 @@ export function mountMonitor(
   notice.onclick=()=>{panel.hidden=false;setPanelTab('overview');};
   root.querySelector('main')!.append(notice);
   let disposeContext=()=>{};
+  let nearbyItems:{id:string;lat:number;lon:number;kind:string}[]=[];
+  let disposeNearby=()=>{};
   let records: EventRecord[] = [],
     cases: { id: string; country: string }[] = [],
     selected: EventRecord | null = null,
@@ -103,6 +106,7 @@ export function mountMonitor(
         ? ""
         : "상세 지도 연결 실패 · 윤곽 지도 표시 중";
     },
+    nearby:(id)=>root.querySelector('main')?.dispatchEvent(new CustomEvent('nv:nearby-pick',{detail:id})),
     event: (id) => {
       const r = records.find((r) => r.id === id);
       if (r) showEvent(r);
@@ -119,6 +123,7 @@ export function mountMonitor(
     link("합성 실험", "/?case=synthetic"),
     link("USGS Alpha", "/?case=alpha"),
     button("현황", () => {
+      disposeNearby();
       panel.hidden = !panel.hidden;
     }),
     button("새로고침", () => void refresh()),
@@ -150,7 +155,8 @@ export function mountMonitor(
       utilityItems.append(node);
   utility.append(utilityTitle, utilityItems);
   utilityItems.append(link('베타 비교','/?view=beta'));
-  nav.append(utility);
+  const nearbyButton=button('주변 현황',()=>{panel.hidden=true;detail.hidden=true;disposeNearby();const opened=mountNearby(root.querySelector('main')!,map,(items)=>{nearbyItems=items;updateMap();});disposeNearby=opened;});
+  nav.append(nearbyButton,utility);
   if (account) nav.append(account);
   const country = document.createElement("select");
   country.setAttribute("aria-label", "국가 선택");
@@ -187,6 +193,7 @@ export function mountMonitor(
   panel.append(panelHeader,tabs,overviewPane,eventsPane,aiPane);setPanelTab('overview');
   const updateMap = () =>
     map.update({
+      nearby:nearbyItems,
       candidates: [],
       links: [],
       selected: selected?.id ?? null,
@@ -277,6 +284,7 @@ export function mountMonitor(
     }
   }
   function showEvent(r: EventRecord, focusMap=true) {
+    if(focusMap)disposeNearby();
     disposeContext();
     selected=r;detail.hidden=false;if(focusMap)panel.hidden=true;
     updateMap();syncSelection();
@@ -449,6 +457,7 @@ export function mountMonitor(
   window.addEventListener("nv:auth-change", authChanged);
   return () => {
     disposeContext();
+    disposeNearby();
     destroyed = true;
     clearInterval(timer);
     window.removeEventListener("nv:auth-change", authChanged);
