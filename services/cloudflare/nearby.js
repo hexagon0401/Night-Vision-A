@@ -13,7 +13,7 @@ export async function nearbyRoute(request,env,url){
  if(q.type==='vessels'&&!env.AISSTREAM_API_KEY)return json({...base,status:'key_required',reason:'AISSTREAM_API_KEY'});
  if(q.type==='webcams'&&!env.WINDY_API_KEY)return json({...base,status:'key_required',reason:'WINDY_API_KEY'});
  if((env.NEARBY_DISABLED_PROVIDERS??'').split(',').includes(q.type))return json({...base,status:'disabled'});
- const old=await stmt(env.DB,'SELECT value FROM settings WHERE key=?',key).first();if(old){const x=JSON.parse(old.value);if(x.expires>Date.now())return json({...x.body,cached:true});}
+ const old=await stmt(env.DB,'SELECT value FROM settings WHERE key=?',key).first();if(old){const x=JSON.parse(old.value);if(x.expires>Date.now()&&(q.type!=='satellite'||x.body.items.every(i=>Object.hasOwn(i,'geometry'))))return json({...x.body,cached:true});}
  const epoch=Date.now(),job=key;let slot=null;
  for(let i=0;i<3;i++){try{if(await stmt(env.DB,'INSERT INTO context_locks VALUES(?,?,?) ON CONFLICT(slot) DO UPDATE SET job=excluded.job,expires=excluded.expires WHERE expires<? RETURNING slot',i,job,epoch+16000,epoch).first()){slot=i;break;}}catch{}}
  if(slot===null)return json({...base,status:'rate_limited',reason:'concurrency_limit'});
