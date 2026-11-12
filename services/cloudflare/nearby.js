@@ -21,7 +21,7 @@ export async function nearbyRoute(request,env,url){
   const count=await stmt(env.DB,'SELECT COUNT(*) n FROM settings WHERE key LIKE ?','nearby:v1:%').first();if(count.n>=300&&!old){await stmt(env.DB,"DELETE FROM settings WHERE key IN (SELECT key FROM settings WHERE key LIKE 'nearby:v1:%' LIMIT 30)").run();}
   const quota=await stmt(env.DB,"INSERT INTO quotas VALUES(date('now'),?,1) ON CONFLICT(day,bucket) DO UPDATE SET count=count+1 WHERE count<200 RETURNING count",'nearby:'+q.type).first();if(!quota)return json({...base,status:'rate_limited',reason:'daily_provider_budget'});
   let body;
-  try{const items=await(q.type==='aircraft'?nearbyAircraft(q):q.type==='vessels'?nearbyShips(q,env):q.type==='satellite'?nearbyScenes(q):nearbyCameras(q,env));body={...base,queried_at:new Date().toISOString(),status:items.length?'ok':'empty',items};}
+  try{const items=await(q.type==='aircraft'?nearbyAircraft(q):q.type==='vessels'?nearbyShips(q,env):q.type==='satellite'?nearbyScenes(q):nearbyCameras(q,env));body={...base,queried_at:new Date().toISOString(),status:items.length?'ok':'empty',items,...(items.source_diagnostics?{source_diagnostics:items.source_diagnostics}:{})};}
   catch(e){body={...base,status:e.message==='rate_limited'?'rate_limited':'temporarily_failed',reason:/^(upstream_|stale_|invalid_)/.test(e.message)?e.message:'upstream_lookup_failed'};}
   const ttl=body.status==='ok'||body.status==='empty'?(q.type==='webcams'||q.type==='satellite'?3600000:30000):60000;
   await stmt(env.DB,'INSERT OR REPLACE INTO settings VALUES(?,?)',key,JSON.stringify({expires:Date.now()+ttl,body})).run();return json(body);

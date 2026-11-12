@@ -1,3 +1,4 @@
+import {ontologyRoute,syncOntology,ontologyStatus} from './ontology.js';
 import {engineRoute} from './nv2-engine.js';
 import { nimKeys } from "./credentials.js";
 import {
@@ -50,6 +51,7 @@ export default {
           503,
         );
       await initialize(env.DB);
+      if(url.pathname.startsWith('/api/v2/ontology/')||url.pathname==='/api/v2/admin/ontology-sync')return await ontologyRoute(request,env,url);
       if(['/api/v2/engine/modules','/api/v2/engine/investigate'].includes(url.pathname))return await engineRoute(request,env,url);
       if(url.pathname==='/api/v2/nearby')return await nearbyRoute(request,env,url);
       if(url.pathname==='/api/v2/nearby/webcam')return await webcamImage(request,env,url);
@@ -69,6 +71,7 @@ export default {
         await monitorAuthorization(request, env);
         if (request.method !== "POST")
           throw new ApiError(405, "method_not_allowed");
+        if(url.pathname==='/api/internal/ontology-sync')return json(await syncOntology(env,await body(request,2000)));
         if (url.pathname === "/api/internal/monitor-ai") {
           try {
             return json(await monitorSummary(env));
@@ -111,6 +114,9 @@ export default {
           review_model: env.NIM_REVIEW_MODEL,
           github: !!(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
           ingest_key: !!env.NV_INGEST_TOKEN,
+          ontology: await ontologyStatus(env),
+          provider_keys: {aisstream:!!env.AISSTREAM_API_KEY,windy:!!env.WINDY_API_KEY,mapillary:!!env.MAPILLARY_ACCESS_TOKEN,firecrawl:!!env.FIRECRAWL_API_KEY},
+          evidence_extraction_enabled:env.NV_EVIDENCE_EXTRACTION_ENABLED==='true',
         });
       }
       if (url.pathname === "/api/v2/admin/nim-test") {
