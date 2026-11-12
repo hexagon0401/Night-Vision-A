@@ -1,0 +1,10 @@
+import type {Feature,Geometry} from 'geojson';
+const statuses=['observed','documented','reported','inferred','scenario','unresolved'];
+export function readEvidenceMap(value:any):Feature<Geometry>[] {
+ if(!value||!['nv2-module/1.0','nv-investigation/2.0'].includes(value.schema_version))throw Error('NV2 모듈 또는 조사 JSON이 필요합니다.');
+ const ledger=value.source_ledger;if(!Array.isArray(ledger)||ledger.length>500)throw Error('출처 장부가 필요합니다.');
+ const ids=new Set(ledger.filter(s=>{try{const u=new URL(s.url);return typeof s.source_id==='string'&&u.protocol==='https:'&&!u.username&&!u.password;}catch{return false;}}).map(s=>s.source_id));
+ const geo=value.map??value.result?.geojson??value.result;if(geo?.type!=='FeatureCollection'||!Array.isArray(geo.features)||geo.features.length>500)throw Error('최대 500개의 GeoJSON 지형 요소가 필요합니다.');
+ let total=0;const coordinates=(p:any):boolean=>{if(!Array.isArray(p)||++total>20000)return false;if(typeof p[0]==='number')return p.length===2&&p.every(Number.isFinite)&&Math.abs(p[0])<=180&&Math.abs(p[1])<=85;return p.length>0&&p.every(coordinates);};
+ return geo.features.map((f:any)=>{const g=f.geometry,p=f.properties;if(f.type!=='Feature'||!g||!['Point','LineString','Polygon','MultiPolygon'].includes(g.type)||!coordinates(g.coordinates)||!p||!statuses.includes(p.evidence_status)||!Array.isArray(p.source_ids)||!p.source_ids.length||!p.source_ids.every((id:string)=>ids.has(id)))throw Error('좌표·근거 상태·출처 ID를 검증하지 못했습니다.');if(g.type==='Point'&&typeof g.coordinates[0]!=='number'||g.type==='LineString'&&(g.coordinates.length<2||typeof g.coordinates[0]?.[0]!=='number'))throw Error('잘못된 GeoJSON 구조입니다.');if(g.type==='Polygon'||g.type==='MultiPolygon'){const rings=g.type==='Polygon'?g.coordinates:g.coordinates.flat();if(!rings.every((ring:any)=>Array.isArray(ring)&&ring.length>=4&&typeof ring[0]?.[0]==='number'&&JSON.stringify(ring[0])===JSON.stringify(ring.at(-1))))throw Error('다각형 고리가 닫혀 있지 않습니다.');}return {type:'Feature',geometry:g,properties:{id:String(p.id??'').slice(0,180),evidence_status:p.evidence_status,source_ids:p.source_ids,title:String(p.title??'근거 지도').slice(0,300)}};});
+}

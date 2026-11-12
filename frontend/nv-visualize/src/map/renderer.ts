@@ -5,6 +5,8 @@ import detailStyle from "./detail-style.json";
 import type { Candidate, CandidateLink, Point } from "../cases/model";
 
 export interface MapData {
+  evidenceFeatures?:import("geojson").Feature<import("geojson").Geometry>[];
+  footprints?: {id:string;geometry:import("geojson").Polygon|import("geojson").MultiPolygon}[];
   nearby?: {id:string; lat:number; lon:number; kind:string}[];
   events?: { id: string; lat: number; lon: number; precision: number; color?: string; radius?: number }[];
   candidates: Candidate[];

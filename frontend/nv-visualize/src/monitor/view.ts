@@ -1,3 +1,6 @@
+import {readEvidenceMap} from './evidence-map';
+import {enginePanel} from './engine-panel';
+import {layerControl,type LayerPoint} from './layers';
 import {mountNearby} from "./nearby";
 import {contextDrawer} from "./context/drawer";
 import { accountControl, readSession } from "../ui/controls";
@@ -82,7 +85,7 @@ export function mountMonitor(
   notice.setAttribute('aria-label','감시 상태 확인');
   notice.onclick=()=>{panel.hidden=false;setPanelTab('overview');};
   root.querySelector('main')!.append(notice);
-  let disposeContext=()=>{};
+  let disposeContext=()=>{};let disposeEngine=()=>{};let evidenceFeatures:import("geojson").Feature<import("geojson").Geometry>[]=[];let layerEvents=true;let layerPoints:LayerPoint[]=[];let layerFootprints:any[]=[];
   let nearbyItems:{id:string;lat:number;lon:number;kind:string}[]=[];
   let disposeNearby=()=>{};
   let records: EventRecord[] = [],
@@ -155,6 +158,7 @@ export function mountMonitor(
       utilityItems.append(node);
   utility.append(utilityTitle, utilityItems);
   utilityItems.append(link('베타 비교','/?view=beta'));
+  const mapImport=document.createElement('input');mapImport.type='file';mapImport.accept='.json,application/json';mapImport.hidden=true;mapImport.setAttribute('aria-label','NV2 근거 지도 JSON');mapImport.onchange=async()=>{const file=mapImport.files?.[0];if(!file)return;message.hidden=false;try{if(file.size>2000000)throw Error('2MB 이하 JSON을 선택하세요.');evidenceFeatures=readEvidenceMap(JSON.parse(await file.text()));updateMap();message.textContent=`근거 지도 ${evidenceFeatures.length}개 표시 · 파일 출처는 별도 검증 필요`;}catch(e){message.textContent=(e as Error).message;}mapImport.value='';};utilityItems.append(button('NV2 근거 지도 가져오기',()=>mapImport.click()),mapImport,button('가져온 근거 지도 지우기',()=>{evidenceFeatures=[];updateMap();}));
   const nearbyButton=button('주변 현황',()=>{panel.hidden=true;detail.hidden=true;disposeNearby();const opened=mountNearby(root.querySelector('main')!,map,(items)=>{nearbyItems=items;updateMap();});disposeNearby=opened;});
   nav.append(nearbyButton,utility);
   if (account) nav.append(account);
@@ -193,13 +197,15 @@ export function mountMonitor(
   panel.append(panelHeader,tabs,overviewPane,eventsPane,aiPane);setPanelTab('overview');
   const updateMap = () =>
     map.update({
-      nearby:nearbyItems,
+      nearby:[...layerPoints,...nearbyItems].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i),
+      footprints:layerFootprints,
+      evidenceFeatures,
       candidates: [],
       links: [],
       selected: selected?.id ?? null,
       showMarkers: true,
       showLinks: false,
-      events: records
+      events: (layerEvents?records:[])
         .filter(
           (r): r is EventRecord & { lat: number; lon: number } =>
             r.lat !== null && r.lon !== null,
@@ -212,6 +218,7 @@ export function mountMonitor(
           ...eventAppearance(r,palette,markerScale),
         })),
     });
+  const disposeLayers=layerControl(root.querySelector('main')!,map,(events,points,footprints)=>{layerEvents=events;layerPoints=points;layerFootprints=footprints;updateMap();},(type)=>{disposeNearby();panel.hidden=true;detail.hidden=true;disposeNearby=mountNearby(root.querySelector('main')!,map,(items)=>{nearbyItems=items;updateMap();},type);});
   const legend=el('details','','event-legend');
   const legendTitle=el('summary','사건 표시');legendTitle.prepend(icon(Activity));legend.append(legendTitle);
   const legendBody=el('div','','legend-body');
@@ -275,7 +282,7 @@ export function mountMonitor(
     );
   }
   function clearSelection() {
-    disposeContext();
+    disposeContext();disposeEngine();
     selected=null;detail.hidden=true;updateMap();syncSelection();nav.querySelector<HTMLButtonElement>('button')?.focus({preventScroll:true});
   }
   function syncSelection() {
@@ -305,7 +312,7 @@ export function mountMonitor(
       const cell=el('div');cell.append(el('span',label),el('strong',value==null?'미상':value.toLocaleString('ko-KR')+'명'));range.append(cell);
     }
     hero.append(range,el('small','제공기관의 추정 범위이며 독립적으로 확인된 수치가 아닙니다.'));
-    detail.replaceChildren(header,badges,h,meta,type);
+    disposeEngine();detail.replaceChildren(header,badges,h,meta,type);
     if(r.kind==='ucdp')detail.append(hero);
     if(r.fatality_validation==='invalid_provider_estimates')detail.append(el('p','원본 추정치의 범위가 일관되지 않아 미상으로 표시합니다. 사망자 집계에서 제외하며 0명으로 바꾸지 않습니다.','inline-notice'));
     const actors=el('section','','event-section');const actorsTitle=el('h3','관련 당사자');actorsTitle.prepend(icon(Users));actors.append(actorsTitle);
@@ -327,7 +334,7 @@ export function mountMonitor(
     detail.append(actions);
     const contextHost=el('div'),investigate=button('사건 자료 탐색',()=>{investigate.disabled=true;disposeContext=contextDrawer(contextHost,r.id,r.hash);contextHost.scrollIntoView({block:'nearest',behavior:'instant'});});
     investigate.className='investigate-button';const copy=button('링크 복사',()=>{const url=new URL(window.location.href);url.searchParams.set('view','monitor');url.searchParams.set('event',r.id);void navigator.clipboard.writeText(url.href).then(()=>copy.textContent='복사됨').catch(()=>copy.textContent='링크 복사 실패');});
-    const contextActions=el('div','','event-actions');contextActions.append(investigate,copy);detail.append(contextActions,contextHost);
+    const contextActions=el('div','','event-actions');contextActions.append(investigate,copy);detail.append(contextActions,contextHost);const engineHost=el('div');const engineButton=button('NV 엔진으로 검토',()=>{engineButton.disabled=true;disposeEngine();disposeEngine=enginePanel(engineHost,r.id);});contextActions.prepend(engineButton);detail.append(engineHost);
     const provenance=el('details','','event-disclosure verification');const provenanceTitle=el('summary','출처·검증 정보');provenanceTitle.prepend(icon(ShieldCheck));provenance.append(provenanceTitle);
     const facts=el('dl','','event-facts');
     for(const [k,v] of [['자료 버전',`${r.kind.toUpperCase()} ${r.version??'미제공'}`],['자료 구분',r.dataset==='candidate'?'잠정 자료 (Candidate)':r.dataset==='annual'?'연간 확정 자료':'미제공'],['원본 사건 ID',r.upstream_id??r.id],['수집 시각',when(r.acquired_at??null)],['진행 상태','미확인 · 기록 날짜는 현재 상태를 뜻하지 않음'],['원본 해시',r.hash]])facts.append(el('dt',k),el('dd',v));
@@ -462,7 +469,7 @@ export function mountMonitor(
     clearInterval(timer);
     window.removeEventListener("nv:auth-change", authChanged);
     root.removeEventListener("keydown",escapeSelection);
-    accountCleanup();
+    disposeLayers();disposeEngine();accountCleanup();
     map.destroy();
   };
 }

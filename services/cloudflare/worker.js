@@ -1,3 +1,4 @@
+import {engineRoute} from './nv2-engine.js';
 import { nimKeys } from "./credentials.js";
 import {
   ApiError,
@@ -49,6 +50,7 @@ export default {
           503,
         );
       await initialize(env.DB);
+      if(['/api/v2/engine/modules','/api/v2/engine/investigate'].includes(url.pathname))return await engineRoute(request,env,url);
       if(url.pathname==='/api/v2/nearby')return await nearbyRoute(request,env,url);
       if(url.pathname==='/api/v2/nearby/webcam')return await webcamImage(request,env,url);
       if(url.pathname==='/api/v2/nearby/preview')return await preview(request,env,url);

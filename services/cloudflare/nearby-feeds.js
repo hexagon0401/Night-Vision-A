@@ -1,4 +1,4 @@
-import {boundedJSON,iso} from './event-context-providers/common.js';
+import {boundedJSON,iso,validGeometry} from './event-context-providers/common.js';
 import {discoverWindy} from './event-context-providers/media.js';
 export const distance=(a,b)=>{const rad=x=>x*Math.PI/180,h=Math.sin(rad(b.lat-a.lat)/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(rad(b.lon-a.lon)/2)**2;return 12742*Math.asin(Math.sqrt(Math.min(1,h)));};
 export const validPoint=p=>Number.isFinite(p?.lat)&&Number.isFinite(p?.lon)&&Math.abs(p.lat)<=90&&Math.abs(p.lon)<=180;
@@ -28,6 +28,6 @@ export async function nearbyScenes(q){
  if(!Array.isArray(data.features))throw Error('invalid_stac');
  return data.features.slice(0,4).flatMap(f=>{
   const captured=iso(f.properties?.datetime);if(!captured||captured<start.toISOString()||captured>end.toISOString()||!/^S2[ABC]_\w{5}_\d{8}_\d+_L2A$/.test(f.id??''))return [];
-  return [{id:f.id,kind:'satellite',title:'Copernicus Sentinel-2 · '+captured.slice(0,10),observed_at:captured,provider:'earth_search',source_url:'https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/'+f.id,cloud_pct:Number.isFinite(f.properties['eo:cloud_cover'])?Math.round(f.properties['eo:cloud_cover']*10)/10:null,note:'해당 지역이 포함된 위성 타일의 저해상도 미리보기 · 실시간 사진이 아님',attribution:'Copernicus Sentinel data / Element 84 Earth Search'}];
+  return [{geometry:validGeometry(f.geometry)&&['Polygon','MultiPolygon'].includes(f.geometry?.type)&&JSON.stringify(f.geometry).length<10000?f.geometry:null,id:f.id,kind:'satellite',title:'Copernicus Sentinel-2 · '+captured.slice(0,10),observed_at:captured,provider:'earth_search',source_url:'https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/'+f.id,cloud_pct:Number.isFinite(f.properties['eo:cloud_cover'])?Math.round(f.properties['eo:cloud_cover']*10)/10:null,note:'해당 지역이 포함된 위성 타일의 저해상도 미리보기 · 실시간 사진이 아님',attribution:'Copernicus Sentinel data / Element 84 Earth Search'}];
  });
 }

@@ -1,0 +1,137 @@
+[
+  {
+    "id": "nv2-source-destructor",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-source-destructor/SKILL.md",
+    "mission": "Disassemble laws, diplomatic statements and reports into precise semantic, conditional and temporal claims, then compare them without flattening nuance.",
+    "input": "Verified source text with offsets/pages, issuer and date, legal context, source language and comparison document(s).",
+    "output": "Atomic clauses with speech-act, agent, beneficiary, scope, modality, conditions, exception, negation, legal status, ambiguity and text-diff links.",
+    "protocol": "1. Acquire exact original wording and preserve quote offsets. Separate recitals, operative sections, nonbinding explanations, legislative prohibitions, certifications and reporting obligations.\n2. For every clause identify grammatical actor, affected object, verb and modality (`shall`, `may`, `seek`, `respects`, `commits`), explicit negative, limitation, relevant institution, time/geography and source status.\n3. Decompose `if/unless/subject to/until` into executable conditions; for a prohibition determine WHAT conduct, WHICH funds/parties, trigger date and exception rather than calling it an absolute ban.\n4. Compare original vs later version with semantic diff and actor/scope shifts; distinguish signer's nonbinding interpretive reservation from enacted statutory text.\n5. Generate two interpretations (narrow plain reading, broader plausible political signal), counter-reading, required missing text and boundary of support. A lexical nuance alone cannot establish secret intent.\n6. Issue granular claim cards with quote, legal/linguistic limitation and a question for corroborating implementation evidence."
+  },
+  {
+    "id": "nv2-topic-miner",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-topic-miner/SKILL.md",
+    "mission": "Discover consequential, falsifiable questions behind topical events via structural tensions rather than word-count ranking.",
+    "input": "Article/report/document claims, actor graph, baseline time series, analyst's disclosed priors, budget and scope.",
+    "output": "Ranked TopicCandidates with tensions, concealed mechanisms, null explanation, expected discriminating sources and scorecard.",
+    "protocol": "1. Normalize signals and disaggregate high-frequency press coverage from genuinely novel documentary changes. Represent each event as actor-action-object-modality-condition-time-geo.\n2. Compute structural tension edges: promise-vs-behavior, law-vs-executive interpretation, old-vs-current doctrine, declared-vs-operational capability, burden transfer, geographic scope and statement-vs-measurement.\n3. Generate questions through WHAT changed → WHO pays/benefits → BY WHAT MECHANISM could facts connect → WHAT would have to be true → WHAT original record would discriminate → WHAT benign alternative is equally consistent.\n4. Make at least three levels of question (surface, structural, latent causal). Keep topics with no original anchor or no possible falsifier on watchlist, not as concluded findings.\n5. Rank finalists by ordinal 0–4 evidence traceability, impact, novelty, cross-domain explanatory value, falsifiability and accessible independent sources; subtract collection/harm cost. State reasons, don't relabel score as probability.\n6. Run adversarial reframing: generate at least one credible policy, administrative or mundane explanation; check if the topic merely presupposes the analyst's prior. Select top candidates by gain-per-research-cost."
+  },
+  {
+    "id": "nv2-evidence-finder",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-evidence-finder/SKILL.md",
+    "mission": "Find direct measurement or documentary tests for a claim, resolve source dependence and track evidence upgrades/downgrades.",
+    "input": "Atomic claim, observable prediction, independent supporting/counter sources and preferred data families.",
+    "output": "ClaimEvidenceMatrix, evidence grading, corroboration tree, alternate explanations and missing measurements.",
+    "protocol": "1. Translate the claim into smallest observable propositions: existence, date, identity, quantity, causal link, intent and geographic attribution each require distinct evidence.\n2. Select evidence class: signed source, shipment/inventory ledger, audited budget, public event database, independently dated visual, or first-hand attributed statement.\n3. Build two search branches: strongest plausible support and strongest plausible falsification. A government announcement is documentary evidence of a position, not independent evidence of real-world outcomes.\n4. Group reports by original primary quote/interview; resolve reprints and derivative analysis. Score directness, independence, consistency, temporal alignment and measurement units qualitatively.\n5. Audit alternative unit definitions (troops stationed vs deployed; announced vs obligated budgets; chip vs board vs rack; date released vs date photographed); reconcile quantities with transparent arithmetic and null unexplained amounts.\n6. If imagery is material, demand original asset, capture date and multiple independent spatial anchors; route image origin analysis to a separate request if the needed tools are absent."
+  },
+  {
+    "id": "nv2-source-tracker",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-source-tracker/SKILL.md",
+    "mission": "Reconstruct information provenance, first appearance, citation chains, retractions and claim evolution across agencies, outlets and versions.",
+    "input": "Claim or exact phrase, candidate URLs/docs, date range, archival access and cited-source relationships.",
+    "output": "SourceDependencyGraph, origin candidates, reprint clusters, corrections/version timeline and independence count.",
+    "protocol": "1. Normalize author/publisher, article release, update and retrieval dates, URL canonicalization and exact quotation fingerprint; preserve source original language.\n2. Follow citations and first named attribution backward; search exact fragments and historical site copies, not simply earliest indexed search result.\n3. Build DAG nodes for original report, official statement, republished article, commentary, document archive and later correction. Link `CITES`, `COPIES`, `CONTRADICTS`, `UPDATES` and `UNCONFIRMED_LINEAGE`.\n4. Compute independence by upstream reporting chain. If report A and B cite the same anonymous official, count one source line; keep editorial confirmation only when independently demonstrated.\n5. Run timeline checks: original statement preceded follow-on commentary? release time vs edit time? later article claiming older quote? disputed translation from original?\n6. Return origin confidence as `verified-original`, `likely-upstream`, `unresolved`. Never call an earliest search index hit the origin without corroboration."
+  },
+  {
+    "id": "nv2-source-finder",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-source-finder/SKILL.md",
+    "mission": "Retrieve and rank original public documents that can discriminate contested factual claims, without confusing publisher authority and factual corroboration.",
+    "input": "Question, exact proposition, named entities/aliases, jurisdictions, time interval, requested source grade and access tools.",
+    "output": "SearchPlan plus SourceLedger candidate/verified entries, official-original URLs, actual accessed spans and gaps.",
+    "protocol": "1. Define each claim's best authority: law → govinfo/Congress and signed text; policy → original issuer; troop counts → dated DoD/CRS records; finance → filed audited statements; ownership → registry by date; academic assertion → original paper and methods.\n2. Build bilingual query families using exact quotations, agency abbreviations, historical variants, translated terms, filetype:pdf, official domain, citation trails, law section numbers and archived document titles.\n3. Search primary organization site then document archives/Wayback where accessible, then regulator/statutory registry, then secondary independent news and analysis. Use authorized web/Firecrawl tools only if actually connected.\n4. Retrieve original and cite exact section, publication date, amendment status and genuine source URL. If a search snippet is all that exists, label snippet-only and do not claim full-text verification.\n5. Separate document authority from truth: a DoD denial is authoritative evidence that denial occurred but not a physical audit; a legislative impact assessment is not an operational order.\n6. Run missing-source escalation: search quoted text in archival domain aliases, document title/number, cited footnotes, independent agency archive; stop on permission, robots or paywall rather than bypassing."
+  },
+  {
+    "id": "nv2-movement-tracker",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-movement-tracker/SKILL.md",
+    "mission": "Reconcile publicly documented historical asset/force movement and distinguish actual movements from orders, plans, claims and rumors.",
+    "input": "Named public event/asset class, time window, departure/arrival report, quantity and public authoritative records.",
+    "output": "MovementLedger with event dates, object/unit normalization, documented origin/destination at appropriate public resolution and explicit confidence/status.",
+    "protocol": "1. Separate physical objects and scales: personnel, units, cargo, GPU chips/boards/servers, aircraft tails, ships, investment cash; document conversions and avoid mixing categories.\n2. Label status `completed_actual`, `announced`, `ordered`, `planned`, `claimed`, `denied`, `unknown`, `scenario`. A rumor must never be drawn as actual movement.\n3. Collect historic corroboration from officially released movements, dated public manifests, company filings and time-aligned independent contemporaneous news; respect publisher terms and privacy.\n4. Build temporal accounting: starting balance + arrivals - departures - disposals + adjustments = ending balance; record physical inventory separately from contract quantities and control/ownership.\n5. When origin/destination not independently known, use named region only or null; never interpolate track points, transit routes or exact unit locations. Avoid real-time military/individual movement monitoring or tactical targeting detail.\n6. Compare public reports of a movement with denials/command statements; flag differences of time window, unit, troop definition and legal headcount restriction."
+  },
+  {
+    "id": "nv2-source-catcher",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-source-catcher/SKILL.md",
+    "mission": "Handle unattributed leaks, disputed media reports, and official denials as noisy investigative leads while preserving granular wording and source uncertainty.",
+    "input": "Rumor headline/quote, alleged source class, publication time, counterstatements and related measurable signals.",
+    "output": "RumorCase with proposition-specific denial scope, independent origin, verification pivots, nonpublication warnings and current status.",
+    "protocol": "1. Atomize sensational report into separately falsifiable items: quantity, date, unit, authority, location, decision status, motive. Do not assume every detail stands or falls together.\n2. Classify anonymous single official, multi-person attribution, leaked memo with verifiable provenance, unattributed social post, satire, amended report and official denial independently.\n3. Trace earliest version and shared chain; search claimed supporting document, procurement, parliamentary/hearing question, public posture change and contemporaneous official response.\n4. Parse the denial for exact target and modality: `not true` of the 4,500 figure? current plan? negotiations? all potential future moves? Mark what was NOT denied and also what was NOT established.\n5. Test mundane explanations: obsolete plans, draft option, deliberate signaling, mistranslation, unrelated force rotation, agency dispute. These remain hypotheses until evidence.\n6. Maintain a lead quarantine; do not publish unsubstantiated individual accusations or connect named private persons to espionage or wrongdoing without strong lawful evidence."
+  },
+  {
+    "id": "nv2-chrono-search",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-chrono-search/SKILL.md",
+    "mission": "Investigate long-run documentary sequences backward and forward without mixing enactment, publication, historic fact and later reinterpretation.",
+    "input": "Anchor issue/document, earliest relevant baseline, desired interval, jurisdictions and search budget.",
+    "output": "Evidence-linked chronology, same-clause semantic diffs, periodization, discontinuities and search gaps.",
+    "protocol": "1. Establish dual clocks for each record: event/effective time and known/published time; retain versions and retroactive commentary separately.\n2. From the current anchor search backward through footnotes, predecessor law, signed accord, early doctrine and concrete historic events; seek contemporaneous original documents.\n3. Search forward for actual implementation, amendments, appropriations, military organizational changes, diplomatic response, denials and contradictions.\n4. Define turning points by changed institution, verb modality, command relationships, force/budget baseline and geographic scope; compare like-for-like documents before inferring shift.\n5. Build a 3-scale timeline (decades/years, months/weeks, event-day), not a fixed recent-news-only window; insert breakpoints where causal mechanisms or law changed.\n6. At each phase compact findings with stable source IDs, counterhypotheses, missing primary items and next chronological pivot; preserve original quote and exact offset."
+  },
+  {
+    "id": "nv2-map-pointer",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-map-pointer/SKILL.md",
+    "mission": "Resolve ambiguous organization/location language into verified public geospatial entities with documented geometry, uncertainty and no invented point placement.",
+    "input": "Text mention, date, location/type context, candidate official facility names, permitted gazetteers and public imagery.",
+    "output": "GeoResolutionCandidates with entity type, alias, administrative hierarchy, geocoding evidence, geometry/null and uncertainty status.",
+    "protocol": "1. NER geospan detection: facility, compound, installation, city, country, route, theater and abstract strategic region; retain original-language mention and entity role.\n2. Disambiguate `USFK base` as a category, not a unique point; construct multiple plausible candidate installations and ask source-backed questions of mission/organization/date to narrow.\n3. Use official public geospatial gazetteer or location record and a second independent source for exact civilian/public site location, preserving coordinate reference system, source accuracy and update timestamp.\n4. If source only identifies city/region, return municipal polygon/country region or null according to licensed geometry; never substitute a made-up city centroid and represent it as an exact installation.\n5. Detect conflicting aliases (Osan vs Songtan, 8th Army vs USFK command, military base vs airfield) and multiple names for the same site without merging distinct units.\n6. For sensitive sites restrict outputs to lawfully public, appropriate-resolution locations and no targeting-relevant precision. Mark `resolution: country|region|city|public_site` and `geometry_status: verified|approximate|pending`."
+  },
+  {
+    "id": "nv2-hypothesis-lab",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-hypothesis-lab/SKILL.md",
+    "mission": "Execute Analysis of Competing Hypotheses, counterfactual tests, signs-and-indicators and adversarial red team without assigning fake numerical confidence.",
+    "input": "Question, candidate explanations, evidence claims with independence groups, timeframe, analyst prior, budget.",
+    "output": "ACH matrix, evidence diagnosticity, alternative/benign hypothesis, revised verdicts, decisive open tests and counterfactuals.",
+    "protocol": "1. Write at least one normal/benign null model and 2–4 genuinely distinguishable mechanistic hypotheses; avoid variants of the same conclusion masquerading as alternatives.\n2. For each hypothesis list observable predictions, incompatible evidence, necessary assumptions and explicit abandonment condition. Specify which outcomes would matter *before* searching.\n3. Classify each evidence item `support|contradict|neutral|ambiguous` and `high|medium|low diagnosticity`, based on how differently it is expected under competing mechanisms.\n4. Discount correlated documentation and articles copied from one source; challenge base rates, actor incentives, chronological precedence, legal authority and ordinary organizational routines.\n5. Compute qualitative verdict `supported|partially_supported|plausible_unverified|contradicted|insufficient_evidence` with reasons; no unsupported `95%` or unearned TRUE/FALSE.\n6. Design next information-gain tests that could **falsify a favored theory**. Stop if remaining tests are unavailable, illegal, nonpublic or unlikely to discriminate; explain residual uncertainty."
+  },
+  {
+    "id": "nv2-maplizer",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-maplizer/SKILL.md",
+    "mission": "Turn verified geospatial evidence and typed relationships into deterministic, traceable map scenes and GeoJSON without generating new factual coordinates.",
+    "input": "Validated events, GeoResolution records, claims, relationship graph, time filters and narrative scenes.",
+    "output": "GeoJSON/scene specification and legend for map, timeline, document panel, evidence graph and risk-scenario layers.",
+    "protocol": "1. Run preflight: each point geometry has named coordinate source, WGS84 order longitude-latitude, permissible ranges, source timestamp and public granularity. Reject impossible/unsourced points.\n2. Split layers: verified public facility/region, actual dated historic movement, announced proposal, analyst inference, contested report, conditional scenario. Never draw inferred connections with same style as observed movements.\n3. Convert only authenticated geometries into GeoJSON FeatureCollections. Unknown point does not appear on map; represent it in unlocated evidence panel instead of inventing centerpoint.\n4. Align every arrow with source-backed endpoints, status, event interval, unit and quantity, no interpolated path; for broad policy relation use graph edge rather than geodesic claim of travel.\n5. Create a Scene set: history, key documents/clauses, claims/denials, hypotheses, country/region-level conditional risks. All map selections open the source and status rationale.\n6. Validate changes by replaying frozen fixtures; provide accessibility text, legend, report ID, contradiction indicators, data vintage and no precise attack/targeting visual."
+  },
+  {
+    "id": "nv2-visual-forensics",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-visual-forensics/SKILL.md",
+    "mission": "Independently test provenance, image reuse and location/hardware claims in public filings, shareholder decks, satellite imagery and videos.",
+    "input": "Original image/PDF/slide or accessible source URL, published and claimed capture dates, comparison image candidates and provenance question.",
+    "output": "MediaLedger, exact/near-match result, disputed caption and geographic/asset attribution verdict with limits.",
+    "protocol": "1. Preserve original issuer asset and derived copy, SHA256, URL, slide/page, file type, displayed caption, XMP/EXIF (if actually inspected), date and potential copyright restrictions.\n2. Use hash for byte-identical images, perceptual hash/visual overlay/OCR/keyframe comparisons for cropped or recolored variants when tools are installed. State `not independently compared` if absent.\n3. Trace earliest verifiably published source via original photo archives, reverse-search tools and old site versions; search several crops and exact caption words with language variants.\n4. Treat matches in layers: same file, near-identical visual, same site, same facility, exact equipment or ownership, alleged deceptive intent. Do not jump from a photo match to ownership or export violation.\n5. Verify geo attribution with independently sourced external features, public plan, image acquisition time and building stage; account for lens orientation, weather, crop and stock art.\n6. Report visual comparisons as human-inspectable pairs, objective points of agreement/mismatch, alternative explanations and source-dependent uncertainty."
+  },
+  {
+    "id": "nv2-diplomatic-reader",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-diplomatic-reader/SKILL.md",
+    "mission": "Perform high-fidelity bilingual discourse analysis of diplomatic/legal claims, speech acts and calibrated official denials while refusing intent hallucination.",
+    "input": "Exact original-language statement, speaker role, date, full context, question asked, other-language official version and comparable historical language.",
+    "output": "SpeechActLedger, proposition-scope comparison, competing readings, what-is-not-said, supporting context and falsifiers.",
+    "protocol": "1. Authenticate official transcript and complete question-and-answer context; separate translation, paraphrase, diplomatic boilerplate and decision-effective text.\n2. Tag verbs as acknowledgment, respect, agreement, commitment, obligation, prediction, denial or non-answer; parse agent, object, negation, temporal scope, universal quantifiers and exceptions.\n3. When a spokesperson says `fake news` or `not true`, reconstruct the precise proposition challenged. An unqualified colloquial phrase is not a signed legal guarantee; distinguish policy dissent, number correction and timing denial.\n4. Compare 2006 and later communiqués phrase by phrase, including both speakers' verbs and conditional reservation; historical baseline controls misleading isolated word interpretation.\n5. Produce literal/narrow reading and alternative plausible pragmatic readings. Evaluate possible face-saving, strategic ambiguity and message audience as hypotheses, never automatically as intent facts.\n6. Check with independent official implementation, legislative constraints and public acts. State `semantic-signal only` when no operational corroboration exists."
+  },
+  {
+    "id": "nv2-corporate-tracer",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-corporate-tracer/SKILL.md",
+    "mission": "Investigate public corporate filings, ownership, funding and beneficial control without conflating entities, security classes, economic rights and unverified allegations.",
+    "input": "Exact legal entity names, countries/registries, as-of date, directors/share classes, reported capital flows and filed documents.",
+    "output": "Dated EntityOwnershipGraph, capital-flow records, ownership denominator, conflicts, corporate source ledger and information gaps.",
+    "protocol": "1. Resolve legal entity across languages, registration IDs, branch/subsidiary, dissolved/former names, jurisdiction; keep similarly named companies separate until verified.\n2. Retrieve authorized public annual report, regulator filing, exchange notice, shareholder circular, registry extract, litigation and procurement record where available.\n3. Record economic ownership, voting power, options/warrants, pledged holdings, nominee holdings, debt financing and actual control as distinct graph edge types with class/denominator/date.\n4. Reconcile share percentages against issued/fully diluted shares on matching dates; a financing relationship alone is not ultimate beneficial ownership. Unknown private register remains restricted/unverified.\n5. Track cash actual/announced capex/loans/equity/transaction consideration separately, applying currency and valuation dates. Compare contemporaneous public filings and independent authoritative confirmation.\n6. When physical assets are alleged, distinguish purchased chips, boards, assembled servers, racks, shipped units, in-transit and installed systems; do not infer missing GPUs from inconsistent units."
+  },
+  {
+    "id": "nv2-outreach-prep",
+    "version": "0.1.0",
+    "source": "skill://plugins_6af52b7a5ed081919c575b96390416ff/nv2-outreach-prep/SKILL.md",
+    "mission": "Prepare evidence-based, fair professional interview and right-of-reply requests through public institutional channels without sending anything by default.",
+    "input": "Specific disputed source claims, primary citation IDs, organization and verified public professional contact channels, desired language and contact scope.",
+    "output": "ContactRolePlan, ranked 3–5 questions discriminating hypotheses, neutral draft, consent checkpoint, response ledger initialized NOT SENT.",
+    "protocol": "1. Determine why an interview could add independently verifiable information rather than repeat a press statement; formulate precise factual requests against original document IDs.\n2. Find organization media relations, public affairs, investor relations, company secretariat, public agency record officer or named authorized spokesperson through published official pages.\n3. Do not guess email patterns or harvest private contact details. Verify title, institution and official address from primary public source at the time of draft.\n4. Prepare three to five nonaccusatory questions designed to discriminate specific rival explanations; allow a correction/right-of-reply path and clarify on-record/off-record only with respondent agreement.\n5. Create one concise Korean/English draft, note respondent role and why appropriate, relevant citations, reply deadline and permission to publish. Mark `sent_at:null` and `status:NOT_SENT`.\n6. Explicitly stop before sending, calls, forms, appointments, follow-ups, fees or recording. Require per-action user authorization; no impersonation, covert recording, pressure or misrepresentation."
+  }
+]

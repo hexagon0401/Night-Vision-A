@@ -1,7 +1,7 @@
 import type {MapPort} from '../map/renderer';
 type NearbyItem={id:string;kind:string;title:string;lat?:number;lon?:number;observed_at?:string|null;source_url?:string;cloud_pct?:number|null;note?:string;attribution?:string;license?:string;license_url?:string};
 const el=(tag:string,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;e.className=cls;return e;};
-export function mountNearby(host:HTMLElement,map:MapPort,update:(items:{id:string;kind:string;lat:number;lon:number}[])=>void){
+export function mountNearby(host:HTMLElement,map:MapPort,update:(items:{id:string;kind:string;lat:number;lon:number}[])=>void,initialType:string='aircraft'){
  const panel=el('section','','monitor-evidence nearby-panel');panel.setAttribute('aria-label','주변 현황');host.append(panel);
  let abort=new AbortController(),objectUrl:string|null=null,closed=false,generation=0,imageGeneration=0,imageAbort:AbortController|null=null;
  const cleanupImage=()=>{imageGeneration++;imageAbort?.abort();imageAbort=null;panel.querySelectorAll('img').forEach(img=>img.remove());if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}};
@@ -10,7 +10,7 @@ export function mountNearby(host:HTMLElement,map:MapPort,update:(items:{id:strin
  const header=el('div','','inspector-header'),closeButton=el('button','닫기') as HTMLButtonElement;closeButton.onclick=close;header.append(el('h2','주변 현황'),closeButton);
  const summary=el('p','지도의 현재 중심 주변을 조회합니다.','muted'),radius=document.createElement('select');radius.setAttribute('aria-label','조회 반경');for(const n of [10,25,50]){const o=document.createElement('option');o.value=String(n);o.textContent=n+' km';radius.append(o);}radius.value='25';
  const tabs=el('div','','monitor-tabs'),body=el('div');const gps=el('button','내 위치로 이동') as HTMLButtonElement;gps.onclick=()=>{if(!navigator.geolocation){summary.textContent='이 기기에서 위치를 사용할 수 없습니다.';return;}navigator.geolocation.getCurrentPosition(p=>{if(closed)return;map.focus([[p.coords.longitude,p.coords.latitude]]);void load();},()=>{summary.textContent='위치 권한을 확인하세요. 지도 중심으로도 조회할 수 있습니다.';},{timeout:10000});};const refresh=el('button','현재 지도에서 다시 조회') as HTMLButtonElement;refresh.onclick=()=>void load();panel.append(header,summary,radius,gps,refresh,tabs,body);
- const types=[['aircraft','비행기'],['vessels','선박'],['webcams','웹캠'],['satellite','위성']] as const;let current:typeof types[number][0]='aircraft';
+ const types=[['aircraft','비행기'],['vessels','선박'],['webcams','웹캠'],['satellite','위성']] as const;let current:typeof types[number][0]=types.some(([id])=>id===initialType)?initialType as typeof types[number][0]:'aircraft';
  const load=async()=>{
   const currentGeneration=++generation;abort.abort();abort=new AbortController();cleanupImage();update([]);body.replaceChildren(el('p','자료 조회 중…'));const center=map.center(),point={lat:center.lat,lon:((center.lon+180)%360+360)%360-180};
   const query=new URLSearchParams({lat:String(point.lat),lon:String(point.lon),radius:radius.value,type:current});
@@ -27,5 +27,5 @@ export function mountNearby(host:HTMLElement,map:MapPort,update:(items:{id:strin
    body.append(el('p',data.note,'muted'));
   }catch(e){if(!closed&&(e as Error).name!=='AbortError')body.replaceChildren(el('p','주변 자료 연결을 확인하세요.'));}
  };
- for(const [id,label] of types){const b=el('button',label) as HTMLButtonElement;b.onclick=()=>{current=id;void load();};tabs.append(b);}radius.onchange=()=>void load();void load();return close;
+ for(const [id,label] of types){const b=el('button',label) as HTMLButtonElement;b.setAttribute('aria-pressed',String(id===current));b.onclick=()=>{current=id;for(const x of Array.from(tabs.children))x.setAttribute('aria-pressed',String(x===b));void load();};tabs.append(b);}radius.onchange=()=>void load();void load();return close;
 }

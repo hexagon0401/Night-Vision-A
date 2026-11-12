@@ -223,6 +223,9 @@ try {
   await db.prepare('UPDATE heads SET snapshot=? WHERE provider=?').bind('snapshot:context-empty','ucdp').run();
   assert.equal((await req(contextPath)).status,404,'unpublished record is not resolved from the old cache');
   await db.prepare('UPDATE heads SET snapshot=? WHERE provider=?').bind(snapshot.id,'ucdp').run();
+  const moduleList=await(await req('/api/v2/engine/modules')).json();assert.equal(moduleList.modules.length,15);
+  const engine=await(await req('/api/v2/engine/investigate?event=ucdp%3A1')).json();assert.equal(engine.schema_version,'nv-investigation/2.0');assert.equal(engine.module_results.length,15);assert.equal(engine.map.features.length,0,'regional records never become exact evidence map points');
+  assert.equal((await req('/api/v2/engine/investigate',{event_id:'ucdp:1'})).status,401,'anonymous NIM use rejected');assert.equal(nimCalls,0,'public engine adapters do not consume model budget');
   const nearBase='/api/v2/nearby?lat=37.5&lon=126.9&radius=25&type=';
   assert.equal((await req('/api/v2/nearby?lat=&lon=1')).status,400);
   const air=await(await req(nearBase+'aircraft')).json();assert.equal(air.status,'ok');assert.equal(air.items[0].kind,'aircraft');
