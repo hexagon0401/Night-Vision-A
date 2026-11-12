@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 
-from nv_engine.models import CaseBundle
+from nv_engine.models import CaseBundle, OntologyGraph
 from nv_engine.sources.config import Manifest
 from nv_engine.collect.types import CollectionResult
 from nv_api.app import app
@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--check', action='store_true', help='fail on drift; do not modify files')
     args = parser.parse_args()
     artifacts = {
+        'schemas/ontology-graph.v2.schema.json': OntologyGraph.model_json_schema(),
         'schemas/case-bundle.schema.json': CaseBundle.model_json_schema(),
         'schemas/source-manifest.schema.json': Manifest.model_json_schema(),
         'schemas/collection-result.schema.json': CollectionResult.model_json_schema(),

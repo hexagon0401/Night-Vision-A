@@ -1,0 +1,1386 @@
+{
+  "$defs": {
+    "EvidenceLink": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "evidence_link_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Evidence Link Id",
+          "type": "string"
+        },
+        "quote_span": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Quote Span"
+        },
+        "role": {
+          "enum": [
+            "SUPPORTS",
+            "CONTRADICTS",
+            "MENTIONS",
+            "DERIVED_FROM",
+            "UNVERIFIED_MATCH"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "documented",
+            "reported",
+            "inferred",
+            "scenario",
+            "refuted",
+            "unresolved"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_link_id",
+        "claim_id",
+        "source_id",
+        "role",
+        "quote_span",
+        "status"
+      ],
+      "title": "EvidenceLink",
+      "type": "object"
+    },
+    "ExecutionReceipt": {
+      "additionalProperties": false,
+      "properties": {
+        "completed_at_utc": {
+          "format": "date-time",
+          "title": "Completed At Utc",
+          "type": "string"
+        },
+        "tool_call_id": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Tool Call Id",
+          "type": "string"
+        },
+        "tool_name": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Tool Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool_name",
+        "tool_call_id",
+        "completed_at_utc"
+      ],
+      "title": "ExecutionReceipt",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "ModuleRun": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "completed_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Completed At Utc"
+        },
+        "executor": {
+          "enum": [
+            "deterministic_adapter",
+            "inline_skill",
+            "mcp_remote_verified",
+            "not_executed"
+          ],
+          "title": "Executor",
+          "type": "string"
+        },
+        "input_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Input Hash"
+        },
+        "module": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Module",
+          "type": "string"
+        },
+        "module_run_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Module Run Id",
+          "type": "string"
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Result Hash"
+        },
+        "started_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Started At Utc"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "partial",
+            "blocked",
+            "not_executed"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module_run_id",
+        "case_id",
+        "module",
+        "status",
+        "executor",
+        "started_at_utc",
+        "completed_at_utc",
+        "input_hash",
+        "result_hash",
+        "receipt"
+      ],
+      "title": "ModuleRun",
+      "type": "object"
+    },
+    "MultiPolygon": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "maximum": 180,
+                    "minimum": -180,
+                    "type": "number"
+                  },
+                  {
+                    "maximum": 90,
+                    "minimum": -90,
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "minItems": 4,
+              "type": "array"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiPolygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "MultiPolygon",
+      "type": "object"
+    },
+    "OntologyAnomaly": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Baseline",
+          "type": "object"
+        },
+        "calibration": {
+          "enum": [
+            "uncalibrated",
+            "calibrated_with_validation"
+          ],
+          "title": "Calibration",
+          "type": "string"
+        },
+        "candidate_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "detector": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Detector",
+          "type": "string"
+        },
+        "entity_id": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 3,
+              "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Entity Id"
+        },
+        "metric": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Metric",
+          "type": "string"
+        },
+        "observation_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 3,
+            "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "review_state": {
+          "enum": [
+            "candidate",
+            "reviewed",
+            "rejected"
+          ],
+          "title": "Review State",
+          "type": "string"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 3,
+            "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "documented",
+            "reported",
+            "inferred",
+            "scenario",
+            "refuted",
+            "unresolved"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "entity_id",
+        "metric",
+        "detector",
+        "baseline",
+        "score",
+        "calibration",
+        "source_ids",
+        "observation_ids",
+        "status",
+        "review_state"
+      ],
+      "title": "OntologyAnomaly",
+      "type": "object"
+    },
+    "OntologyClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "event_from_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event From Utc"
+        },
+        "event_to_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event To Utc"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Language"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "quote_span": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote Span"
+        },
+        "review_state": {
+          "enum": [
+            "not_reviewed",
+            "proposed",
+            "human_reviewed",
+            "source_verified",
+            "rejected"
+          ],
+          "title": "Review State",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 3,
+            "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "statement": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "documented",
+            "reported",
+            "inferred",
+            "scenario",
+            "refuted",
+            "unresolved"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "statement",
+        "language",
+        "source_ids",
+        "status",
+        "event_from_utc",
+        "event_to_utc",
+        "limitations",
+        "review_state"
+      ],
+      "title": "OntologyClaim",
+      "type": "object"
+    },
+    "OntologyEntity": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "maxLength": 300,
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "attributes": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Attributes",
+          "type": "object"
+        },
+        "created_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created At Utc"
+        },
+        "display_name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Display Name",
+          "type": "string"
+        },
+        "entity_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "event",
+            "vessel",
+            "aircraft",
+            "satellite_scene",
+            "camera",
+            "facility",
+            "organization",
+            "location",
+            "person_public",
+            "document",
+            "anomaly"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "privacy_class": {
+          "enum": [
+            "public",
+            "restricted",
+            "non_sensitive_public_context"
+          ],
+          "title": "Privacy Class",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 3,
+            "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "documented",
+            "reported",
+            "inferred",
+            "scenario",
+            "refuted",
+            "unresolved"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_id",
+        "kind",
+        "display_name",
+        "status",
+        "privacy_class",
+        "attributes",
+        "source_ids"
+      ],
+      "title": "OntologyEntity",
+      "type": "object"
+    },
+    "OntologyIdentifier": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "identifier_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Identifier Id",
+          "type": "string"
+        },
+        "namespace": {
+          "maxLength": 50,
+          "minLength": 1,
+          "title": "Namespace",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 3,
+            "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "documented",
+            "reported",
+            "inferred",
+            "scenario",
+            "refuted",
+            "unresolved"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "valid_from_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Valid From Utc"
+        },
+        "valid_to_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Valid To Utc"
+        },
+        "value": {
+          "maxLength": 255,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "identifier_id",
+        "entity_id",
+        "namespace",
+        "value",
+        "valid_from_utc",
+        "valid_to_utc",
+        "source_ids",
+        "status"
+      ],
+      "title": "OntologyIdentifier",
+      "type": "object"
+    },
+    "OntologyObservation": {
+      "additionalProperties": false,
+      "properties": {
+        "acquired_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Acquired At Utc"
+        },
+        "entity_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "geometry": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "MultiPolygon": "#/$defs/MultiPolygon",
+                  "Point": "#/$defs/Point",
+                  "Polygon": "#/$defs/Polygon"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/Point"
+                },
+                {
+                  "$ref": "#/$defs/Polygon"
+                },
+                {
+                  "$ref": "#/$defs/MultiPolygon"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Geometry"
+        },
+        "geometry_role": {
+          "enum": [
+            "measured_position",
+            "provider_reported_position",
+            "scene_footprint",
+            "catalog_location",
+            "unlocated"
+          ],
+          "title": "Geometry Role",
+          "type": "string"
+        },
+        "geometry_source_id": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 3,
+              "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Geometry Source Id"
+        },
+        "measurements": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Measurements",
+          "type": "object"
+        },
+        "observation_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "observed_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed At Utc"
+        },
+        "precision_m": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Precision M"
+        },
+        "provider_id": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Provider Id",
+          "type": "string"
+        },
+        "quality_notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Quality Notes",
+          "type": "array"
+        },
+        "recorded_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Recorded At Utc"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 3,
+            "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "documented",
+            "reported",
+            "inferred",
+            "scenario",
+            "refuted",
+            "unresolved"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "visibility_policy": {
+          "enum": [
+            "public",
+            "restricted",
+            "delayed_public",
+            "aggregated_only"
+          ],
+          "title": "Visibility Policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "observation_id",
+        "entity_id",
+        "provider_id",
+        "observed_at_utc",
+        "acquired_at_utc",
+        "recorded_at_utc",
+        "source_ids",
+        "status",
+        "geometry",
+        "geometry_source_id",
+        "precision_m",
+        "geometry_role",
+        "visibility_policy",
+        "measurements"
+      ],
+      "title": "OntologyObservation",
+      "type": "object"
+    },
+    "OntologyRelation": {
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "predicate": {
+          "enum": [
+            "REPORTED_IN",
+            "OBSERVED_AT",
+            "OPERATED_BY",
+            "LOCATED_AT",
+            "MENTIONED_IN",
+            "RELATED_TO",
+            "CITES",
+            "DERIVED_FROM",
+            "CONTRADICTS",
+            "CORROBORATES",
+            "POSSIBLY_SAME_AS",
+            "REPORTED_INVOLVED_IN"
+          ],
+          "title": "Predicate",
+          "type": "string"
+        },
+        "relation_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Relation Id",
+          "type": "string"
+        },
+        "resolution_state": {
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected"
+          ],
+          "title": "Resolution State",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 3,
+            "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "documented",
+            "reported",
+            "inferred",
+            "scenario",
+            "refuted",
+            "unresolved"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "subject_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "valid_from_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Valid From Utc"
+        },
+        "valid_to_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Valid To Utc"
+        }
+      },
+      "required": [
+        "relation_id",
+        "subject_id",
+        "predicate",
+        "object_id",
+        "source_ids",
+        "status",
+        "valid_from_utc",
+        "valid_to_utc",
+        "resolution_state"
+      ],
+      "title": "OntologyRelation",
+      "type": "object"
+    },
+    "OntologySource": {
+      "additionalProperties": false,
+      "properties": {
+        "access_status": {
+          "enum": [
+            "opened",
+            "metadata_only",
+            "failed",
+            "restricted",
+            "not_fetched"
+          ],
+          "title": "Access Status",
+          "type": "string"
+        },
+        "acquired_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Acquired At Utc"
+        },
+        "content_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Hash"
+        },
+        "derived_from_source_id": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 3,
+              "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Derived From Source Id"
+        },
+        "independence_group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Independence Group"
+        },
+        "indexed_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Indexed At Utc"
+        },
+        "license_status": {
+          "enum": [
+            "approved",
+            "metadata_only",
+            "pending",
+            "prohibited",
+            "unknown"
+          ],
+          "title": "License Status",
+          "type": "string"
+        },
+        "original_or_derived": {
+          "enum": [
+            "original",
+            "derived",
+            "unknown"
+          ],
+          "title": "Original Or Derived",
+          "type": "string"
+        },
+        "published_at_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At Utc"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publisher"
+        },
+        "quote_span": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote Span"
+        },
+        "source_id": {
+          "maxLength": 256,
+          "minLength": 3,
+          "pattern": "^[A-Za-z][A-Za-z0-9:._@-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        }
+      },
+      "required": [
+        "source_id",
+        "url",
+        "publisher",
+        "content_hash",
+        "original_or_derived",
+        "derived_from_source_id",
+        "independence_group",
+        "published_at_utc",
+        "indexed_at_utc",
+        "acquired_at_utc",
+        "license_status",
+        "access_status"
+      ],
+      "title": "OntologySource",
+      "type": "object"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            },
+            {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            }
+          ],
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "Point",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Point",
+      "type": "object"
+    },
+    "Polygon": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "minItems": 4,
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "Polygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Polygon",
+      "type": "object"
+    }
+  },
+  "$id": "https://nightvision.hexagon0401.workers.dev/schemas/ontology-graph.v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "anomalies": {
+      "items": {
+        "$ref": "#/$defs/OntologyAnomaly"
+      },
+      "title": "Anomalies",
+      "type": "array"
+    },
+    "as_of_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "As Of Utc"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/OntologyClaim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "entities": {
+      "items": {
+        "$ref": "#/$defs/OntologyEntity"
+      },
+      "title": "Entities",
+      "type": "array"
+    },
+    "evidence_links": {
+      "items": {
+        "$ref": "#/$defs/EvidenceLink"
+      },
+      "title": "Evidence Links",
+      "type": "array"
+    },
+    "identifiers": {
+      "items": {
+        "$ref": "#/$defs/OntologyIdentifier"
+      },
+      "title": "Identifiers",
+      "type": "array"
+    },
+    "module_runs": {
+      "items": {
+        "$ref": "#/$defs/ModuleRun"
+      },
+      "title": "Module Runs",
+      "type": "array"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/OntologyObservation"
+      },
+      "title": "Observations",
+      "type": "array"
+    },
+    "relations": {
+      "items": {
+        "$ref": "#/$defs/OntologyRelation"
+      },
+      "title": "Relations",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "nv-ontology/2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/OntologySource"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "synthetic",
+    "entities",
+    "identifiers",
+    "observations",
+    "sources",
+    "claims",
+    "evidence_links",
+    "relations",
+    "anomalies",
+    "module_runs"
+  ],
+  "title": "NV Ontology Graph v2",
+  "type": "object"
+}
