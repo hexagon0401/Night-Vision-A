@@ -22,11 +22,11 @@ export async function discoverMapillary(r,now,env){
 }
 export async function discoverWindy(r,now,env){
  const radius=r.precision===1?15:25;
- const url=new URL('https://api.windy.com/webcams/api/v3/webcams');url.search=new URLSearchParams({nearby:[r.lat,r.lon,radius].join(','),include:'categories,location,urls',categories:'traffic,city,square,landscape,coast,port,beach,mountain',limit:'4',lang:'ko'}).toString();
+ const url=new URL('https://api.windy.com/webcams/api/v3/webcams');url.search=new URLSearchParams({nearby:[r.lat,r.lon,radius].join(','),include:'categories,location,urls',categories:'traffic,city,square,landscape,coast,port,beach,mountain',limit:'50',lang:'ko'}).toString();
  const data=await boundedJSON(url.href,{headers:{'x-windy-api-key':env.WINDY_API_KEY}});
  if(!Array.isArray(data.webcams)||!Number.isFinite(data.total))throw new Error('upstream_invalid_response');
  const seen=new Set();
- return data.webcams.slice(0,4).flatMap(camera=>{
+ return data.webcams.slice(0,50).flatMap(camera=>{
   const id=String(camera.webcamId??''),l=camera.location;
   if(seen.has(id)||!/^\d{1,30}$/.test(id)||camera.status!=='active'||!Number.isFinite(l?.latitude)||!Number.isFinite(l?.longitude)||Math.abs(l.latitude)>90||Math.abs(l.longitude)>180)return [];
   const categories=(camera.categories??[]).map(c=>typeof c==='string'?c:c.id);
@@ -43,5 +43,5 @@ export async function discoverWindy(r,now,env){
   i.camera={camera_id:id,camera_type:'public_webcam',heading_deg:null,heading_confidence:'unknown',feed_mode:'link_only',frame_captured_at_utc:null};
   i.raw_source_ref=iso(camera.lastUpdatedOn);i.relation_reasons=['nearby_public_camera_context_only'];
   i.warnings=['현재 주변 공개 카메라입니다. 과거 사건 당시 녹화 영상이 아닙니다.','카탈로그 갱신 시각은 촬영 시각이 아닙니다. 영상·촬영 시각은 Windy 원출처에서 확인하세요.'];return i;
- });
+ }).slice(0,4);
 }
