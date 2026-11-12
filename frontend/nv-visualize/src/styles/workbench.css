@@ -333,3 +333,5 @@
 @media(max-width:760px){.layer-control{top:120px;left:10px;width:270px;z-index:2}.monitor-evidence{width:calc(100vw - 20px);padding:18px}.context-tabs button{min-height:44px}.context-provider-state{grid-template-columns:1fr}.context-provider-state .badge{justify-self:start}.context-card{padding:14px}.engine-module{align-items:flex-start}}
 
 .monitor-panel{z-index:4}.layer-control{z-index:2;top:var(--nv-header-bottom,100px);max-height:calc(100dvh - 220px);overflow:auto}.nv-engine-panel .engine-module .badge{flex-shrink:0}
+
+.monitor .monitor-panel,.monitor .monitor-evidence{background:#121516!important}.engine-candidate{overflow-wrap:anywhere;min-width:0}.engine-candidate details p{font-size:11px;color:#b8bdc0}.layer-selection{padding:12px;border:1px solid #48515a;border-radius:8px;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
