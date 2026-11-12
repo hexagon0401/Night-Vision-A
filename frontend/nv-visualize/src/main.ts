@@ -12,7 +12,10 @@ let cleanup: (() => void) | undefined,
   enhanceCleanup: (() => void) | undefined,
   accountCleanup: (() => void) | undefined,
   generation = 0;
+const routeKey=()=>{const url=new URL(location.href);url.searchParams.delete('object');url.hash='';url.searchParams.sort();return url.href;};
+let renderedRoute='';
 async function render() {
+  renderedRoute=routeKey();
   const current = ++generation,
     url = new URL(location.href);
   cleanup?.();
@@ -97,7 +100,7 @@ root.addEventListener("click", (event) => {
     navigate(to.href);
   }
 });
-window.addEventListener("popstate", () => void render());
+window.addEventListener("popstate", () => {if(routeKey()!==renderedRoute)void render();});
 window.addEventListener("pagehide", () => {
   cleanup?.();
   disposeMap();
