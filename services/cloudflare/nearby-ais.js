@@ -30,7 +30,8 @@ export async function nearbyShips(q,env){
  const cacheEnabled=(!!q.bbox||env.NV_ONTOLOGY_V2_ENABLED==='true')&&!!env.DB;let previous=null,cacheState=cacheEnabled?'empty':'disabled';
  if(cacheEnabled){try{const row=await env.DB.prepare('SELECT value FROM settings WHERE key=?').bind('ais-static:v1').first();previous=row?JSON.parse(row.value):null;cacheState=previous?'loaded':'empty';}catch{cacheState='unavailable';}}
  const d=q.radius/111,lon=d/Math.max(.2,Math.cos(q.lat*Math.PI/180));
- const response=await fetch('https://stream.aisstream.io/v0/stream',{headers:{Upgrade:'websocket'},redirect:'manual',signal:AbortSignal.timeout(4000)});
+ const handshake=new AbortController(),handshakeTimer=setTimeout(()=>handshake.abort(),4000);let response;
+ try{response=await fetch('https://stream.aisstream.io/v0/stream',{headers:{Upgrade:'websocket'},redirect:'manual',signal:handshake.signal});}finally{clearTimeout(handshakeTimer);}
  if(response.status!==101||!response.webSocket)throw Error('upstream_websocket_unavailable');
  const ws=response.webSocket;ws.accept();const messages=[];
  try {
@@ -39,9 +40,10 @@ export async function nearbyShips(q,env){
    const finish=()=>{clearTimeout(timer);resolve();};
    ws.addEventListener('close',()=>{clearTimeout(timer);reject(Error('upstream_websocket_closed'));},{once:true});ws.addEventListener('error',()=>{clearTimeout(timer);reject(Error('upstream_websocket_failed'));},{once:true});
    ws.addEventListener('message',event=>{
-    if(typeof event.data!=='string'||event.data.length>50000)return;total+=event.data.length;
+    let data=event.data;if(data instanceof ArrayBuffer){if(data.byteLength>50000)return;try{data=new TextDecoder('utf-8',{fatal:true}).decode(data);}catch{return;}}
+    if(typeof data!=='string'||data.length>50000)return;total+=data.length;
     if(total>1000000||messages.length>=200){finish();return;}
-    try{const m=JSON.parse(event.data);if(m.error||m.Error){clearTimeout(timer);reject(Error('upstream_subscription_rejected'));return;}messages.push(m);}catch{}
+    try{const m=JSON.parse(data);if(m.error||m.Error){clearTimeout(timer);reject(Error('upstream_subscription_rejected'));return;}messages.push(m);}catch{}
    });
    ws.send(JSON.stringify({APIKey:env.AISSTREAM_API_KEY,BoundingBoxes:q.bbox?[[[q.bbox[1],q.bbox[0]],[q.bbox[3],q.bbox[2]]]]:[[[Math.max(-90,q.lat-d),Math.max(-180,q.lon-lon)],[Math.min(90,q.lat+d),Math.min(180,q.lon+lon)]]],FilterMessageTypes:['PositionReport','ShipStaticData']}));
   });
