@@ -35,7 +35,7 @@ export async function nearbyShips(q,env){
  const ws=response.webSocket;ws.accept();const messages=[];
  try {
   await new Promise((resolve,reject)=>{
-   const timer=setTimeout(resolve,6500);let total=0;
+   const timer=setTimeout(resolve,10000);let total=0;
    const finish=()=>{clearTimeout(timer);resolve();};
    ws.addEventListener('close',()=>{clearTimeout(timer);reject(Error('upstream_websocket_closed'));},{once:true});ws.addEventListener('error',()=>{clearTimeout(timer);reject(Error('upstream_websocket_failed'));},{once:true});
    ws.addEventListener('message',event=>{
