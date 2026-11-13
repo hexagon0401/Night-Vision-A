@@ -10,6 +10,8 @@ try{
  const get=type=>mf.dispatchFetch('https://example.test/api/v2/traffic?type='+type);
  const first=await get('aircraft');assert.equal(first.status,200);const body=await first.json();assert.equal(body.items.length,1);assert.equal(body.items[0].course_deg,90);assert.equal(body.items[0].heading_deg,null);assert.equal(body.provider,'opensky');assert.equal(first.headers.get('Cache-Control'),'no-store');
  await get('aircraft');assert.equal(calls,1,'global upstream request is shared/cached');
+ const delta=await(await mf.dispatchFetch('https://example.test/api/v2/traffic?type=aircraft&format=delta')).json();assert.equal(delta.mode,'snapshot');assert.equal(delta.upserts.length,1);assert.equal(delta.items,undefined);const next=await(await mf.dispatchFetch('https://example.test/api/v2/traffic?type=aircraft&format=delta&cursor='+encodeURIComponent(delta.cursor))).json();assert.equal(next.mode,'delta');assert.equal(next.upserts.length,0);assert.equal(calls,1);
+
  const vessels=await(await get('vessels')).json();assert.equal(vessels.status,'key_required');assert.equal(vessels.source_diagnostics.collector,'shared_persistent_websocket');assert.equal(calls,1);
  assert.equal((await get('invalid')).status,400);
  console.log('Traffic integration passed: actual SQLite DO binding, world aircraft normalization/cache, missing AIS key, status/error and no-store boundaries.');

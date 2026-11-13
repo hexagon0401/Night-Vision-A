@@ -6,7 +6,7 @@ import type { Point } from "../cases/model";
 
 // One MapLibre context for basemap, events and Trace. No second WebGL canvas.
 export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: () => void) {
-  const source = "nv-overlay";
+  const source = "nv-overlay",trafficSource="nv-traffic";
   const ids = ["nv-ontology-fill","nv-ontology-outline","nv-ontology-points","nv-ontology-selected","nv-evidence-points","nv-evidence-lines","nv-evidence-areas","nv-footprints","nv-direct", "nv-inferred", "nv-scenario", "nv-events", "nv-nearby", "nv-traffic-icons", "nv-traffic-selected", "nv-event-selection", "nv-markers", "nv-counts"];
   const pendingIcons=new Set<string>(),failedIcons=new Set<string>();
   const loadIcon=(id:string)=>{if(map.hasImage?.(id)||pendingIcons.has(id)||failedIcons.has(id))return;pendingIcons.add(id);map.loadImage(`${import.meta.env.BASE_URL}assets/nightvision/png/2x/${id}.png`).then(({data})=>{if(destroyed)return;if(!map.hasImage(id))map.addImage(id,data,{pixelRatio:2});lastRendered=undefined;if(latest)render(latest);}).catch(()=>failedIcons.add(id)).finally(()=>pendingIcons.delete(id));};
@@ -44,6 +44,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
     if (!map.getSource(source)) {
       if (!map.isStyleLoaded()) return;
       map.addSource(source,{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+      map.addSource(trafficSource,{type:"geojson",data:{type:"FeatureCollection",features:[]}});
       map.addLayer({id:'nv-ontology-fill',type:'fill',source,filter:['all',['==',['get','kind'],'ontology-object'],['==',['geometry-type'],'Polygon']],paint:{'fill-color':['match',['get','object_kind'],'satellite_scene','#a89fc7','#8fb7aa'],'fill-opacity':.14}});
       map.addLayer({id:'nv-ontology-outline',type:'line',source,filter:['all',['==',['get','kind'],'ontology-object'],['==',['geometry-type'],'Polygon']],paint:{'line-color':['case',['get','object_selected'],'#fff','#a89fc7'],'line-width':['case',['get','object_selected'],2,1]}});
       map.addLayer({id:'nv-ontology-points',type:'circle',source,filter:['all',['==',['get','kind'],'ontology-object'],['==',['geometry-type'],'Point']],paint:{'circle-radius':7,'circle-color':['match',['get','object_kind'],'vessel','#d1a568','aircraft','#86b6d8','camera','#8fba9f','event','#c87970','#b7b8bc'],'circle-stroke-color':'#e8ecee','circle-stroke-width':1}});
@@ -56,8 +57,8 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
       map.addLayer({id:'nv-evidence-lines',type:'line',source,filter:['all',['==',['get','kind'],'evidence'],['==',['geometry-type'],'LineString']],paint:{'line-color':['match',['get','evidence_status'],'inferred','#c99b61','scenario','#b69ad1','#9bb9cc'],'line-width':2,'line-dasharray':[3,2]}});
       map.addLayer({id:'nv-evidence-points',type:'circle',source,filter:['all',['==',['get','kind'],'evidence'],['==',['geometry-type'],'Point']],paint:{'circle-radius':6,'circle-color':'#9bb9cc','circle-stroke-color':'#fff','circle-stroke-width':1}});
       map.addLayer({id:"nv-events",type:"circle",source,filter:["==",["get","kind"],"event"],paint:{"circle-radius":["get","radius"],"circle-color":["get","color"],"circle-opacity":["case",["==",["get","precision"],1],.9,.55],"circle-stroke-color":["case",["get","selected"],"#ffffff",["get","color"]],"circle-stroke-width":["case",["get","selected"],2,1]}});
-      map.addLayer({id:"nv-nearby",type:"circle",source,filter:["==",["get","kind"],"nearby"],paint:{"circle-radius":["case",["in",["get","category"],["literal",["vessel","aircraft"]]],2.5,7],"circle-color":["match",["get","category"],"aircraft","#d1d7db","vessel","#d1d7db","#8fba9f"],"circle-stroke-color":"#fff","circle-stroke-width":1.5}});
-      for(const selected of [false,true])map.addLayer({id:selected?'nv-traffic-selected':'nv-traffic-icons',type:'symbol',source,filter:['all',['==',['get','kind'],'nearby'],['in',['get','category'],['literal',['vessel','aircraft']]],['==',['get','aisSelected'],selected]],layout:{'icon-image':['get','icon_id'],'icon-size':['interpolate',['linear'],['zoom'],1,selected?.4:.16,8,selected?.5:.38],'icon-allow-overlap':selected,'icon-ignore-placement':selected,'icon-rotate':['coalesce',['get','bearing'],0],'icon-rotation-alignment':'map','icon-pitch-alignment':'map'},paint:{'icon-opacity':['case',['get','direction_known'],1,.65]}});
+      map.addLayer({id:"nv-nearby",type:"circle",source:trafficSource,filter:["==",["get","kind"],"nearby"],paint:{"circle-radius":["case",["in",["get","category"],["literal",["vessel","aircraft"]]],2.5,7],"circle-color":["match",["get","category"],"aircraft","#d1d7db","vessel","#d1d7db","#8fba9f"],"circle-stroke-color":"#fff","circle-stroke-width":1.5}});
+      for(const selected of [false,true])map.addLayer({id:selected?'nv-traffic-selected':'nv-traffic-icons',type:'symbol',source:trafficSource,filter:['all',['==',['get','kind'],'nearby'],['in',['get','category'],['literal',['vessel','aircraft']]],['==',['get','aisSelected'],selected]],layout:{'icon-image':['get','icon_id'],'icon-size':['interpolate',['linear'],['zoom'],1,selected?.4:.16,8,selected?.5:.38],'icon-allow-overlap':selected,'icon-ignore-placement':selected,'icon-rotate':['coalesce',['get','bearing'],0],'icon-rotation-alignment':'map','icon-pitch-alignment':'map'},paint:{'icon-opacity':['case',['get','direction_known'],1,.65]}});
       map.addLayer({id:"nv-event-selection",type:"circle",source,filter:["all",["==",["get","kind"],"event"],["==",["get","selected"],true]],paint:{"circle-radius":["+",["get","radius"],5],"circle-color":"#ffffff","circle-opacity":0,"circle-stroke-color":"#f2f2f0","circle-stroke-width":2}});
       map.addLayer({id:"nv-markers",type:"circle",source,filter:["==",["get","kind"],"marker"],paint:{"circle-radius":["case",[">",["get","count"],1],12,7],"circle-color":["case",["get","selected"],"#ebebe6","#181818"],"circle-stroke-color":"#ebebe6","circle-stroke-width":1.2}});
       map.addLayer({id:"nv-counts",type:"symbol",source,filter:["all",["==",["get","kind"],"marker"],[">",["get","count"],1]],layout:{"text-field":["to-string",["get","count"]],"text-font":["Noto Sans Regular"],"text-size":11,"text-allow-overlap":true},paint:{"text-color":"#f2f2f0"}});
@@ -71,7 +72,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
     const markers=groupMarkers(data);
     for (const m of markers) point(m.point,{kind:"marker",ids:JSON.stringify(m.ids),count:m.ids.length,selected:m.ids.includes(data.selected??"")});
     for (const e of data.events??[]) point([e.lon,e.lat],{kind:"event",id:e.id,precision:e.precision,color:e.color??"#e1e1dc",radius:e.radius??5,selected:e.id===data.selected});
-    for(const n of data.nearby??[])point([n.lon,n.lat],{kind:"nearby",category:n.kind,id:n.id,aisSelected:n.selected===true,icon_id:n.kind==='vessel'?iconFromAIS(n.ship_type):iconFromICAOType(n.aircraft_type),bearing:n.heading_deg??n.course_deg??0,direction_known:Number.isFinite(n.heading_deg)||Number.isFinite(n.course_deg)});
+    traffic(data.nearby??[]);
     const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     for (const path of data.trace?.paths??(data.showLinks?data.links:[])) {
       const coordinates=data.trace?arc(path.points,reduced?1:data.trace.progress):path.points;
@@ -81,10 +82,11 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
     (map.getSource(source) as GeoJSONSource).setData({type:"FeatureCollection",features} as FeatureCollection);
     if (!notified) {notified=true;map.once("render",onReady);}
   };
+  const traffic=(items:NonNullable<MapData['nearby']>)=>{if(latest)latest.nearby=items;const target=map.getSource(trafficSource) as GeoJSONSource|undefined;if(!target)return;for(const n of items)if(['vessel','aircraft'].includes(n.kind))loadIcon(n.kind==='vessel'?iconFromAIS(n.ship_type):iconFromICAOType(n.aircraft_type));target.setData({type:'FeatureCollection',features:items.map(n=>({type:'Feature',id:n.id,geometry:{type:'Point',coordinates:[n.lon,n.lat]},properties:{kind:'nearby',category:n.kind,id:n.id,aisSelected:n.selected===true,icon_id:n.kind==='vessel'?iconFromAIS(n.ship_type):iconFromICAOType(n.aircraft_type),bearing:n.heading_deg??n.course_deg??0,direction_known:Number.isFinite(n.heading_deg)||Number.isFinite(n.course_deg)}}))});};
   const reload = () => {if(latest) render(latest);};
   map.on("style.load",reload);
   return {
-    render,
+    render,traffic,
     pick(x:number,y:number) {
       if(!latest) return null;
       // Project canonical points at the current camera; worker tile updates may
@@ -109,6 +111,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
       destroyed=true;map.off("style.load",reload);
       for (const id of [...ids].reverse()) if(map.getLayer(id)) map.removeLayer(id);
       if(map.getSource(source)) map.removeSource(source);
+      if(map.getSource(trafficSource))map.removeSource(trafficSource);
     },
   };
 }
