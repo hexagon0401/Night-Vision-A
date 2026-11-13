@@ -14,8 +14,14 @@ export function position(a:Point,b:Point,t:number){
 }
 export function inside(lon:number,lat:number,b:number[]){return lat>=b[1]&&lat<=b[3]&&(b[0]<=b[2]?lon>=b[0]&&lon<=b[2]:lon>=b[0]||lon<=b[2]);}
 export class PowerReserve{
- tracks=new Map<string,Track>();cursor=0;delay:number;target:number;revision=0;private lastWall=0;
+ tracks=new Map<string,Track>();provider:string|null=null;cursor=0;delay:number;target:number;revision=0;private lastWall=0;
  constructor(public kind:TrafficKind){this.delay=this.target=kind==='vessels'?120000:180000;}
+ setProvider(provider:string){
+  if(!provider||this.provider===provider)return false;
+  const changed=this.provider!==null;this.provider=provider;
+  if(changed){this.tracks.clear();this.cursor=0;this.lastWall=0;this.delay=this.target;this.revision++;}
+  return changed;
+ }
  get gap(){return this.kind==='vessels'?300000:120000;}
  setDelay(ms:number){this.target=Math.max(this.kind==='vessels'?120000:180000,Math.min(MAX_DELAY,ms));}
  tick(now:number,starved=false){
