@@ -52,7 +52,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
       map.addLayer({id:'nv-evidence-lines',type:'line',source,filter:['all',['==',['get','kind'],'evidence'],['==',['geometry-type'],'LineString']],paint:{'line-color':['match',['get','evidence_status'],'inferred','#c99b61','scenario','#b69ad1','#9bb9cc'],'line-width':2,'line-dasharray':[3,2]}});
       map.addLayer({id:'nv-evidence-points',type:'circle',source,filter:['all',['==',['get','kind'],'evidence'],['==',['geometry-type'],'Point']],paint:{'circle-radius':6,'circle-color':'#9bb9cc','circle-stroke-color':'#fff','circle-stroke-width':1}});
       map.addLayer({id:"nv-events",type:"circle",source,filter:["==",["get","kind"],"event"],paint:{"circle-radius":["get","radius"],"circle-color":["get","color"],"circle-opacity":["case",["==",["get","precision"],1],.9,.55],"circle-stroke-color":["case",["get","selected"],"#ffffff",["get","color"]],"circle-stroke-width":["case",["get","selected"],2,1]}});
-      map.addLayer({id:"nv-nearby",type:"circle",source,filter:["==",["get","kind"],"nearby"],paint:{"circle-radius":7,"circle-color":["match",["get","category"],"aircraft","#86b6d8","vessel","#d1a568","#8fba9f"],"circle-stroke-color":"#fff","circle-stroke-width":1.5}});
+      map.addLayer({id:"nv-nearby",type:"circle",source,filter:["==",["get","kind"],"nearby"],paint:{"circle-radius":["case",["==",["get","aisSelected"],true],10,7],"circle-color":["match",["get","category"],"aircraft","#86b6d8","vessel","#d1a568","#8fba9f"],"circle-stroke-color":"#fff","circle-stroke-width":1.5}});
       map.addLayer({id:"nv-event-selection",type:"circle",source,filter:["all",["==",["get","kind"],"event"],["==",["get","selected"],true]],paint:{"circle-radius":["+",["get","radius"],5],"circle-color":"#ffffff","circle-opacity":0,"circle-stroke-color":"#f2f2f0","circle-stroke-width":2}});
       map.addLayer({id:"nv-markers",type:"circle",source,filter:["==",["get","kind"],"marker"],paint:{"circle-radius":["case",[">",["get","count"],1],12,7],"circle-color":["case",["get","selected"],"#ebebe6","#181818"],"circle-stroke-color":"#ebebe6","circle-stroke-width":1.2}});
       map.addLayer({id:"nv-counts",type:"symbol",source,filter:["all",["==",["get","kind"],"marker"],[">",["get","count"],1]],layout:{"text-field":["to-string",["get","count"]],"text-font":["Noto Sans Regular"],"text-size":11,"text-allow-overlap":true},paint:{"text-color":"#f2f2f0"}});
@@ -66,7 +66,7 @@ export function attachOverlay(map: LibreMap, callbacks: MapCallbacks, onReady: (
     const markers=groupMarkers(data);
     for (const m of markers) point(m.point,{kind:"marker",ids:JSON.stringify(m.ids),count:m.ids.length,selected:m.ids.includes(data.selected??"")});
     for (const e of data.events??[]) point([e.lon,e.lat],{kind:"event",id:e.id,precision:e.precision,color:e.color??"#e1e1dc",radius:e.radius??5,selected:e.id===data.selected});
-    for(const n of data.nearby??[])point([n.lon,n.lat],{kind:"nearby",category:n.kind,id:n.id});
+    for(const n of data.nearby??[])point([n.lon,n.lat],{kind:"nearby",category:n.kind,id:n.id,aisSelected:n.selected===true});
     const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     for (const path of data.trace?.paths??(data.showLinks?data.links:[])) {
       const coordinates=data.trace?arc(path.points,reduced?1:data.trace.progress):path.points;

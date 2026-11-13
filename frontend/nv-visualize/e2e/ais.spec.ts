@@ -1,0 +1,9 @@
+import {test,expect} from '@playwright/test';
+for(const width of [1440,390])test(`AIS viewport layer and selected ship ${width}px`,async({page})=>{
+ await page.setViewportSize({width,height:900});await page.addInitScript(()=>localStorage.setItem('nv:camera:v1',JSON.stringify({center:[129,35.1],zoom:12})));
+ let calls=0;await page.route('**/*',route=>{const u=new URL(route.request().url());if(u.hostname!=='127.0.0.1')return route.abort();if(!u.pathname.startsWith('/api/'))return route.continue();
+ if(u.pathname==='/api/v2/nearby'){calls++;expect(u.searchParams.get('bbox')).toBeTruthy();return route.fulfill({json:{status:'ok',queried_at:new Date().toISOString(),items:[{id:'vessel:123456789',kind:'vessel',mmsi:'123456789',title:'SYNTHETIC AIS TEST',lat:35.1,lon:129,speed_knots:12.5,course_deg:90,heading_deg:null,observed_at:new Date().toISOString()}]}});}
+ const data:Record<string,unknown>={'/api/auth/me':{user:null},'/api/v2/status':{runs_per_day:12,last_success:null,providers:[],runs:[]},'/api/v2/events':{records:[]},'/api/v2/overview':{countries:[]},'/api/v2/cases':{cases:[]}};return route.fulfill({json:data[u.pathname]??{}});});
+ await page.goto('/?view=monitor');await page.getByText('지도 레이어',{exact:true}).click();const check=page.getByLabel('AIS · 민간 선박',{exact:true});await check.check();await expect(page.locator('.layer-control')).toContainText('1척');expect(calls).toBeGreaterThan(0);
+ await page.locator('main').evaluate(e=>e.dispatchEvent(new CustomEvent('nv:nearby-pick',{detail:'vessel:123456789'})));const detail=page.locator('.layer-selection');await expect(detail).toContainText('123456789');await expect(detail).toContainText('12.5 kn');await expect(detail).toContainText('90°');await expect(detail).toContainText('AISstream');await expect(detail).toContainText('5분');await check.uncheck();await expect(detail).toBeHidden();await expect(page.locator('canvas')).toHaveCount(1);
+});

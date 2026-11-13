@@ -99,7 +99,7 @@ export function mountMonitor(
     user: any = null;
   const map = factory(root.querySelector<HTMLElement>(".map")!, {
     pick: () => {},
-    move: () => {},
+    move: () => root.querySelector('main')?.dispatchEvent(new Event('nv:map-move')),
     dismiss: () => {},
     ready: () => {},
     error: () => {
