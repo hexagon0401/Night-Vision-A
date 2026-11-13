@@ -4,11 +4,27 @@
   "compatibility_date": "2026-01-01",
   "workers_dev": true,
   "preview_urls": false,
-  "version_metadata": {"binding": "CF_VERSION_METADATA"},
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
   "main": "../../services/cloudflare/worker.js",
-  "rules": [{"type":"Text","globs":["**/*.sql"],"fallthrough":true}],
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.sql"
+      ],
+      "fallthrough": true
+    }
+  ],
   "keep_vars": true,
-  "d1_databases": [{"binding": "DB", "database_name": "nv-monitor", "migrations_dir": "../../services/cloudflare/migrations"}],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nv-monitor",
+      "migrations_dir": "../../services/cloudflare/migrations"
+    }
+  ],
   "vars": {
     "MONITOR_RUNS_PER_DAY": "12",
     "GITHUB_ALLOWED_USER_IDS": "82876856",
@@ -18,6 +34,26 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/", "/index.html"]
-  }
+    "run_worker_first": [
+      "/api/*",
+      "/",
+      "/index.html"
+    ]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "TRAFFIC_HUB",
+        "class_name": "TrafficHub"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "traffic-v1",
+      "new_sqlite_classes": [
+        "TrafficHub"
+      ]
+    }
+  ]
 }

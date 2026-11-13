@@ -1,3 +1,5 @@
+export {TrafficHub} from './traffic-hub.js';
+import {trafficRoute} from './traffic-hub.js';
 import {ontologyRoute,syncOntology,ontologyStatus} from './ontology.js';
 import {engineRoute} from './nv2-engine.js';
 import { nimKeys } from "./credentials.js";
@@ -41,6 +43,7 @@ export default {
           headers,
         });
       }
+      if(url.pathname==='/api/v2/traffic')return await trafficRoute(request,env,url);
       if (!env.DB)
         return json(
           {
