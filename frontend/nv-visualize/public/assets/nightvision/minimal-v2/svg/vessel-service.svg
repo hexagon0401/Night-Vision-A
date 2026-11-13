@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Service / SAR">
+ <g stroke="#172034" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M32 4 L43 14 Q45 18 45 24 L45 50 Q45 59 38 59 L26 59 Q19 59 19 50 L19 24 Q19 18 21 14 Z" fill="#EEF3FC"/></g>
+ <g fill="#172034" stroke="none"><rect x="26" y="30" width="12" height="16" rx="2"/><path d="M32 32 V44 M27 38 H37" stroke="#9B82FF" stroke-width="2.8" fill="none"/></g>
+</svg>

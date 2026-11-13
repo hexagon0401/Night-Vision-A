@@ -1,3 +1,6 @@
+// Minimal v2 art adapter: preserve sourced v1 classification semantics.
+const minimalIds={"vessel-ro_ro": "vessel-cargo", "vessel-gas_tanker": "vessel-tanker", "vessel-chemical_tanker": "vessel-tanker", "vessel-pleasure": "vessel-unknown", "vessel-hsc": "vessel-fast", "vessel-tow": "vessel-tug", "vessel-dredger": "vessel-service", "vessel-pilot": "vessel-service", "vessel-sar": "vessel-service", "vessel-medical": "vessel-service", "vessel-law_enforcement": "vessel-patrol", "vessel-military": "vessel-patrol", "vessel-wig": "vessel-unknown", "aircraft-bizjet": "aircraft-business", "aircraft-regional_jet": "aircraft-regional", "aircraft-jumbo": "aircraft-widebody", "aircraft-light_single": "aircraft-light_prop", "aircraft-twin_piston": "aircraft-light_prop", "aircraft-glider": "aircraft-unknown", "aircraft-tiltrotor": "aircraft-unknown", "aircraft-heavy_transport": "aircraft-unknown", "aircraft-cargo": "aircraft-freighter"};
+const minimal=id=>minimalIds[id]??id;
 /** Night Vision AIS/ADS-B icon mapping, zero dependencies. */
 const SHIP = new Set(["unknown", "cargo", "container", "bulk", "ro_ro", "tanker", "gas_tanker", "chemical_tanker", "passenger", "cruise", "ferry", "fishing", "tow", "tug", "dredger", "sailing", "pleasure", "hsc", "pilot", "sar", "law_enforcement", "military", "service", "medical", "wig"]);
 const AIR = new Set(["unknown", "light_single", "twin_piston", "turboprop", "regional_jet", "narrowbody", "widebody", "jumbo", "cargo", "bizjet", "helicopter", "fighter", "heavy_transport", "uav", "glider", "tiltrotor"]);
@@ -30,7 +33,7 @@ export function iconFromAIS(typeCode, verifiedSubtype=null) {
     const families={cargo:['container','bulk','ro_ro'],passenger:['cruise','ferry'],tanker:['gas_tanker','chemical_tanker']};
     if ((families[k]??[]).includes(verifiedSubtype)) k=verifiedSubtype;
   }
-  return `vessel-${SHIP.has(k)?k:'unknown'}`;
+  return minimal(`vessel-${SHIP.has(k)?k:'unknown'}`);
 }
 
 const TYPE_GROUPS = {
@@ -56,11 +59,11 @@ export function iconFromICAOType(typeDesignator, verifiedRole=null) {
   let k=TYPE_TO_ICON.get(code)??'unknown';
   // Cargo role cannot be inferred from airframe designator; apply only for verified role.
   if (verifiedRole==='cargo' && ['regional_jet','narrowbody','widebody','jumbo','heavy_transport'].includes(k))k='cargo';
-  return `aircraft-${AIR.has(k)?k:'unknown'}`;
+  return minimal(`aircraft-${AIR.has(k)?k:'unknown'}`);
 }
 export const iconURL = (id, scale=2)=> {
   if(!/^((vessel|aircraft)-[a-z_]+)$/.test(id))throw new Error('invalid_icon_id');
   if(![1,2,3].includes(scale))throw new Error('invalid_pixel_ratio');
-  return `/assets/nightvision/png/${scale}x/${id}.png`;
+  return `/assets/nightvision/minimal-v2/png/${({1:24,2:48,3:96})[scale]}/${id}.png`;
 };
 export const iconHeading = (headingDegrees) => Number.isFinite(headingDegrees) ? ((headingDegrees%360)+360)%360 : 0;

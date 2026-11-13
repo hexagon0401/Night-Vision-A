@@ -1,0 +1,240 @@
+{
+  "version": "2.0.0",
+  "title": "Night Vision Minimal AIS + ADS-B Icons",
+  "design": "Flat two-tone silhouette; detailed rendering intentionally removed",
+  "icons": {
+    "vessel-unknown": {
+      "ko": "미분류 선박",
+      "en": "Unknown vessel",
+      "svg": "svg/vessel-unknown.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-cargo": {
+      "ko": "일반 화물선",
+      "en": "Cargo vessel",
+      "svg": "svg/vessel-cargo.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-container": {
+      "ko": "컨테이너선",
+      "en": "Container ship",
+      "svg": "svg/vessel-container.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-bulk": {
+      "ko": "벌크선",
+      "en": "Bulk carrier",
+      "svg": "svg/vessel-bulk.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-tanker": {
+      "ko": "유조선·탱커",
+      "en": "Tanker",
+      "svg": "svg/vessel-tanker.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-passenger": {
+      "ko": "여객선·크루즈",
+      "en": "Passenger / cruise",
+      "svg": "svg/vessel-passenger.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-fast": {
+      "ko": "고속선",
+      "en": "High-speed vessel",
+      "svg": "svg/vessel-fast.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-fishing": {
+      "ko": "어선",
+      "en": "Fishing vessel",
+      "svg": "svg/vessel-fishing.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-tug": {
+      "ko": "예인선",
+      "en": "Tug / towing",
+      "svg": "svg/vessel-tug.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-service": {
+      "ko": "작업·구조선",
+      "en": "Service / SAR",
+      "svg": "svg/vessel-service.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-sailing": {
+      "ko": "범선",
+      "en": "Sailing vessel",
+      "svg": "svg/vessel-sailing.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "vessel-patrol": {
+      "ko": "순찰선·공무선",
+      "en": "Patrol / official",
+      "svg": "svg/vessel-patrol.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-unknown": {
+      "ko": "미분류 항공기",
+      "en": "Unknown aircraft",
+      "svg": "svg/aircraft-unknown.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-light_prop": {
+      "ko": "경비행기",
+      "en": "Light prop",
+      "svg": "svg/aircraft-light_prop.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-turboprop": {
+      "ko": "터보프롭",
+      "en": "Turboprop",
+      "svg": "svg/aircraft-turboprop.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-business": {
+      "ko": "비즈니스 제트",
+      "en": "Business jet",
+      "svg": "svg/aircraft-business.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-regional": {
+      "ko": "리저널 제트",
+      "en": "Regional jet",
+      "svg": "svg/aircraft-regional.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-narrowbody": {
+      "ko": "중형 여객기",
+      "en": "Narrowbody",
+      "svg": "svg/aircraft-narrowbody.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-widebody": {
+      "ko": "대형 광동체",
+      "en": "Widebody",
+      "svg": "svg/aircraft-widebody.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-freighter": {
+      "ko": "화물기",
+      "en": "Freighter",
+      "svg": "svg/aircraft-freighter.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-helicopter": {
+      "ko": "헬리콥터",
+      "en": "Helicopter",
+      "svg": "svg/aircraft-helicopter.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-uav": {
+      "ko": "무인항공기",
+      "en": "UAV (verified)",
+      "svg": "svg/aircraft-uav.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    },
+    "aircraft-fighter": {
+      "ko": "전술기 형태",
+      "en": "Tactical jet (verified)",
+      "svg": "svg/aircraft-fighter.svg",
+      "png_sizes": [
+        24,
+        48,
+        96
+      ]
+    }
+  },
+  "default_size_px": 24,
+  "heading": "upward north, rotate via COG/track when available",
+  "source": "original_svg_paths"
+}

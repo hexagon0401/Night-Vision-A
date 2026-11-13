@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Helicopter">
+ <g stroke="#172034" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="26" y="11" width="12" height="29" rx="6" fill="#EEF3FC"/><rect x="30" y="36" width="4" height="19" rx="2" fill="#EEF3FC"/></g>
+ <g fill="#172034" stroke="none"><path d="M9 25 H55 M32 5 V49" stroke="#EEF3FC" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="25" r="5" fill="#9B82FF"/></g>
+</svg>
