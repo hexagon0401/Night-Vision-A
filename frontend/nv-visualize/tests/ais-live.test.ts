@@ -29,3 +29,8 @@ test('world zoom skips collection and viewport change cancels stale request',asy
 });
 
 test('early provider websocket close is a failure, never successful zero coverage',async()=>{const ws=Object.assign(new EventTarget(),{accept:vi.fn(),close:vi.fn(),send:()=>queueMicrotask(()=>ws.dispatchEvent(new Event('close')))});vi.stubGlobal('fetch',vi.fn().mockResolvedValue({status:101,webSocket:ws}));await expect(nearbyShips({lat:35,lon:129,radius:25},{})).rejects.toThrow('upstream_websocket_closed');expect(ws.close).toHaveBeenCalled();});
+test('handshake timeout is cleared before sampling and binary AIS frames are decoded',async()=>{
+ vi.useFakeTimers();const now=Date.now(),meta={MMSI:123456789,time_utc:new Date(now).toISOString()};let signal:AbortSignal;
+ const ws=Object.assign(new EventTarget(),{accept:vi.fn(),close:vi.fn(),send:()=>queueMicrotask(()=>{for(const message of [{MessageType:'PositionReport',MetaData:meta,Message:{PositionReport:{Valid:true,Latitude:35,Longitude:129,Sog:1,Cog:90}}},{MessageType:'ShipStaticData',MetaData:meta,Message:{ShipStaticData:{Valid:true,Type:70,Name:'SYNTHETIC'}}}])ws.dispatchEvent(new MessageEvent('message',{data:new TextEncoder().encode(JSON.stringify(message)).buffer}));})});
+ vi.stubGlobal('fetch',vi.fn().mockImplementation((_url,options)=>{signal=options.signal;return Promise.resolve({status:101,webSocket:ws});}));const promise=nearbyShips({lat:35,lon:129,radius:25},{});await vi.advanceTimersByTimeAsync(10001);expect(signal!.aborted).toBe(false);expect(await promise).toHaveLength(1);expect(ws.close).toHaveBeenCalled();
+});
