@@ -31,7 +31,7 @@
     "NIM_MODEL": "nvidia/nemotron-3.5-lightning-30b-a3b",
     "NIM_REVIEW_MODEL": "meta/llama-3.3-70b-instruct",
     "NV_AIRCRAFT_PROVIDER": "adsb_lol",
-    "ADSB_LOL_ENABLED": "false",
+    "ADSB_LOL_ENABLED": "true",
     "ADSB_LOL_DAILY_LIMIT": "300",
     "ADSB_LOL_ALLOW_GLOBAL_FILTERS": "false"
   },

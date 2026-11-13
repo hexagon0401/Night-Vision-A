@@ -1,17 +1,17 @@
-# adsb.lol regional autopilot — staged implementation
+# adsb.lol regional autopilot
 
 ## Scope and approval boundary
 
 Implements the owner's `NightVision_ADSB_Lol_Codex_Kit_v1.2_2026-11-13.zip` in the existing TrafficHub, without a new binding, migration, daemon, paid plan, or changes to AIS collection. The supplied instructions are retained under `docs/design/adsb-lol-v1.2/`; their historical verification statements describe the kit author, not a live provider test by this implementation.
 
-The kit's START_HERE explicitly says **“Do not deploy without owner approval.”** Deployment, enabling collection, selecting actual watch regions and the first live source request remain pending explicit owner approval. No default watchlist is shipped. The example region from the ZIP is not deployed.
+The kit's START_HERE explicitly says **“Do not deploy without owner approval.”** The owner approved GitHub publication and production deployment on 2026-11-13. Runtime availability can be enabled for the owner controls; selecting actual watch regions and starting automatic collection remain explicit owner actions. No live source request is made by deployment. No default watchlist is shipped. The example region from the ZIP is not deployed.
 
-Read-only Cloudflare inspection (2026-11-13): account token is active; `nightvision` exists, `TRAFFIC_HUB` is bound, the existing secret is named **`ADSB_API-KEY`**. Its value was not read, logged or overwritten. The new provider flags were not yet present on the operating Worker. Builds trigger metadata could not be read with this token (401); branch push may trigger preview builds, so release commits are prepared locally pending approval to publish/deploy. R2 access credentials are unnecessary for this change.
+Read-only Cloudflare inspection (2026-11-13): account token is active; `nightvision` exists, `TRAFFIC_HUB` is bound, the existing secret is named **`ADSB_API-KEY`**. Its value was not read, logged or overwritten. The new provider flags were not yet present on the operating Worker. Builds trigger metadata could not be read with this token (401); branch push may trigger preview builds; publication/deployment was held until the owner approval recorded above. R2 access credentials are unnecessary for this change.
 
 ## Behavior
 
 - `NV_AIRCRAFT_PROVIDER=adsb_lol` selects the new source and prevents old OpenSky fetches on public reads and alarms. The code retains OpenSky for explicit rollback.
-- Repository release defaults: new provider selected, `ADSB_LOL_ENABLED=false`, daily cap 300, global filters disabled. Deployment alone cannot start collection. Existing runtime keys remain untouched (`keep_vars`).
+- After deployment approval, repository release defaults are: new provider selected, `ADSB_LOL_ENABLED=true`, daily cap 300, global filters disabled. This flag permits owner controls, not automatic collection. Deployment alone cannot start collection. Existing runtime keys remain untouched (`keep_vars`).
 - A real owner configures 1–8 circles, each 1–250 nautical miles, then explicitly starts collection. One circle is sampled per six-minute UTC slot (nominal 240/day). With N regions each is sampled about every 6N minutes; this is **not worldwide all-aircraft coverage**. Delayed alarms make one current attempt and skip missed slots.
 - Explicit ICAO24 or regional focus runs every 90 seconds, at most 60 attempts/UTC day, for 1–90 minutes per activation. Expiry/disable removes the focus target; editing targets does not refill the day's allowance. Focus wins coincident base slots. Request errors consume the same budget as successful calls.
 - One persistent SQLite Durable Object, one existing alarm, one serialized manual/configuration/scheduled queue. Alarm rearming preserves AIS and skips OpenSky while the new provider is selected. No visitor is necessary after the owner starts the schedule.
@@ -53,7 +53,7 @@ Free-plan limits still apply to Worker/DO requests, CPU duration and storage. Br
 
 Live source schema/entitlement, deployed owner login/control, actual alarm cadence, dashboard usage and real receiver coverage remain unverified until the approved rollout. Tests do not prove live regional inventory.
 
-## Results — 2026-11-13 (KST)
+## Pre-release validation — 2026-11-13 (KST)
 
 | Check | Actual result |
 | --- | --- |
@@ -64,10 +64,10 @@ Live source schema/entitlement, deployed owner login/control, actual alarm caden
 | Production Worker integration | D1/auth/OAuth/AI/ontology + legacy traffic + new SQLite ADS-B checks passed |
 | Cold runtime | Config/quota/review pause/shared alarm preserved after Miniflare dispose/recreate using persistent SQLite |
 | Build | TypeScript/Vite passed; existing MapLibre chunk-size advisory remains |
-| Wrangler | **dry-run only**, disabled ADS-B runtime defaults; no upload/deploy |
+| Wrangler | Initial **dry-run** passed with the then-disabled runtime flag; release deployment is separately owner-authorized |
 | Preservation | 68 original files byte-identical; seven historical archives intact |
 | Contracts/geography/exports | Existing generation and integrity checks passed |
 | Operational source | **Not called**; actual aircraft inventory/entitlement unverified |
-| Production | Unchanged; no new release, region configuration or autopilot activation |
+| Production at initial validation | Unchanged; no region configuration or autopilot activation |
 
 The first full browser run found a mobile popup overlap and two tests still referencing the old civilian-aircraft label. The popup stacking and fixtures were corrected, then the complete 21-test suite passed. The durable restart test initially used obsolete Miniflare persistence settings; it now uses the installed runtime's `resourcePersistencePath` and verifies actual persisted state. Wrangler's initial local config-directory error was resolved by pointing `XDG_CONFIG_HOME` to `/tmp/nv-wrangler-config`; the subsequent dry-run passed. These were local test/setup corrections, not production failures.
