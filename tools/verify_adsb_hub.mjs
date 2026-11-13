@@ -69,5 +69,9 @@ try{
  await mf.dispose();mf=new Miniflare(options);const coldNS=await mf.getDurableObjectNamespace('TRAFFIC_HUB'),cold=coldNS.get(coldNS.idFromName('public-world-v1'));
  await cold.fetch('https://traffic.internal/__test',{method:'POST',body:JSON.stringify({now:T+1440000})});
  const restored=await(await cold.fetch('https://traffic.internal/adsb-auto-status')).json();assert.equal(restored.quota.used,4);assert.equal(restored.provider_paused,true);assert.equal(restored.config.enabled,false);assert.ok(restored.next_alarm_at,'shared alarm persists across actual runtime restart');assert.equal(calls,4);
+ await mf.dispose();const bootOptions={...options,resourcePersistencePath:join(persist,'bootstrap'),workers:options.workers.map(w=>({...w,config:{...w.config,env:{...w.config.env}}}))};
+ const bindings=bootOptions.workers[0].config.env;bindings.ADSB_LOL_AUTOSTART_ID={...bindings.ADSB_LOL_ENABLED,value:'synthetic-bootstrap'};bindings.ADSB_LOL_WATCHLIST_JSON={...bindings.ADSB_LOL_ENABLED,value:JSON.stringify([region])};
+ mf=new Miniflare(bootOptions);const bootNS=await mf.getDurableObjectNamespace('TRAFFIC_HUB'),bootHub=bootNS.get(bootNS.idFromName('public-world-v1'));
+ const boot=await(await bootHub.fetch('https://traffic.internal/adsb-auto-status')).json();assert.equal(boot.config.enabled,true);assert.equal(boot.config.regions.length,1);assert.ok(boot.next_alarm_at);assert.equal(calls,4,'bootstrap arms but never fetches immediately');
  console.log('ADSB SQLite integration passed: owner auth/CSRF, actual alarm, shared serialized quota, 100 read-only viewers, deltas, stale removal, retry pause and AIS isolation.');
 }finally{await mf.dispose();rmSync(persist,{recursive:true,force:true});}
