@@ -19,6 +19,10 @@ export async function webcamImage(request,env,url){
   const key='nearby:v1:webcams:'+q.lat+':'+q.lon+':'+q.radius;const entry=await stmt(env.DB,'SELECT value FROM settings WHERE key=?',key).first();
   const saved=entry?JSON.parse(entry.value):null;requireValue(saved&&saved.expires>Date.now()&&saved.body.items.some(i=>i.id==='windy_webcams_v3:'+id),'unknown_or_expired_webcam',404);
  }
+ return fetchWindyImage(env,id);
+}
+export async function fetchWindyImage(env,id){
+ requireValue(/^\d{1,30}$/.test(id),'invalid_webcam');requireValue(env.WINDY_API_KEY,'windy_key_required',503);requireValue(!(env.CONTEXT_DISABLED_PROVIDERS??'').split(',').includes('windy_webcams_v3'),'provider_disabled',503);
  const budget=await stmt(env.DB,"INSERT INTO quotas VALUES(date('now'),'nearby-webcam-image',1) ON CONFLICT(day,bucket) DO UPDATE SET count=count+1 WHERE count<200 RETURNING count").first();requireValue(budget,'webcam_daily_budget',429);
  const api='https://api.windy.com/webcams/api/v3/webcams/'+id+'?include=images,urls';const data=await boundedJSON(api,{headers:{'x-windy-api-key':env.WINDY_API_KEY}});
  requireValue(String(data.webcamId)===id&&data.status==='active','webcam_unavailable',404);

@@ -28,6 +28,7 @@ export const sharedMap: typeof createMap = (container, callbacks) => {
       basemap: (d) => current?.basemap?.(d),
       event: (id) => current?.event?.(id),
       nearby: (id) => current?.nearby?.(id),
+      object: (props) => current?.object?.(props),
     });
   else {
     map.resize?.();
@@ -41,6 +42,7 @@ export const sharedMap: typeof createMap = (container, callbacks) => {
   const instance = map;
   return {
     center: () => instance.center(),
+    bounds: () => instance.bounds?.() ?? [-180,-85,180,85],
     update: (d) => instance.update(d),
     focus: (p, a) => instance.focus(p, a),
     stop: () => instance.stop?.(),

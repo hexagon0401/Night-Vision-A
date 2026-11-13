@@ -5,9 +5,11 @@ import detailStyle from "./detail-style.json";
 import type { Candidate, CandidateLink, Point } from "../cases/model";
 
 export interface MapData {
+  ontologyFeatures?: import("geojson").FeatureCollection<import("geojson").Geometry>;
+  selectedObject?: string|null;
   evidenceFeatures?:import("geojson").Feature<import("geojson").Geometry>[];
   footprints?: {id:string;geometry:import("geojson").Polygon|import("geojson").MultiPolygon}[];
-  nearby?: {id:string; lat:number; lon:number; kind:string}[];
+  nearby?: {id:string; lat:number; lon:number; kind:string;selected?:boolean}[];
   events?: { id: string; lat: number; lon: number; precision: number; color?: string; radius?: number }[];
   candidates: Candidate[];
   links: CandidateLink[];
@@ -18,6 +20,7 @@ export interface MapData {
 }
 export interface MapPort {
   center(): {lat:number; lon:number};
+  bounds?(): [number,number,number,number];
   update(data: MapData): void;
   focus(points: Point[], animate?: boolean): void;
   stop?(): void;
@@ -34,6 +37,7 @@ export interface MapCallbacks {
   basemap?(detailed: boolean): void;
   event?(id: string): void;
   nearby?(id:string):void;
+  object?(props:Record<string,unknown>):void;
 }
 interface Marker {
   point: Point;
@@ -141,6 +145,7 @@ export function createMap(
     overlayReady = false;
   const needed = () =>
     Boolean(
+      data.ontologyFeatures?.features.length ||
       data.nearby?.length ||
       data.events?.length ||
       data.trace?.point ||
@@ -230,6 +235,7 @@ export function createMap(
   });
   return {
     center:()=>{const c=map.getCenter();return {lat:c.lat,lon:c.lng};},
+    bounds:()=>{const b=map.getBounds();const south=Math.max(-85,b.getSouth()),north=Math.min(85,b.getNorth());if(b.getEast()-b.getWest()>=360)return [-180,south,180,north];const normalize=(n:number)=>((n+180)%360+360)%360-180;const west=normalize(b.getWest()),east=normalize(b.getEast());return west<=east?[west,south,east,north]:[-180,south,180,north];},
     update(value) {
       data = value;
       render();

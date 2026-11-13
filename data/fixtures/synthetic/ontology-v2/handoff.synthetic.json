@@ -1,0 +1,393 @@
+{
+  "schema_version": "nv-ontology/2.0",
+  "synthetic": true,
+  "as_of_utc": "2026-11-12T09:00:00Z",
+  "entities": [
+    {
+      "entity_id": "vessel:synthetic:v01",
+      "kind": "vessel",
+      "display_name": "SYNTHETIC VESSEL 01",
+      "status": "reported",
+      "privacy_class": "non_sensitive_public_context",
+      "attributes": {
+        "type": "Demo cargo ship",
+        "mmsi": null,
+        "imo": null
+      },
+      "source_ids": [
+        "source:synthetic:ais"
+      ],
+      "created_at_utc": "2026-11-12T08:00:00Z"
+    },
+    {
+      "entity_id": "aircraft:synthetic:a01",
+      "kind": "aircraft",
+      "display_name": "SYNTHETIC AIRCRAFT 01",
+      "status": "reported",
+      "privacy_class": "non_sensitive_public_context",
+      "attributes": {
+        "icao24": null,
+        "callsign": "TEST123"
+      },
+      "source_ids": [
+        "source:synthetic:adsb"
+      ],
+      "created_at_utc": "2026-11-12T08:00:00Z"
+    },
+    {
+      "entity_id": "event:synthetic:e01",
+      "kind": "event",
+      "display_name": "FICTIONAL EVENT, NO ACTUAL INCIDENT",
+      "status": "unresolved",
+      "privacy_class": "non_sensitive_public_context",
+      "attributes": {
+        "victims": null
+      },
+      "source_ids": [
+        "source:synthetic:event"
+      ],
+      "created_at_utc": "2026-11-12T08:00:00Z"
+    },
+    {
+      "entity_id": "satellite:synthetic:s01",
+      "kind": "satellite_scene",
+      "display_name": "SYNTHETIC SCENE 01",
+      "status": "documented",
+      "privacy_class": "non_sensitive_public_context",
+      "attributes": {
+        "cloud_pct": 12,
+        "collection": "synthetic-stac"
+      },
+      "source_ids": [
+        "source:synthetic:stac"
+      ],
+      "created_at_utc": "2026-11-12T08:00:00Z"
+    },
+    {
+      "entity_id": "camera:synthetic:c01",
+      "kind": "camera",
+      "display_name": "SYNTHETIC CAMERA",
+      "status": "documented",
+      "privacy_class": "non_sensitive_public_context",
+      "attributes": {
+        "viewer_only": true,
+        "capture_at": null
+      },
+      "source_ids": [
+        "source:synthetic:camera"
+      ],
+      "created_at_utc": "2026-11-12T08:00:00Z"
+    }
+  ],
+  "identifiers": [
+    {
+      "identifier_id": "ident:synthetic:v01",
+      "entity_id": "vessel:synthetic:v01",
+      "namespace": "synthetic",
+      "value": "V01",
+      "valid_from_utc": null,
+      "valid_to_utc": null,
+      "source_ids": [
+        "source:synthetic:ais"
+      ],
+      "status": "reported"
+    }
+  ],
+  "observations": [
+    {
+      "observation_id": "obs:synthetic:v01",
+      "entity_id": "vessel:synthetic:v01",
+      "provider_id": "synthetic",
+      "observed_at_utc": "2026-11-12T08:30:00Z",
+      "acquired_at_utc": "2026-11-12T08:35:00Z",
+      "recorded_at_utc": "2026-11-12T08:40:00Z",
+      "source_ids": [
+        "source:synthetic:ais"
+      ],
+      "status": "reported",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4,
+          20.8
+        ]
+      },
+      "geometry_source_id": "source:synthetic:ais",
+      "precision_m": 1000,
+      "geometry_role": "provider_reported_position",
+      "visibility_policy": "public",
+      "measurements": {
+        "speed_kn": null
+      },
+      "quality_notes": [
+        "SYNTHETIC ONLY; one point is not a track"
+      ]
+    },
+    {
+      "observation_id": "obs:synthetic:a01",
+      "entity_id": "aircraft:synthetic:a01",
+      "provider_id": "synthetic",
+      "observed_at_utc": "2026-11-12T08:40:00Z",
+      "acquired_at_utc": "2026-11-12T08:41:00Z",
+      "recorded_at_utc": "2026-11-12T08:42:00Z",
+      "source_ids": [
+        "source:synthetic:adsb"
+      ],
+      "status": "reported",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.1,
+          21.1
+        ]
+      },
+      "geometry_source_id": "source:synthetic:adsb",
+      "precision_m": 1500,
+      "geometry_role": "provider_reported_position",
+      "visibility_policy": "public",
+      "measurements": {
+        "callsign": "TEST123"
+      },
+      "quality_notes": [
+        "SYNTHETIC ONLY"
+      ]
+    },
+    {
+      "observation_id": "obs:synthetic:event",
+      "entity_id": "event:synthetic:e01",
+      "provider_id": "synthetic",
+      "observed_at_utc": null,
+      "acquired_at_utc": "2026-11-12T08:41:00Z",
+      "recorded_at_utc": "2026-11-12T08:43:00Z",
+      "source_ids": [
+        "source:synthetic:event"
+      ],
+      "status": "unresolved",
+      "geometry": null,
+      "geometry_source_id": null,
+      "precision_m": null,
+      "geometry_role": "unlocated",
+      "visibility_policy": "public",
+      "measurements": {
+        "event_date": "unknown"
+      },
+      "quality_notes": [
+        "Unlocated, never render at 0,0"
+      ]
+    },
+    {
+      "observation_id": "obs:synthetic:scene",
+      "entity_id": "satellite:synthetic:s01",
+      "provider_id": "synthetic",
+      "observed_at_utc": "2026-11-11T14:00:00Z",
+      "acquired_at_utc": "2026-11-12T08:00:00Z",
+      "recorded_at_utc": "2026-11-12T08:10:00Z",
+      "source_ids": [
+        "source:synthetic:stac"
+      ],
+      "status": "documented",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.5,
+              19.5
+            ],
+            [
+              33.5,
+              19.5
+            ],
+            [
+              33.5,
+              21.2
+            ],
+            [
+              31.5,
+              19.5
+            ]
+          ]
+        ]
+      },
+      "geometry_source_id": "source:synthetic:stac",
+      "precision_m": 100,
+      "geometry_role": "scene_footprint",
+      "visibility_policy": "public",
+      "measurements": {
+        "cloud_pct": 12
+      },
+      "quality_notes": [
+        "Scene footprint is not evidence of event"
+      ]
+    },
+    {
+      "observation_id": "obs:synthetic:camera",
+      "entity_id": "camera:synthetic:c01",
+      "provider_id": "synthetic",
+      "observed_at_utc": null,
+      "acquired_at_utc": "2026-11-12T08:00:00Z",
+      "recorded_at_utc": "2026-11-12T08:05:00Z",
+      "source_ids": [
+        "source:synthetic:camera"
+      ],
+      "status": "documented",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          33.5,
+          22.0
+        ]
+      },
+      "geometry_source_id": "source:synthetic:camera",
+      "precision_m": 100,
+      "geometry_role": "catalog_location",
+      "visibility_policy": "public",
+      "measurements": {
+        "frame_captured_at_utc": null
+      },
+      "quality_notes": [
+        "Catalog location only"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "source:synthetic:ais",
+      "url": null,
+      "publisher": "Synthetic fixture",
+      "content_hash": null,
+      "original_or_derived": "original",
+      "derived_from_source_id": null,
+      "independence_group": "synthetic",
+      "published_at_utc": null,
+      "indexed_at_utc": null,
+      "acquired_at_utc": "2026-11-12T08:00:00Z",
+      "license_status": "approved",
+      "access_status": "metadata_only",
+      "title": "Synthetic ais",
+      "quote_span": null
+    },
+    {
+      "source_id": "source:synthetic:adsb",
+      "url": null,
+      "publisher": "Synthetic fixture",
+      "content_hash": null,
+      "original_or_derived": "original",
+      "derived_from_source_id": null,
+      "independence_group": "synthetic",
+      "published_at_utc": null,
+      "indexed_at_utc": null,
+      "acquired_at_utc": "2026-11-12T08:00:00Z",
+      "license_status": "approved",
+      "access_status": "metadata_only",
+      "title": "Synthetic adsb",
+      "quote_span": null
+    },
+    {
+      "source_id": "source:synthetic:event",
+      "url": null,
+      "publisher": "Synthetic fixture",
+      "content_hash": null,
+      "original_or_derived": "original",
+      "derived_from_source_id": null,
+      "independence_group": "synthetic",
+      "published_at_utc": null,
+      "indexed_at_utc": null,
+      "acquired_at_utc": "2026-11-12T08:00:00Z",
+      "license_status": "approved",
+      "access_status": "metadata_only",
+      "title": "Synthetic event",
+      "quote_span": null
+    },
+    {
+      "source_id": "source:synthetic:stac",
+      "url": null,
+      "publisher": "Synthetic fixture",
+      "content_hash": null,
+      "original_or_derived": "original",
+      "derived_from_source_id": null,
+      "independence_group": "synthetic",
+      "published_at_utc": null,
+      "indexed_at_utc": null,
+      "acquired_at_utc": "2026-11-12T08:00:00Z",
+      "license_status": "approved",
+      "access_status": "metadata_only",
+      "title": "Synthetic stac",
+      "quote_span": null
+    },
+    {
+      "source_id": "source:synthetic:camera",
+      "url": null,
+      "publisher": "Synthetic fixture",
+      "content_hash": null,
+      "original_or_derived": "original",
+      "derived_from_source_id": null,
+      "independence_group": "synthetic",
+      "published_at_utc": null,
+      "indexed_at_utc": null,
+      "acquired_at_utc": "2026-11-12T08:00:00Z",
+      "license_status": "approved",
+      "access_status": "metadata_only",
+      "title": "Synthetic camera",
+      "quote_span": null
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim:synthetic:01",
+      "statement": "Fixture only: simulated marine position used to test object selection.",
+      "language": "en",
+      "source_ids": [
+        "source:synthetic:ais"
+      ],
+      "status": "reported",
+      "event_from_utc": null,
+      "event_to_utc": null,
+      "limitations": [
+        "No real AIS feed"
+      ],
+      "review_state": "not_reviewed",
+      "quote_span": null
+    }
+  ],
+  "evidence_links": [
+    {
+      "evidence_link_id": "link:synthetic:01",
+      "claim_id": "claim:synthetic:01",
+      "source_id": "source:synthetic:ais",
+      "role": "MENTIONS",
+      "quote_span": null,
+      "status": "reported"
+    }
+  ],
+  "relations": [
+    {
+      "relation_id": "rel:synthetic:01",
+      "subject_id": "vessel:synthetic:v01",
+      "predicate": "RELATED_TO",
+      "object_id": "event:synthetic:e01",
+      "source_ids": [
+        "source:synthetic:event"
+      ],
+      "status": "unresolved",
+      "valid_from_utc": null,
+      "valid_to_utc": null,
+      "resolution_state": "proposed"
+    }
+  ],
+  "anomalies": [],
+  "module_runs": [
+    {
+      "module_run_id": "run:synthetic:01",
+      "case_id": "event:synthetic:e01",
+      "module": "nv2-maplizer",
+      "status": "not_executed",
+      "executor": "not_executed",
+      "started_at_utc": null,
+      "completed_at_utc": null,
+      "input_hash": null,
+      "result_hash": null,
+      "receipt": null
+    }
+  ]
+}

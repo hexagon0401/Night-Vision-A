@@ -5,10 +5,11 @@ export function nearbyQuery(url){
  const lat=Number(url.searchParams.get('lat')),lon=Number(url.searchParams.get('lon')),radius=Number(url.searchParams.get('radius')??25);
  requireValue(url.searchParams.has('lat')&&url.searchParams.has('lon')&&url.searchParams.get('lat')!==''&&url.searchParams.get('lon')!==''&&Number.isFinite(lat)&&Math.abs(lat)<=85&&Number.isFinite(lon)&&Math.abs(lon)<=179.5&&[10,25,50].includes(radius),'invalid_nearby_query');
  const type=url.searchParams.get('type')??'webcams';requireValue(['webcams','aircraft','vessels','satellite'].includes(type),'invalid_nearby_type');
- return {lat:Math.round(lat*100)/100,lon:Math.round(lon*100)/100,radius,type};
+ let bbox=null;if(url.searchParams.has('bbox')){const raw=url.searchParams.get('bbox').split(',');bbox=raw.map(Number);requireValue(raw.every(x=>x.trim()!=='')&&type==='vessels'&&bbox.length===4&&bbox.every(Number.isFinite)&&bbox[0]>=-180&&bbox[2]<=180&&bbox[1]>=-85&&bbox[3]<=85&&bbox[0]<bbox[2]&&bbox[1]<bbox[3]&&bbox[2]-bbox[0]<=1&&bbox[3]-bbox[1]<=1,'invalid_vessel_viewport');}
+ return {...(bbox?{bbox}:{}),lat:Math.round(lat*100)/100,lon:Math.round(lon*100)/100,radius,type};
 }
 export async function nearbyRoute(request,env,url){
- requireValue(request.method==='GET','method_not_allowed',405);const q=nearbyQuery(url),now=new Date().toISOString(),key='nearby:v1:'+q.type+':'+q.lat+':'+q.lon+':'+q.radius;
+ requireValue(request.method==='GET','method_not_allowed',405);const q=nearbyQuery(url),now=new Date().toISOString(),key='nearby:v1:'+q.type+':'+q.lat+':'+q.lon+':'+q.radius+(q.bbox?':'+q.bbox.join(','):'');
  const base={schema_version:'nearby_context.v1',query:q,queried_at:now,status:'empty',items:[],note:q.type==='webcams'&&q.radius>25?'웹캠은 중심에서 최대 25km만 조회합니다. 사건 증거가 아니며 수신 누락·지연이 있을 수 있습니다.':'조회한 주변 현황이며 사건 증거가 아닙니다. 수신 누락·지연이 있을 수 있습니다.'};
  if(q.type==='vessels'&&!env.AISSTREAM_API_KEY)return json({...base,status:'key_required',reason:'AISSTREAM_API_KEY'});
  if(q.type==='webcams'&&!env.WINDY_API_KEY)return json({...base,status:'key_required',reason:'WINDY_API_KEY'});
@@ -21,7 +22,7 @@ export async function nearbyRoute(request,env,url){
   const count=await stmt(env.DB,'SELECT COUNT(*) n FROM settings WHERE key LIKE ?','nearby:v1:%').first();if(count.n>=300&&!old){await stmt(env.DB,"DELETE FROM settings WHERE key IN (SELECT key FROM settings WHERE key LIKE 'nearby:v1:%' LIMIT 30)").run();}
   const quota=await stmt(env.DB,"INSERT INTO quotas VALUES(date('now'),?,1) ON CONFLICT(day,bucket) DO UPDATE SET count=count+1 WHERE count<200 RETURNING count",'nearby:'+q.type).first();if(!quota)return json({...base,status:'rate_limited',reason:'daily_provider_budget'});
   let body;
-  try{const items=await(q.type==='aircraft'?nearbyAircraft(q):q.type==='vessels'?nearbyShips(q,env):q.type==='satellite'?nearbyScenes(q):nearbyCameras(q,env));body={...base,queried_at:new Date().toISOString(),status:items.length?'ok':'empty',items};}
+  try{const items=await(q.type==='aircraft'?nearbyAircraft(q):q.type==='vessels'?nearbyShips(q,env):q.type==='satellite'?nearbyScenes(q):nearbyCameras(q,env));body={...base,queried_at:new Date().toISOString(),status:items.length?'ok':'empty',items,...(items.source_diagnostics?{source_diagnostics:items.source_diagnostics}:{})};}
   catch(e){body={...base,status:e.message==='rate_limited'?'rate_limited':'temporarily_failed',reason:/^(upstream_|stale_|invalid_)/.test(e.message)?e.message:'upstream_lookup_failed'};}
   const ttl=body.status==='ok'||body.status==='empty'?(q.type==='webcams'||q.type==='satellite'?3600000:30000):60000;
   await stmt(env.DB,'INSERT OR REPLACE INTO settings VALUES(?,?)',key,JSON.stringify({expires:Date.now()+ttl,body})).run();return json(body);
