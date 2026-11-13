@@ -19,6 +19,8 @@ export interface MapData {
   trace?: { paths: CandidateLink[]; progress: number; point: Point | null };
 }
 export interface MapPort {
+  traffic?(kind:string,items:NonNullable<MapData['nearby']>):void;
+  popup?(point:Point,content:HTMLElement,onClose:()=>void):{move(point:Point):void;close():void};
   center(): {lat:number; lon:number};
   bounds?(): [number,number,number,number];
   update(data: MapData): void;
@@ -137,6 +139,7 @@ export function createMap(
   let overlay:
     | {
         render(data: MapData): void;
+        traffic(items:NonNullable<MapData['nearby']>):void;
         pick(x: number, y: number): unknown;
         destroy(): void;
       }
@@ -233,11 +236,16 @@ export function createMap(
       if (!failure.tile) fallback(); // TileJSON/source failure; tile errors get a grace period.
     } else if (!detailed && failure.sourceId === "countries") callbacks.error();
   });
+  let trafficPopup:maplibregl.Popup|null=null;
+  const trafficLayers=new Map<string,NonNullable<MapData['nearby']>>();
+  const mergeTraffic=(items:NonNullable<MapData['nearby']>)=>[...items.filter(n=>!trafficLayers.has(n.kind)),...[...trafficLayers.values()].flat()];
   return {
+    traffic(kind,items){trafficLayers.set(kind,items);data.nearby=mergeTraffic(data.nearby??[]);if(overlay)overlay.traffic(data.nearby);else render();},
+    popup(point,content,onClose){trafficPopup?.remove();const popup=new maplibregl.Popup({anchor:'bottom',offset:14,maxWidth:'320px',className:'nv-traffic-popup',closeOnClick:false}).setLngLat(point).setDOMContent(content).addTo(map);trafficPopup=popup;popup.once('close',()=>{if(trafficPopup===popup)trafficPopup=null;onClose();});return {move:p=>popup.setLngLat(p),close:()=>popup.remove()};},
     center:()=>{const c=map.getCenter();return {lat:c.lat,lon:c.lng};},
     bounds:()=>{const b=map.getBounds();const south=Math.max(-85,b.getSouth()),north=Math.min(85,b.getNorth());if(b.getEast()-b.getWest()>=360)return [-180,south,180,north];const normalize=(n:number)=>((n+180)%360+360)%360-180;const west=normalize(b.getWest()),east=normalize(b.getEast());return west<=east?[west,south,east,north]:[-180,south,180,north];},
     update(value) {
-      data = value;
+      data = {...value,nearby:mergeTraffic(value.nearby??[])};
       render();
     },
     stop() {
@@ -263,6 +271,7 @@ export function createMap(
       destroyed = true;
       clearTimeout(deadline);
       overlay?.destroy();
+      trafficPopup?.remove();
       map.remove();
     },
   };

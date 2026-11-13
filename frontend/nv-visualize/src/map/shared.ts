@@ -41,6 +41,8 @@ export const sharedMap: typeof createMap = (container, callbacks) => {
   }
   const instance = map;
   return {
+    traffic:instance.traffic?(kind,items)=>instance.traffic!(kind,items):undefined,
+    popup:instance.popup?(p,c,close)=>instance.popup!(p,c,close):undefined,
     center: () => instance.center(),
     bounds: () => instance.bounds?.() ?? [-180,-85,180,85],
     update: (d) => instance.update(d),
