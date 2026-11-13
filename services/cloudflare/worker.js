@@ -54,6 +54,22 @@ export default {
           503,
         );
       await initialize(env.DB);
+      if(['/api/v2/adsb','/api/v2/adsb/admin/status','/api/v2/adsb/admin/config'].includes(url.pathname)){
+        const config=url.pathname.endsWith('/config');
+        requireValue(request.method===(config?'POST':'GET'),'method_not_allowed',405);
+        await requireUser(request,env);
+        requireValue(env.TRAFFIC_HUB,'traffic_hub_binding_required',503);
+        const target=new URL('https://traffic.internal'+(config?'/adsb-auto-config':url.pathname.endsWith('/status')?'/adsb-auto-status':'/adsb'));
+        let command;
+        if(config){sameOrigin(request);command=await body(request,4000);}
+        else if(url.pathname==='/api/v2/adsb'){
+          // Owner GETs which spend quota also require an explicit same-origin request.
+          if(url.searchParams.get('mode')!=='status')sameOrigin(request);
+          for(const key of ['mode','lat','lon','radius_nm','value'])if(url.searchParams.has(key))target.searchParams.set(key,url.searchParams.get(key));
+        }
+        const id=env.TRAFFIC_HUB.idFromName('public-world-v1');
+        return await env.TRAFFIC_HUB.get(id).fetch(new Request(target,{method:config?'POST':'GET',...(config?{headers:{'Content-Type':'application/json'},body:JSON.stringify(command)}:{})}));
+      }
       if(url.pathname.startsWith('/api/v2/ontology/')||url.pathname==='/api/v2/admin/ontology-sync')return await ontologyRoute(request,env,url);
       if(['/api/v2/engine/modules','/api/v2/engine/investigate'].includes(url.pathname))return await engineRoute(request,env,url);
       if(url.pathname==='/api/v2/nearby')return await nearbyRoute(request,env,url);
@@ -118,7 +134,7 @@ export default {
           github: !!(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
           ingest_key: !!env.NV_INGEST_TOKEN,
           ontology: await ontologyStatus(env),
-          provider_keys: {aisstream:!!env.AISSTREAM_API_KEY,windy:!!env.WINDY_API_KEY,mapillary:!!env.MAPILLARY_ACCESS_TOKEN,firecrawl:!!env.FIRECRAWL_API_KEY},
+          provider_keys: {adsb_lol:!!(env['ADSB_API-KEY']||env.ADSB_LOL_API_KEY),aisstream:!!env.AISSTREAM_API_KEY,windy:!!env.WINDY_API_KEY,mapillary:!!env.MAPILLARY_ACCESS_TOKEN,firecrawl:!!env.FIRECRAWL_API_KEY},
           evidence_extraction_enabled:env.NV_EVIDENCE_EXTRACTION_ENABLED==='true',
         });
       }
