@@ -40,7 +40,7 @@ export async function nearbyShips(q,env){
    const finish=()=>{clearTimeout(timer);resolve();};
    ws.addEventListener('close',()=>{clearTimeout(timer);reject(Error('upstream_websocket_closed'));},{once:true});ws.addEventListener('error',()=>{clearTimeout(timer);reject(Error('upstream_websocket_failed'));},{once:true});
    ws.addEventListener('message',event=>{
-    let data=event.data;if(data instanceof ArrayBuffer){if(data.byteLength>50000)return;try{data=new TextDecoder('utf-8',{fatal:true}).decode(data);}catch{return;}}
+    let data=event.data;if(Object.prototype.toString.call(data)==='[object ArrayBuffer]'){if(data.byteLength>50000)return;try{data=new TextDecoder('utf-8',{fatal:true}).decode(data);}catch{return;}}
     if(typeof data!=='string'||data.length>50000)return;total+=data.length;
     if(total>1000000||messages.length>=200){finish();return;}
     try{const m=JSON.parse(data);if(m.error||m.Error){clearTimeout(timer);reject(Error('upstream_subscription_rejected'));return;}messages.push(m);}catch{}
