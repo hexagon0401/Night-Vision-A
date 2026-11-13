@@ -454,3 +454,5 @@ try {
 await import('../../../tools/verify_ontology_runtime.mjs');
 
 await import('../../../tools/verify_traffic_hub.mjs');
+
+await import('../../../tools/verify_adsb_hub.mjs');
