@@ -9,7 +9,7 @@ export interface MapData {
   selectedObject?: string|null;
   evidenceFeatures?:import("geojson").Feature<import("geojson").Geometry>[];
   footprints?: {id:string;geometry:import("geojson").Polygon|import("geojson").MultiPolygon}[];
-  nearby?: {id:string; lat:number; lon:number; kind:string;selected?:boolean}[];
+  nearby?: {id:string; lat:number; lon:number; kind:string;selected?:boolean;ship_type?:number;aircraft_type?:string|null;heading_deg?:number|null;course_deg?:number|null}[];
   events?: { id: string; lat: number; lon: number; precision: number; color?: string; radius?: number }[];
   candidates: Candidate[];
   links: CandidateLink[];

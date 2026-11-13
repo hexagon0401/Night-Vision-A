@@ -452,3 +452,5 @@ try {
 
 // Exercise opt-in ontology gates against an isolated database and mocked APIs.
 await import('../../../tools/verify_ontology_runtime.mjs');
+
+await import('../../../tools/verify_traffic_hub.mjs');
