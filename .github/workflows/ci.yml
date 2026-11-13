@@ -36,6 +36,7 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/nv-visualize/package-lock.json
       - run: npm ci
+      - run: node --test ../../services/cloudflare/tests/*.test.mjs
       - run: npm test
       - run: npm run build
       - run: node scripts/worker-integration.mjs

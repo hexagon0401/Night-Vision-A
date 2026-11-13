@@ -1,3 +1,5 @@
+import {handleAdsbLolDO,adsbJson,adsbKey} from './adsb-lol.mjs';
+import {configureAdsbAutopilot,runAdsbAutopilot,readAdsbAutopilotSnapshot,nextAutopilotDue} from './adsb-autopilot.mjs';
 import {skyPolicy,skyNext,aisWindow} from './traffic-schedule.js';
 import {shipRegistration} from './maritime-mid.js';
 import {TrafficDelta} from './traffic-delta.js';
@@ -57,18 +59,52 @@ export class TrafficHub{
   })().catch(()=>{this.connection='disconnected';this.lastError='upstream_connection_failed';this.retryAt=Date.now()+30000;}).finally(()=>{this.connecting=null;});return this.connecting;
  }
  async aircraft(){
+  if(this.env.NV_AIRCRAFT_PROVIDER==='adsb_lol')return;
   if(this.airPending)return this.airPending;this.resetDay();const policy=skyPolicy(this.env,this.budget);if(Date.now()<skyNext(Date.now(),policy,this.budget))return;
   this.airPending=(async()=>{try{let headers={Accept:'application/json','User-Agent':'NightVision/3.2 (+https://nightvision.hexagon0401.workers.dev)'};this.airStage='configuration';if(this.env.OPENSKY_CLIENT_ID&&this.env.OPENSKY_CLIENT_SECRET){if(!this.token||Date.now()>=this.tokenUntil){this.airStage='oauth';const auth=await boundedJSON('https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded',Accept:'application/json','User-Agent':'NightVision/3.2 (+https://nightvision.hexagon0401.workers.dev)'},body:new URLSearchParams({grant_type:'client_credentials',client_id:this.env.OPENSKY_CLIENT_ID,client_secret:this.env.OPENSKY_CLIENT_SECRET}).toString()},30000,10000);if(typeof auth.access_token!=='string'||auth.access_token.length>10000)throw Error('upstream_invalid_oauth_response');this.token=auth.access_token;this.tokenUntil=Date.now()+Math.max(30,Math.min(3600,Number(auth.expires_in)||300)-30)*1000;}headers={...headers,Authorization:'Bearer '+this.token};}this.airStage='positions';this.budget.positionRequests=(this.budget.positionRequests??0)+1;if(this.budget.remainingCredits!==undefined)this.budget.remainingCredits=Math.max(0,this.budget.remainingCredits-4);this.budget.positionAt=Date.now();await this.state.storage.put('budget',this.budget);const d=await boundedJSON('https://opensky-network.org/api/states/all',{headers},6000000,15000,r=>{const raw=r.headers.get('X-Rate-Limit-Remaining');if(raw!==null&&Number.isFinite(Number(raw))){this.budget.remainingCredits=Math.max(0,Number(raw));if(this.env.OPENSKY_CLIENT_ID&&this.env.OPENSKY_CLIENT_SECRET)this.budget.confirmedCredits=Number(raw)>4000&&Number(raw)<=8000?8000:4000;}if(r.status===429){const raw=r.headers.get('X-Rate-Limit-Retry-After-Seconds')??r.headers.get('Retry-After');const seconds=Number(raw);this.budget.providerRetryAt=Date.now()+(Number.isFinite(seconds)&&seconds>0?seconds:3600)*1000;}});this.air=globalAircraft(d);this.airAt=Date.now();this.airError=null;this.airStage='ready';this.budget.failures=0;this.budget.failureRetryAt=0;await this.persistAir();}catch(error){this.airError=/^(upstream_|rate_limited|invalid_global_)/.test(error.message)?error.message:'upstream_aircraft_unavailable';this.airAt=Date.now();this.budget.failures=(this.budget.failures??0)+1;this.budget.failureRetryAt=Date.now()+Math.min(21600000,policy.interval_ms*2**Math.min(8,this.budget.failures));}finally{await this.state.storage.put('budget',this.budget);if(this.scheduledAir)await this.scheduleAir();}})().finally(()=>{this.airPending=null;});return this.airPending;
  }
  async persistAir(){const items=this.air??[];for(let at=0;at<items.length;at+=1000)await this.state.storage.put('air:'+at/1000,items.slice(at,at+1000));await this.state.storage.put('air:meta',{at:this.airAt,parts:Math.ceil(items.length/1000),scheduled:!!this.scheduledAir});}
  async scheduleAir(){return this.arm();}
- async arm(){const now=Date.now(),due=[];if(this.scheduledAir)due.push(Math.max(now+1000,skyNext(now,skyPolicy(this.env,this.budget),this.budget)));if(this.scheduledAis){const w=aisWindow(now);due.push(w.active?Math.min(now+30000,w.end):w.next_start);}if(due.length){const target=Math.max(now+1000,Math.min(...due)),existing=await this.state.storage.getAlarm();if(existing===null||existing<=now||target<existing)await this.state.storage.setAlarm(target);}}
+ // Serialize manual calls, configuration and alarm work across all storage/network awaits.
+ adsbWork(operation){const next=(this.adsbQueue??Promise.resolve()).catch(()=>{}).then(operation);this.adsbQueue=next.catch(()=>{});return next;}
+ async adsbStatus(){
+  const quota=await(await handleAdsbLolDO(new Request('https://traffic.internal/adsb?mode=status'),this)).json();
+  const config=await this.state.storage.get('adsb:auto')??{enabled:false,regions:[],focus:null};
+  const snapshot=await readAdsbAutopilotSnapshot(this);
+  return adsbJson({...quota,collection:snapshot.schedule,provider_selected:this.env.NV_AIRCRAFT_PROVIDER==='adsb_lol',secret_binding:adsbKey(this.env)?(this.env['ADSB_API-KEY']?'ADSB_API-KEY':'ADSB_LOL_API_KEY'):null,config,next_alarm_at:await this.state.storage.getAlarm(),next_collection_at:this.env.NV_AIRCRAFT_PROVIDER==='adsb_lol'&&this.env.ADSB_LOL_ENABLED==='true'?nextAutopilotDue(config):null});
+ }
+ async arm(){
+  const now=Date.now(),due=[],adsb=this.env.NV_AIRCRAFT_PROVIDER==='adsb_lol';
+  if(this.scheduledAir&&!adsb)due.push(Math.max(now+1000,skyNext(now,skyPolicy(this.env,this.budget),this.budget)));
+  if(adsb&&this.env.ADSB_LOL_ENABLED==='true'){const at=nextAutopilotDue(await this.state.storage.get('adsb:auto'),now);if(at!==null)due.push(at);}
+  if(this.scheduledAis){const w=aisWindow(now);due.push(w.active?Math.min(now+30000,w.end):w.next_start);}
+  if(due.length){const target=Math.max(now+1000,Math.min(...due)),existing=await this.state.storage.getAlarm();if(existing===null||existing<=now||target<existing)await this.state.storage.setAlarm(target);}
+  else await this.state.storage.deleteAlarm();
+ }
  async fetch(request){
-  const url=new URL(request.url),kind=url.searchParams.get('type');const format=(payload)=>{if(url.searchParams.get('format')!=='delta')return trafficJSON(payload);const tracker=this.deltas[kind];tracker.update(payload.items);const {items,...meta}=payload;return trafficJSON({...meta,...tracker.response(url.searchParams.get('cursor'))});};if(!['vessels','aircraft'].includes(kind))return Response.json({error:'invalid_traffic_type'},{status:400});
+  const url=new URL(request.url);
+  if(url.pathname==='/adsb')return this.adsbWork(()=>handleAdsbLolDO(request,this));
+  if(url.pathname==='/adsb-auto-status')return this.adsbWork(()=>this.adsbStatus());
+  if(url.pathname==='/adsb-auto-config')return this.adsbWork(async()=>{
+   if(request.method!=='POST')return adsbJson({error:'method_not_allowed'},405);
+   let command;try{command=await request.json();}catch{return adsbJson({error:'invalid_autopilot_command'},400);}
+   if(command.enabled&&(this.env.NV_AIRCRAFT_PROVIDER!=='adsb_lol'||this.env.ADSB_LOL_ENABLED!=='true'||!adsbKey(this.env)))return adsbJson({error:'runtime_configuration_required'},409);
+   try{await configureAdsbAutopilot(this,command);}catch(e){return adsbJson({error:/^(invalid_|watch_regions_required)/.test(e.message)?e.message:'invalid_autopilot_command'},400);}
+   await this.arm();return this.adsbStatus();
+  });
+  const kind=url.searchParams.get('type');const format=(payload)=>{if(url.searchParams.get('format')!=='delta')return trafficJSON(payload);const tracker=this.deltas[kind];tracker.update(payload.items);const {items,...meta}=payload;return trafficJSON({...meta,...tracker.response(url.searchParams.get('cursor'))});};if(!['vessels','aircraft'].includes(kind))return Response.json({error:'invalid_traffic_type'},{status:400});
   if(kind==='vessels'){if(!this.scheduledAis){this.scheduledAis=true;await this.state.storage.put('ais:enabled',true);}this.lastDemand=Date.now();await this.connect();await this.arm();const items=this.fleet.snapshot();return format({status:items.length?'ok':['key_required','daily_budget','scheduled_wait'].includes(this.connection)?this.connection:this.connection==='disconnected'?'temporarily_failed':'empty',items,queried_at:new Date().toISOString(),provider:'aisstream',schedule:{windows_per_day:24,seconds_per_window:75,next_window_at:new Date(aisWindow(Date.now()).next_start).toISOString(),window_active:aisWindow(Date.now()).active,source:'https://aisstream.io/documentation'},connection:this.connection,reason:this.lastError,source_diagnostics:{received_live_messages:this.fleet.messages,timed_positions:this.fleet.pending.size,classified_static_objects:this.fleet.static.size,accepted_objects:items.length,last_frame_at:this.lastFrame,coverage:'global_receiver_coverage_not_complete',collector:'shared_persistent_websocket',warmup:this.fleet.static.size===0},remaining_active_seconds:Math.max(0,Math.floor(1800-this.budget.seconds)),note:'전 세계 수신 범위의 최근 민간 선박 · 초기 선종 매칭 대기 · 수신되지 않은 선박은 표시하지 않음'});}
+  if(this.env.NV_AIRCRAFT_PROVIDER==='adsb_lol'){const snapshot=await readAdsbAutopilotSnapshot(this);snapshot.runtime_enabled=this.env.ADSB_LOL_ENABLED==='true';return format(snapshot);}
   if(!this.scheduledAir){this.scheduledAir=true;await this.state.storage.put('air:meta',{at:this.airAt,parts:Math.ceil((this.air??[]).length/1000),scheduled:true});}await this.aircraft();await this.scheduleAir();const items=(this.air??[]).filter(s=>Date.now()-Date.parse(s.observed_at)<120000);return format({status:this.airError?'temporarily_failed':items.length?'ok':'empty',items,provider:'opensky',schedule:{...skyPolicy(this.env,this.budget),used_requests:this.budget.positionRequests??0,remaining_credits:this.budget.remainingCredits??null,next_request_at:new Date(Math.max(Date.now(),skyNext(Date.now(),skyPolicy(this.env,this.budget),this.budget))).toISOString(),source:'https://openskynetwork.github.io/opensky-api/rest.html#api-credits'},upstream_stage:this.airStage??null,credential_status:{client_id:!!this.env.OPENSKY_CLIENT_ID,client_secret:!!this.env.OPENSKY_CLIENT_SECRET,authenticated:!!this.token&&Date.now()<this.tokenUntil},queried_at:new Date(this.airAt||Date.now()).toISOString(),reason:this.airError??null,connection:this.airError?'disconnected':'snapshot',note:'OpenSky 전 세계 공개 정기 항공 편명 · 일일 크레딧 균등 분산 · 수신 범위/누락 있음'});
  }
- async alarm(){await this.save();this.fleet.snapshot();if(this.scheduledAis){if(!aisWindow(Date.now()).active)this.stop('scheduled_wait');else await this.connect();}if(this.scheduledAir)await this.aircraft();await this.arm();}
+ async alarm(){
+  try{
+   await this.save();this.fleet.snapshot();
+   if(this.scheduledAis){if(!aisWindow(Date.now()).active)this.stop('scheduled_wait');else await this.connect();}
+   if(this.env.NV_AIRCRAFT_PROVIDER==='adsb_lol')await this.adsbWork(()=>runAdsbAutopilot(this));
+   else if(this.scheduledAir)await this.aircraft();
+  }finally{await this.arm();}
+ }
 
 }
 export async function trafficRoute(request,env,url){if(request.method!=='GET')return Response.json({error:'method_not_allowed'},{status:405});if(!env.TRAFFIC_HUB)return Response.json({status:'setup_required',items:[],reason:'traffic_hub_binding_required'},{status:503});const id=env.TRAFFIC_HUB.idFromName('public-world-v1');const target=new URL('https://traffic.internal/');for(const key of ['type','format','cursor'])if(url.searchParams.has(key))target.searchParams.set(key,url.searchParams.get(key));if(!target.searchParams.has('type'))target.searchParams.set('type','vessels');return env.TRAFFIC_HUB.get(id).fetch(target);}
