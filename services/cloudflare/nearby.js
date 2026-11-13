@@ -5,7 +5,7 @@ export function nearbyQuery(url){
  const lat=Number(url.searchParams.get('lat')),lon=Number(url.searchParams.get('lon')),radius=Number(url.searchParams.get('radius')??25);
  requireValue(url.searchParams.has('lat')&&url.searchParams.has('lon')&&url.searchParams.get('lat')!==''&&url.searchParams.get('lon')!==''&&Number.isFinite(lat)&&Math.abs(lat)<=85&&Number.isFinite(lon)&&Math.abs(lon)<=179.5&&[10,25,50].includes(radius),'invalid_nearby_query');
  const type=url.searchParams.get('type')??'webcams';requireValue(['webcams','aircraft','vessels','satellite'].includes(type),'invalid_nearby_type');
- let bbox=null;if(url.searchParams.has('bbox')){const raw=url.searchParams.get('bbox').split(',');bbox=raw.map(Number);requireValue(raw.every(x=>x.trim()!=='')&&type==='vessels'&&bbox.length===4&&bbox.every(Number.isFinite)&&bbox[0]>=-180&&bbox[2]<=180&&bbox[1]>=-85&&bbox[3]<=85&&bbox[0]<bbox[2]&&bbox[1]<bbox[3]&&bbox[2]-bbox[0]<=1&&bbox[3]-bbox[1]<=1,'invalid_vessel_viewport');}
+ let bbox=null;if(url.searchParams.has('bbox')){const raw=url.searchParams.get('bbox').split(',');bbox=raw.map(Number);requireValue(raw.every(x=>x.trim()!=='')&&type==='vessels'&&bbox.length===4&&bbox.every(Number.isFinite)&&bbox[0]>=-180&&bbox[2]<=180&&bbox[1]>=-85&&bbox[3]<=85&&bbox[0]<=180&&bbox[2]>=-180&&bbox[0]!==bbox[2]&&bbox[1]<bbox[3],'invalid_vessel_viewport');}
  return {...(bbox?{bbox}:{}),lat:Math.round(lat*100)/100,lon:Math.round(lon*100)/100,radius,type};
 }
 export async function nearbyRoute(request,env,url){

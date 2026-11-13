@@ -6,7 +6,8 @@ export function freshShips(items:Ship[],now=Date.now()){
  for(const s of items){const at=Date.parse(s.observed_at);if(!/^\d{9}$/.test(s.mmsi)||!Number.isFinite(at)||at>now+10000||now-at>=MAX_AGE||!Number.isFinite(s.lat)||!Number.isFinite(s.lon)||Math.abs(s.lat)>85||Math.abs(s.lon)>180)continue;if(!latest.has(s.mmsi)||Date.parse(latest.get(s.mmsi)!.observed_at)<at)latest.set(s.mmsi,s);}
  return [...latest.values()];
 }
-export function viewport(map:MapPort){const b=map.bounds?.();if(!b||!b.every(Number.isFinite)||b[2]<=b[0]||b[3]<=b[1]||b[2]-b[0]>1||b[3]-b[1]>1||b[0]<-180||b[2]>180||b[1]<-85||b[3]>85)return null;return b;}
+export function viewport(map:MapPort){const b=map.bounds?.();if(!b||!b.every(Number.isFinite)||b[2]<=b[0]||b[3]<=b[1])return null;const south=Math.max(-85,b[1]),north=Math.min(85,b[3]);if(south>=north)return null;if(b[2]-b[0]>=360)return [-180,south,180,north];const wrap=(n:number)=>((n+180)%360+360)%360-180;return [wrap(b[0]),south,wrap(b[2]),north];}
+const inBounds=(s:Ship,b:number[])=>s.lat>=b[1]&&s.lat<=b[3]&&(b[0]<=b[2]?s.lon>=b[0]&&s.lon<=b[2]:s.lon>=b[0]||s.lon<=b[2]);
 const text=(tag:string,value:string)=>{const e=document.createElement(tag);e.textContent=value;return e;};
 export function liveAis(host:HTMLElement,map:MapPort,state:HTMLElement,detail:HTMLElement,onShips:(ships:Ship[])=>void){
  let enabled=false,disposed=false,busy=false,version=0,ships:Ship[]=[],selected:string|null=null,lastSuccess:number|null=null,lastObserved:number|null=null,lastAttempt:number|null=null,lastError='',coverageNote='',abort=new AbortController(),pending:ReturnType<typeof setTimeout>|null=null;
@@ -24,12 +25,12 @@ export function liveAis(host:HTMLElement,map:MapPort,state:HTMLElement,detail:HT
  };
  async function load(){
   if(disposed||!enabled||document.hidden)return;
-  const bounds=viewport(map);if(!bounds){abort.abort();version++;busy=false;ships=[];lastError='선박을 보려면 지도 범위를 약 100km 이내로 확대하세요';render();return;}
+  const bounds=viewport(map);if(!bounds){abort.abort();version++;busy=false;ships=[];lastError='현재 지도 범위를 확인할 수 없습니다';render();return;}
   if(!navigator.onLine){lastError='네트워크 끊김';render();return;}if(busy)return;
   busy=true;const current=++version;abort=new AbortController();lastAttempt=Date.now();lastError='';render();
-  try{const q=new URLSearchParams({type:'vessels',lat:String((bounds[1]+bounds[3])/2),lon:String((bounds[0]+bounds[2])/2),radius:'50',bbox:bounds.join(',')});const r=await fetch('/api/v2/nearby?'+q,{signal:AbortSignal.any([abort.signal,AbortSignal.timeout(20000)]),cache:'no-store'});if(!r.ok)throw Error('선박 연결 끊김');const d=await r.json();if(disposed||!enabled||current!==version)return;
+  try{const q=new URLSearchParams({type:'vessels',lat:String((bounds[1]+bounds[3])/2),lon:String(Math.max(-179.5,Math.min(179.5,bounds[0]<=bounds[2]?(bounds[0]+bounds[2])/2:((bounds[0]+(bounds[2]+360-bounds[0])/2+180)%360)-180))),radius:'50',bbox:bounds.join(',')});const r=await fetch('/api/v2/nearby?'+q,{signal:AbortSignal.any([abort.signal,AbortSignal.timeout(20000)]),cache:'no-store'});if(!r.ok)throw Error('선박 연결 끊김');const d=await r.json();if(disposed||!enabled||current!==version)return;
    if(!['ok','empty'].includes(d.status))throw Error(d.status==='key_required'?'AIS 키 설정 확인':d.status==='rate_limited'?'조회 한도 · 자동 재시도 대기':d.status==='disabled'?'선박 공급원 비활성':'선박 연결 끊김');
-   if(!Array.isArray(d.items))throw Error('선박 응답 형식 오류');const merged=new Map(ships.map(s=>[s.mmsi,s]));for(const s of freshShips(d.items)){const old=merged.get(s.mmsi);if(!old||Date.parse(s.observed_at)>=Date.parse(old.observed_at))merged.set(s.mmsi,s);}ships=[...merged.values()].filter(s=>s.lon>=bounds[0]&&s.lon<=bounds[2]&&s.lat>=bounds[1]&&s.lat<=bounds[3]);lastSuccess=Date.now();lastError='';const diag=d.source_diagnostics;coverageNote=diag?.timed_positions>0&&diag?.accepted_objects===0?' · 위치 '+diag.timed_positions+'건 수신, 민간 선종 확인 대기':'';
+   if(!Array.isArray(d.items))throw Error('선박 응답 형식 오류');const merged=new Map(ships.map(s=>[s.mmsi,s]));for(const s of freshShips(d.items)){const old=merged.get(s.mmsi);if(!old||Date.parse(s.observed_at)>=Date.parse(old.observed_at))merged.set(s.mmsi,s);}ships=[...merged.values()].filter(s=>inBounds(s,bounds));lastSuccess=Date.now();lastError='';const diag=d.source_diagnostics;coverageNote=diag?.timed_positions>0&&diag?.accepted_objects===0?' · 위치 '+diag.timed_positions+'건 수신, 민간 선종 확인 대기':'';
   }catch(e){if(current===version&&(e as Error).name!=='AbortError')lastError=(e as Error).message;}finally{if(current===version){busy=false;render();}}
  }
  const move=()=>{if(!enabled)return;abort.abort();version++;busy=false;ships=[];lastObserved=null;render();if(pending)clearTimeout(pending);pending=setTimeout(()=>{pending=null;void load();},800);};
